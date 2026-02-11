@@ -62,6 +62,7 @@ jobs:
         run: npm ci
 
       # Build the project
+      # Note: postbuild script auto-decompresses LibreOffice WASM .gz files
       - name: Build with Next.js
         run: npm run build
         env:

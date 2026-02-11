@@ -1,8 +1,7 @@
 /**
  * RTF to PDF Processor
  * 
- * Converts RTF files to PDF documents.
- * Uses Pyodide via a Web Worker with PyMuPDF for rendering.
+ * Converts RTF documents to PDF using LibreOffice WASM.
  */
 
 import type {
@@ -13,83 +12,38 @@ import type {
 import { PDFErrorCode } from '@/types/pdf';
 import { BasePDFProcessor } from '../processor';
 
-/**
- * RTF to PDF options
- */
 export interface RTFToPDFOptions {
     /** Reserved for future options */
 }
 
-/**
- * RTF to PDF Processor
- * Converts RTF files to PDF using a Web Worker.
- */
-export class RTFToPDFProcessor extends BasePDFProcessor {
-    private worker: Worker | null = null;
-    private workerReady = false;
+let converterPromise: Promise<any> | null = null;
+let converterInstance: any = null;
 
-    /**
-     * Initialize the worker
-     */
-    private async initWorker(): Promise<void> {
-        if (this.worker) return;
+async function getConverter(onProgress?: (percent: number, message: string) => void): Promise<any> {
+    if (converterInstance?.isReady()) return converterInstance;
 
-        return new Promise((resolve, reject) => {
-            try {
-                this.worker = new Worker('/workers/rtf-to-pdf.worker.js', { type: 'module' });
+    if (converterPromise) {
+        await converterPromise;
+        return converterInstance;
+    }
 
-                const handleMessage = (event: MessageEvent) => {
-                    const { type, error, message } = event.data;
-
-                    if (type === 'init-complete') {
-                        this.workerReady = true;
-                        resolve();
-                    } else if (type === 'status') {
-                        this.updateProgress(0, message);
-                    } else if (type === 'error') {
-                        reject(new Error(error || 'Worker initialization failed'));
-                    }
-                };
-
-                this.worker.addEventListener('message', handleMessage);
-                this.worker.addEventListener('error', (err) => {
-                    reject(new Error('Worker connection failed'));
-                });
-
-                // Send init message
-                this.worker.postMessage({
-                    type: 'init',
-                    id: 'init-' + Date.now(),
-                    data: {}
-                });
-
-            } catch (err) {
-                reject(err);
-            }
+    converterPromise = (async () => {
+        const { getLibreOfficeConverter } = await import('@/lib/libreoffice');
+        converterInstance = getLibreOfficeConverter();
+        await converterInstance.initialize((progress: any) => {
+            onProgress?.(progress.percent, progress.message);
         });
-    }
+    })();
 
-    /**
-     * Terminate the worker
-     */
-    private terminateWorker() {
-        if (this.worker) {
-            this.worker.terminate();
-            this.worker = null;
-            this.workerReady = false;
-        }
-    }
+    await converterPromise;
+    return converterInstance;
+}
 
-    /**
-     * Reset processor state
-     */
+export class RTFToPDFProcessor extends BasePDFProcessor {
     protected reset(): void {
         super.reset();
     }
 
-    /**
-     * Process RTF and convert to PDF
-     */
     async process(
         input: ProcessInput,
         onProgress?: ProgressCallback
@@ -99,7 +53,6 @@ export class RTFToPDFProcessor extends BasePDFProcessor {
 
         const { files } = input;
 
-        // Validate we have exactly 1 RTF file
         if (files.length !== 1) {
             return this.createErrorOutput(
                 PDFErrorCode.INVALID_OPTIONS,
@@ -109,114 +62,42 @@ export class RTFToPDFProcessor extends BasePDFProcessor {
         }
 
         const file = files[0];
+        const ext = file.name.split('.').pop()?.toLowerCase() || '';
 
-        // Validate file type
-        const isRTF = file.name.toLowerCase().endsWith('.rtf') ||
-            file.type === 'application/rtf' ||
-            file.type === 'text/rtf';
-        if (!isRTF) {
+        if (ext !== 'rtf') {
             return this.createErrorOutput(
                 PDFErrorCode.FILE_TYPE_INVALID,
-                'Invalid file type. Please upload an RTF file.',
+                'Invalid file type. Please upload an .rtf file.',
                 `Received: ${file.type || file.name}`
             );
         }
 
         try {
-            this.updateProgress(10, 'Initializing converter...');
+            this.updateProgress(5, 'Loading conversion engine (first time may take 1-2 minutes)...');
 
-            try {
-                await this.initWorker();
-            } catch (err) {
-                console.error('Failed to initialize worker:', err);
-                return this.createErrorOutput(
-                    PDFErrorCode.WORKER_FAILED,
-                    'Failed to initialize conversion worker.',
-                    err instanceof Error ? err.message : String(err)
-                );
-            }
-
-            if (this.checkCancelled()) {
-                return this.createErrorOutput(
-                    PDFErrorCode.PROCESSING_CANCELLED,
-                    'Processing was cancelled.'
-                );
-            }
-
-            this.updateProgress(30, 'Converting RTF to PDF...');
-
-            // Process conversion via worker
-            const pdfBlob = await new Promise<Blob>((resolve, reject) => {
-                if (!this.worker) {
-                    reject(new Error('Worker not initialized'));
-                    return;
-                }
-
-                const msgId = 'convert-' + Date.now();
-
-                const handleMessage = (event: MessageEvent) => {
-                    const { type, id, result, error, message } = event.data;
-
-                    if (type === 'status') {
-                        this.updateProgress(this.progress, message);
-                        return;
-                    }
-
-                    if (id !== msgId) return;
-
-                    if (type === 'convert-complete') {
-                        cleanup();
-                        resolve(result);
-                    } else if (type === 'error') {
-                        cleanup();
-                        reject(new Error(error || 'Conversion failed'));
-                    }
-                };
-
-                const handleError = (error: ErrorEvent) => {
-                    cleanup();
-                    reject(new Error('Worker error: ' + error.message));
-                };
-
-                const cleanup = () => {
-                    this.worker?.removeEventListener('message', handleMessage);
-                    this.worker?.removeEventListener('error', handleError);
-                };
-
-                this.worker.addEventListener('message', handleMessage);
-                this.worker.addEventListener('error', handleError);
-
-                this.worker.postMessage({
-                    type: 'convert',
-                    id: msgId,
-                    data: {
-                        file: file
-                    }
-                });
+            const converter = await getConverter((percent, message) => {
+                this.updateProgress(Math.min(percent * 0.8, 80), message);
             });
 
             if (this.checkCancelled()) {
-                return this.createErrorOutput(
-                    PDFErrorCode.PROCESSING_CANCELLED,
-                    'Processing was cancelled.'
-                );
+                return this.createErrorOutput(PDFErrorCode.PROCESSING_CANCELLED, 'Processing was cancelled.');
+            }
+
+            this.updateProgress(85, 'Converting RTF to PDF...');
+
+            const pdfBlob = await converter.convertToPdf(file);
+
+            if (this.checkCancelled()) {
+                return this.createErrorOutput(PDFErrorCode.PROCESSING_CANCELLED, 'Processing was cancelled.');
             }
 
             this.updateProgress(100, 'Conversion complete!');
 
             const baseName = file.name.replace(/\.rtf$/i, '');
-            const outputName = `${baseName}.pdf`;
-
-            return this.createSuccessOutput(
-                pdfBlob,
-                outputName,
-                { format: 'pdf' }
-            );
+            return this.createSuccessOutput(pdfBlob, `${baseName}.pdf`, { format: 'pdf' });
 
         } catch (error) {
             console.error('Conversion error:', error);
-            this.terminateWorker();
-
             return this.createErrorOutput(
                 PDFErrorCode.PROCESSING_FAILED,
                 'Failed to convert RTF to PDF.',
@@ -226,27 +107,15 @@ export class RTFToPDFProcessor extends BasePDFProcessor {
     }
 }
 
-/**
- * Create a new instance of the RTF to PDF processor
- */
 export function createRTFToPDFProcessor(): RTFToPDFProcessor {
     return new RTFToPDFProcessor();
 }
 
-/**
- * Convert RTF to PDF (convenience function)
- */
 export async function rtfToPDF(
     file: File,
     options?: Partial<RTFToPDFOptions>,
     onProgress?: ProgressCallback
 ): Promise<ProcessOutput> {
     const processor = createRTFToPDFProcessor();
-    return processor.process(
-        {
-            files: [file],
-            options: options || {},
-        },
-        onProgress
-    );
+    return processor.process({ files: [file], options: options || {} }, onProgress);
 }

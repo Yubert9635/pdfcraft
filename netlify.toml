@@ -2,7 +2,7 @@
 # Static export deployment
 
 [build]
-  # Build command
+  # Build command - postbuild script in package.json auto-decompresses WASM .gz files
   command = "npm run build"
   # Output directory (Next.js static export)
   publish = "out"
@@ -30,6 +30,10 @@
     X-XSS-Protection = "1; mode=block"
     Referrer-Policy = "strict-origin-when-cross-origin"
     Permissions-Policy = "camera=(), microphone=(), geolocation=()"
+    # Required for SharedArrayBuffer (LibreOffice WASM)
+    Cross-Origin-Opener-Policy = "same-origin"
+    Cross-Origin-Embedder-Policy = "require-corp"
+    Cross-Origin-Resource-Policy = "cross-origin"
 
 [[headers]]
   # JavaScript files - long cache
