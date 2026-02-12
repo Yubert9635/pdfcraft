@@ -2,6 +2,7 @@
  * Excel to PDF Processor
  * 
  * Converts Excel spreadsheets to PDF using LibreOffice WASM.
+ * Uses the shared LibreOfficeConverter singleton (same approach as BentoPDF).
  */
 
 import type {
@@ -11,33 +12,10 @@ import type {
 } from '@/types/pdf';
 import { PDFErrorCode } from '@/types/pdf';
 import { BasePDFProcessor } from '../processor';
+import { getLibreOfficeConverter } from '@/lib/libreoffice';
 
 export interface ExcelToPDFOptions {
     /** Reserved for future options */
-}
-
-// Lazy-loaded converter singleton
-let converterPromise: Promise<any> | null = null;
-let converterInstance: any = null;
-
-async function getConverter(onProgress?: (percent: number, message: string) => void): Promise<any> {
-    if (converterInstance?.isReady()) return converterInstance;
-
-    if (converterPromise) {
-        await converterPromise;
-        return converterInstance;
-    }
-
-    converterPromise = (async () => {
-        const { getLibreOfficeConverter } = await import('@/lib/libreoffice');
-        converterInstance = getLibreOfficeConverter();
-        await converterInstance.initialize((progress: any) => {
-            onProgress?.(progress.percent, progress.message);
-        });
-    })();
-
-    await converterPromise;
-    return converterInstance;
 }
 
 export class ExcelToPDFProcessor extends BasePDFProcessor {
@@ -77,8 +55,10 @@ export class ExcelToPDFProcessor extends BasePDFProcessor {
         try {
             this.updateProgress(5, 'Loading conversion engine (first time may take 1-2 minutes)...');
 
-            const converter = await getConverter((percent, message) => {
-                this.updateProgress(Math.min(percent * 0.8, 80), message);
+            const converter = getLibreOfficeConverter();
+
+            await converter.initialize((progress) => {
+                this.updateProgress(Math.min(progress.percent * 0.8, 80), progress.message);
             });
 
             if (this.checkCancelled()) {

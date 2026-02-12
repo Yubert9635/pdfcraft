@@ -26,6 +26,7 @@ import { logger } from '@/lib/utils/logger';
 import { WorkflowNode, WorkflowEdge, ToolNodeData, WorkflowExecutionState, SavedWorkflow, WorkflowTemplate, WorkflowOutputFile } from '@/types/workflow';
 import { validateWorkflow, validateConnection, topologicalSort, findInputNodes } from '@/lib/workflow/engine';
 import { executeNode, collectInputFiles } from '@/lib/workflow/executor';
+import { buildNodeOutputsFromResult, deriveWorkflowFailureContext } from '@/lib/workflow/execution-utils';
 import { saveWorkflow, getSavedWorkflows, deleteWorkflow, duplicateWorkflow, exportWorkflow, importWorkflow } from '@/lib/workflow/storage';
 import { createExecutionRecord, addExecutionRecord, completeExecutionRecord } from '@/lib/workflow/history';
 import type { WorkflowExecutionRecord } from '@/types/workflow-history';
@@ -370,6 +371,9 @@ function WorkflowEditorContent() {
             })));
         });
 
+        const localExecutedNodes: string[] = [];
+        let currentExecutingNodeId: string | null = null;
+
         try {
             // Find input nodes and assign files to them
             const inputNodes = findInputNodes(nodes as WorkflowNode[], edges as WorkflowEdge[]);
@@ -398,9 +402,6 @@ function WorkflowEditorContent() {
             // Store outputs for each node
             const nodeOutputs = new Map<string, (Blob | WorkflowOutputFile)[]>();
 
-            // Track executed nodes locally to avoid stale closure issues
-            const localExecutedNodes: string[] = [];
-
             // Execute each node in order
             for (let i = 0; i < executionOrder.length; i++) {
                 // Check if execution was aborted
@@ -410,6 +411,7 @@ function WorkflowEditorContent() {
                 }
 
                 const nodeId = executionOrder[i];
+                currentExecutingNodeId = nodeId;
                 // Get fresh node state by reading from the latest nodes
                 // Use a Promise to ensure the state updater runs before we continue
                 const currentNode = await new Promise<WorkflowNode | undefined>((resolve) => {
@@ -545,58 +547,13 @@ function WorkflowEditorContent() {
                     throw error;
                 }
 
-                // Store output for downstream nodes with proper filename metadata
-                let outputs: (Blob | WorkflowOutputFile)[] = [];
-
-                if (result.result) {
-                    if (Array.isArray(result.result)) {
-                        // Handle array results - ensure each has proper metadata
-                        const resultArray = result.result;
-                        outputs = resultArray.map((item, index) => {
-                            if (item instanceof Blob) {
-                                // Plain Blob - wrap with metadata
-                                const baseFilename = result.filename || `${currentNode!.data.label}_output`;
-                                const filename = resultArray.length > 1 
-                                    ? `${baseFilename}_${index + 1}.pdf`
-                                    : `${baseFilename}.pdf`;
-                                return {
-                                    blob: item,
-                                    filename: filename
-                                };
-                            }
-                            // Already a WorkflowOutputFile
-                            return item as WorkflowOutputFile;
-                        });
-                    } else {
-                        // Single result
-                        if (result.filename) {
-                            outputs = [{
-                                blob: result.result,
-                                filename: result.filename
-                            }];
-                        } else {
-                            // Generate default filename from node label
-                            const filename = `${currentNode.data.label.replace(/\s+/g, '_')}_output.pdf`;
-                            outputs = [{
-                                blob: result.result,
-                                filename: filename
-                            }];
-                        }
-                    }
-                } else {
+                if (!result.result) {
                     // Processor returned success but no result blob (e.g. extract-images, extract-attachments)
                     // Pass through input files so downstream nodes can still process
                     logger.warn(`[Workflow] Node "${currentNode.data.label}" produced no output blob, passing through input files`);
-                    outputs = filesToProcess.map((f, idx) => {
-                        if (f instanceof File) {
-                            return { blob: f, filename: f.name };
-                        }
-                        if ('blob' in f && (f as WorkflowOutputFile).blob) {
-                            return f as WorkflowOutputFile;
-                        }
-                        return { blob: f as Blob, filename: `passthrough_${idx + 1}.pdf` };
-                    });
                 }
+
+                const outputs = buildNodeOutputsFromResult(result, currentNode.data.label, filesToProcess);
 
                 nodeOutputs.set(nodeId, outputs);
                 localExecutedNodes.push(nodeId);
@@ -674,21 +631,13 @@ function WorkflowEditorContent() {
 
         } catch (error) {
             logger.error('[Workflow Execution] Workflow execution failed:', error);
-            
-            // Extract detailed error information
-            const errorMessage = error instanceof Error ? error.message : 'Unknown error occurred';
-            const isCancelled = errorMessage.includes('cancelled by user');
-            
-            // Get current execution state for failed node info
-            let failedNodeId = '';
-            let successfulCount = 0;
-            setExecutionState(prev => {
-                failedNodeId = (error as Error & { nodeId?: string })?.nodeId || prev.currentNodeId || '';
-                successfulCount = prev.executedNodes.length;
-                return prev;
-            });
-            
-            const errorCode = (error as Error & { code?: string })?.code;
+
+            const {
+                failedNodeId,
+                successfulCount,
+                errorMessage,
+                isCancelled,
+            } = deriveWorkflowFailureContext(error, currentExecutingNodeId, localExecutedNodes);
             
             // Find the failed node name for better error reporting
             const failedNode = nodes.find(n => n.id === failedNodeId);

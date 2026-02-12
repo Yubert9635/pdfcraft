@@ -1,31 +1,29 @@
 /**
  * LibreOffice WASM Converter
  * 
- * Uses @matbee/libreoffice-converter for document conversion.
+ * Uses @matbee/libreoffice-converter WorkerBrowserConverter for document conversion.
  * 
- * Key customizations:
- * 1. Overrides loadModule() to increase timeout from 60s to 5 minutes
- *    (soffice.wasm ~48MB + soffice.data ~28MB compressed need time to download)
- * 2. Adds data-cfasync="false" to script tag to bypass Cloudflare Rocket Loader
- *    which intercepts/defers JS and breaks WASM initialization
- * 3. Injects CJK fonts into WASM virtual filesystem for Chinese support
+ * Key design decisions:
+ * 1. Uses WorkerBrowserConverter instead of BrowserConverter — runs WASM in a
+ *    dedicated Web Worker, avoiding main-thread blocking and eliminating the need
+ *    for fragile loadModule patches / Cloudflare Rocket Loader workarounds
+ * 2. Uses uncompressed paths (soffice.wasm / soffice.data) — works natively with
+ *    all servers (Next.js dev, Vercel, Netlify, etc.). For Nginx production,
+ *    gzip_static automatically serves the .gz version when available.
+ * 3. Specifies browserWorkerJs for the library's internal worker communication
+ * 4. Checks SharedArrayBuffer support upfront — fails fast with a clear error
+ * 
+ * Reference: bentopdf project uses the same approach successfully.
+ * 
+ * Note: CJK font injection is not supported with WorkerBrowserConverter because
+ * the WASM filesystem lives inside the Worker and is not directly accessible.
+ * To support CJK, fonts must be pre-baked into soffice.data or provided via
+ * a custom worker that writes to the FS before LOK initialization.
  */
 
-import { BrowserConverter } from '@matbee/libreoffice-converter/browser';
+import { WorkerBrowserConverter } from '@matbee/libreoffice-converter/browser';
 
 const LIBREOFFICE_PATH = '/libreoffice-wasm/';
-
-/** Timeout for WASM loading: 5 minutes (soffice.wasm + soffice.data are ~77MB compressed) */
-const WASM_LOAD_TIMEOUT_MS = 5 * 60 * 1000;
-
-/**
- * CJK font files to inject into LibreOffice WASM virtual filesystem.
- * These are fetched from /fonts/ and written to /instdir/share/fonts/truetype/
- * so LibreOffice can render CJK characters correctly.
- */
-const CJK_FONTS = [
-    { url: '/fonts/NotoSansSC-Regular.ttf', filename: 'NotoSansSC-Regular.ttf' },
-];
 
 export interface LoadProgress {
     phase: 'loading' | 'initializing' | 'converting' | 'complete' | 'ready';
@@ -35,14 +33,14 @@ export interface LoadProgress {
 
 export type ProgressCallback = (progress: LoadProgress) => void;
 
+// Singleton for converter instance
 let converterInstance: LibreOfficeConverter | null = null;
 
 export class LibreOfficeConverter {
-    private converter: BrowserConverter | null = null;
+    private converter: WorkerBrowserConverter | null = null;
     private initialized = false;
     private initializing = false;
     private basePath: string;
-    private fontsInstalled = false;
 
     constructor(basePath?: string) {
         this.basePath = basePath || LIBREOFFICE_PATH;
@@ -62,42 +60,67 @@ export class LibreOfficeConverter {
         let progressCallback = onProgress;
 
         try {
-            progressCallback?.({ phase: 'loading', percent: 0, message: 'Loading conversion engine...' });
+            progressCallback?.({ phase: 'loading', percent: 0, message: 'Checking environment...' });
 
-            this.converter = new BrowserConverter({
-                sofficeJs: `${this.basePath}soffice.js`,
-                sofficeWasm: `${this.basePath}soffice.wasm`,
-                sofficeData: `${this.basePath}soffice.data`,
-                sofficeWorkerJs: `${this.basePath}soffice.worker.js`,
+            // Fail fast if SharedArrayBuffer / COOP+COEP is missing
+            await this.checkEnvironment();
+
+            progressCallback?.({ phase: 'loading', percent: 5, message: 'Loading conversion engine...' });
+
+            // Pre-fetch the Worker script and create a Blob URL.
+            // This works around issues where the dev server (Turbopack) or static
+            // hosting prevents the Worker constructor from loading the script
+            // directly via its URL (e.g., wrong MIME type, transformation, or
+            // cross-origin isolation enforcement on sub-resources).
+            const workerBlobUrl = await this.createWorkerBlobUrl();
+
+            // Use full URLs (with origin) for all WASM paths.
+            // Because the Worker runs from a blob: URL, absolute paths like
+            // "/libreoffice-wasm/soffice.js" cannot be resolved correctly by
+            // importScripts — the blob: URL scheme has no HTTP origin to resolve
+            // against. Full URLs (e.g., "http://localhost:3000/...") work everywhere.
+            const origin = typeof window !== 'undefined' ? window.location.origin : '';
+
+            this.converter = new WorkerBrowserConverter({
+                sofficeJs: `${origin}${this.basePath}soffice.js`,
+                sofficeWasm: `${origin}${this.basePath}soffice.wasm`,
+                sofficeData: `${origin}${this.basePath}soffice.data`,
+                sofficeWorkerJs: `${origin}${this.basePath}soffice.worker.js`,
+                browserWorkerJs: workerBlobUrl,
                 verbose: false,
                 onProgress: (info: { phase: string; percent: number; message: string }) => {
                     if (progressCallback && !this.initialized) {
+                        const simplifiedMessage = `Loading conversion engine (${Math.round(info.percent)}%)...`;
                         progressCallback({
                             phase: info.phase as LoadProgress['phase'],
-                            percent: Math.min(info.percent, 90),
-                            message: `Loading conversion engine (${Math.round(info.percent)}%)...`
+                            percent: info.percent,
+                            message: simplifiedMessage
                         });
                     }
                 },
                 onReady: () => {
-                    console.log('[LibreOffice] WASM ready');
+                    console.log('[LibreOffice] Ready!');
                 },
                 onError: (error: Error) => {
                     console.error('[LibreOffice] Error:', error);
                 },
             });
 
-            // Override loadModule to increase timeout and bypass Cloudflare Rocket Loader
-            this.patchLoadModule(this.converter);
-
+            console.log('[LibreOffice] Starting initialization via WorkerBrowserConverter...');
+            const initStart = performance.now();
             await this.converter.initialize();
-
-            // Install CJK fonts into the WASM virtual filesystem
-            progressCallback?.({ phase: 'initializing', percent: 92, message: 'Installing CJK fonts...' });
-            await this.installCJKFonts();
+            const initDuration = Math.round(performance.now() - initStart);
+            console.log(`[LibreOffice] Initialization completed in ${initDuration}ms`);
 
             this.initialized = true;
+
+            // Clean up Blob URL after successful initialization
+            URL.revokeObjectURL(workerBlobUrl);
+
+            // Signal completion
             progressCallback?.({ phase: 'ready', percent: 100, message: 'Conversion engine ready!' });
+
+            // Null out the callback to prevent any late-firing progress updates
             progressCallback = undefined;
         } finally {
             this.initializing = false;
@@ -105,104 +128,102 @@ export class LibreOfficeConverter {
     }
 
     /**
-     * Monkey-patch BrowserConverter.loadModule() to:
-     * 1. Increase timeout from 60s to 5 minutes
-     * 2. Add data-cfasync="false" to bypass Cloudflare Rocket Loader
+     * Pre-fetch the Worker script and return a Blob URL.
+     *
+     * Why: The `new Worker(url)` call in WorkerBrowserConverter can fail in
+     * certain environments (Next.js Turbopack dev server, some static hosts)
+     * because the response lacks required headers, has wrong MIME type, or
+     * the bundler transforms the Worker URL. By fetching the script ourselves
+     * (which the environment check already proved works) and converting it to
+     * a same-origin Blob URL, we guarantee the Worker can load the script.
      */
-    private patchLoadModule(converter: BrowserConverter): void {
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const instance = converter as any;
-        const options = instance.options;
+    private async createWorkerBlobUrl(): Promise<string> {
+        const workerScriptUrl = `${this.basePath}browser.worker.global.js`;
+        console.log(`[LibreOffice] Pre-fetching Worker script: ${workerScriptUrl}`);
 
-        instance.loadModule = () => {
-            const { sofficeJs, sofficeWasm, sofficeData, sofficeWorkerJs } = options;
-            const w = window as any;
+        const response = await fetch(workerScriptUrl);
+        if (!response.ok) {
+            throw new Error(
+                `Failed to fetch Worker script: HTTP ${response.status} ${response.statusText}`
+            );
+        }
 
-            return new Promise((resolve, reject) => {
-                w.Module = {
-                    locateFile: (path: string) => {
-                        if (path.endsWith('.wasm')) return sofficeWasm;
-                        if (path.endsWith('.data')) return sofficeData;
-                        if (path.endsWith('.worker.js') || path.endsWith('.worker.cjs')) return sofficeWorkerJs;
-                        return `${sofficeJs.substring(0, sofficeJs.lastIndexOf('/') + 1)}${path}`;
-                    },
-                    print: options.verbose ? console.log : () => { },
-                    printErr: options.verbose ? console.error : () => { },
-                    onRuntimeInitialized: () => {
-                        console.log('[LibreOffice] WASM runtime initialized');
-                        resolve(w.Module);
-                    },
-                    onAbort: (reason: string) => {
-                        reject(new Error(`WASM abort: ${reason}`));
-                    },
-                };
-
-                const script = document.createElement('script');
-                script.src = sofficeJs;
-
-                // Bypass Cloudflare Rocket Loader - prevents it from deferring this script
-                script.setAttribute('data-cfasync', 'false');
-
-                script.onerror = () => reject(new Error(`Failed to load ${sofficeJs}`));
-                document.head.appendChild(script);
-
-                // Extended timeout: 5 minutes instead of default 60 seconds
-                setTimeout(() => {
-                    reject(new Error('WASM load timeout (5 min)'));
-                }, WASM_LOAD_TIMEOUT_MS);
-            });
-        };
+        const scriptText = await response.text();
+        const blob = new Blob([scriptText], { type: 'application/javascript' });
+        const blobUrl = URL.createObjectURL(blob);
+        console.log(`[LibreOffice] Worker Blob URL created (${scriptText.length} bytes)`);
+        return blobUrl;
     }
 
     /**
-     * Install CJK fonts into LibreOffice WASM virtual filesystem.
-     * This is necessary because the default soffice.data doesn't include
-     * CJK fonts, causing Chinese/Japanese/Korean characters to render
-     * as garbled text or empty boxes in converted documents.
+     * Diagnose environment issues — fail fast if SharedArrayBuffer is not available.
+     * SharedArrayBuffer requires Cross-Origin Isolation (COOP + COEP headers).
      */
-    private async installCJKFonts(): Promise<void> {
-        if (this.fontsInstalled) return;
+    private async checkEnvironment(): Promise<void> {
+        console.warn('[LibreOffice] === Environment Check ===');
 
-        // Access the Emscripten module's virtual filesystem
-        // eslint-disable-next-line @typescript-eslint/no-explicit-any
-        const module = (this.converter as any)?.module;
-        if (!module?.FS) {
-            console.warn('[LibreOffice] Cannot access WASM FS, CJK fonts not installed');
-            return;
+        // 1. Check COOP/COEP — this is the #1 cause of WASM timeout
+        const isIsolated = window.crossOriginIsolated;
+        console.warn(`[LibreOffice] Cross-Origin Isolated: ${isIsolated ? 'YES ✅' : 'NO ❌'}`);
+
+        // 2. Check SharedArrayBuffer directly
+        const hasSAB = typeof SharedArrayBuffer !== 'undefined';
+        console.warn(`[LibreOffice] SharedArrayBuffer: ${hasSAB ? 'Available ✅' : 'NOT available ❌'}`);
+
+        if (!isIsolated || !hasSAB) {
+            const errorMsg = [
+                'LibreOffice WASM requires SharedArrayBuffer for multi-threading.',
+                '',
+                'SharedArrayBuffer is only available in Cross-Origin Isolated contexts.',
+                'Your server MUST return these headers on ALL responses:',
+                '  Cross-Origin-Opener-Policy: same-origin',
+                '  Cross-Origin-Embedder-Policy: require-corp',
+                '  Cross-Origin-Resource-Policy: cross-origin',
+                '',
+                `Current state: crossOriginIsolated=${isIsolated}, SharedArrayBuffer=${hasSAB}`,
+            ].join('\n');
+            console.error(`[LibreOffice] ${errorMsg}`);
+            throw new Error(
+                `SharedArrayBuffer is not available (crossOriginIsolated=${isIsolated}). ` +
+                'Your server must set Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers. ' +
+                'See browser console for details.'
+            );
         }
 
-        const FS = module.FS;
-
-        // Ensure the font directories exist
-        const fontDirs = [
-            '/instdir/share/fonts',
-            '/instdir/share/fonts/truetype',
+        // 3. Check file connectivity
+        const files = [
+            'soffice.wasm',
+            'soffice.data',
+            'soffice.js',
+            'soffice.worker.js',
+            'browser.worker.global.js',
         ];
-        for (const dir of fontDirs) {
-            try { FS.mkdir(dir); } catch { /* directory may already exist */ }
-        }
-
-        // Fetch and install each CJK font
-        for (const font of CJK_FONTS) {
+        for (const file of files) {
+            const url = `${this.basePath}${file}`;
             try {
-                console.log(`[LibreOffice] Downloading CJK font: ${font.filename}...`);
-                const response = await fetch(font.url);
-                if (!response.ok) {
-                    console.warn(`[LibreOffice] Failed to fetch font ${font.url}: ${response.status}`);
-                    continue;
-                }
-                const fontBuffer = await response.arrayBuffer();
-                const fontData = new Uint8Array(fontBuffer);
+                const start = performance.now();
+                const res = await fetch(url, { method: 'HEAD' });
+                const duration = Math.round(performance.now() - start);
 
-                const fontPath = `/instdir/share/fonts/truetype/${font.filename}`;
-                FS.writeFile(fontPath, fontData);
-                console.log(`[LibreOffice] Installed CJK font: ${fontPath} (${(fontData.length / 1024 / 1024).toFixed(1)}MB)`);
-            } catch (err) {
-                console.warn(`[LibreOffice] Failed to install font ${font.filename}:`, err);
+                if (res.ok) {
+                    const size = res.headers.get('content-length');
+                    const type = res.headers.get('content-type');
+                    const sizeMb = size ? (parseInt(size) / 1024 / 1024).toFixed(2) + 'MB' : 'unknown size';
+                    console.warn(
+                        `[LibreOffice] ${file}: OK (${res.status}) ${duration}ms | ${sizeMb} | type=${type}`
+                    );
+                } else {
+                    console.error(`[LibreOffice] ${file}: FAILED (${res.status} ${res.statusText})`);
+                    throw new Error(`Required file ${file} returned HTTP ${res.status}`);
+                }
+            } catch (e) {
+                if (e instanceof Error && e.message.startsWith('Required file')) throw e;
+                console.error(`[LibreOffice] ${file}: NETWORK ERROR`, e);
+                throw new Error(`Cannot fetch ${file}: ${e}`);
             }
         }
 
-        this.fontsInstalled = true;
+        console.warn('[LibreOffice] === Environment Check Passed ✅ ===');
     }
 
     isReady(): boolean {
@@ -214,21 +235,48 @@ export class LibreOfficeConverter {
             throw new Error('Converter not initialized');
         }
 
-        const arrayBuffer = await file.arrayBuffer();
-        const uint8Array = new Uint8Array(arrayBuffer);
-        const ext = file.name.split('.').pop()?.toLowerCase() || '';
+        console.log(`[LibreOffice] Converting ${file.name} to ${outputFormat}...`);
+        console.log(`[LibreOffice] File type: ${file.type}, Size: ${file.size} bytes`);
 
-        const result = await this.converter.convert(uint8Array, {
-            outputFormat: outputFormat as any,
-            inputFormat: ext as any,
-        }, file.name);
+        try {
+            const arrayBuffer = await file.arrayBuffer();
+            const uint8Array = new Uint8Array(arrayBuffer);
+            const ext = file.name.split('.').pop()?.toLowerCase() || '';
 
-        const data = new Uint8Array(result.data);
-        return new Blob([data], { type: result.mimeType });
+            console.log(`[LibreOffice] Detected format from extension: ${ext}`);
+
+            const startTime = Date.now();
+            const result = await this.converter.convert(uint8Array, {
+                outputFormat: outputFormat as any,
+                inputFormat: ext as any,
+            }, file.name);
+
+            const duration = Date.now() - startTime;
+            console.log(`[LibreOffice] Conversion complete! Duration: ${duration}ms, Size: ${result.data.length} bytes`);
+
+            // Create a copy to avoid SharedArrayBuffer type issues
+            const data = new Uint8Array(result.data);
+            return new Blob([data], { type: result.mimeType });
+        } catch (error) {
+            console.error(`[LibreOffice] Conversion FAILED for ${file.name}:`, error);
+            throw error;
+        }
     }
 
     async convertToPdf(file: File): Promise<Blob> {
         return this.convert(file, 'pdf');
+    }
+
+    async wordToPdf(file: File): Promise<Blob> {
+        return this.convertToPdf(file);
+    }
+
+    async pptToPdf(file: File): Promise<Blob> {
+        return this.convertToPdf(file);
+    }
+
+    async excelToPdf(file: File): Promise<Blob> {
+        return this.convertToPdf(file);
     }
 
     async destroy(): Promise<void> {
