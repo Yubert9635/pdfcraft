@@ -69,6 +69,4 @@ comparisons.txt
 public/libreoffice-wasm/soffice.wasm
 public/libreoffice-wasm/soffice.data
 
-# CJK fonts (downloaded, not committed)
-public/fonts/*.ttf
-public/fonts/*.otf
+

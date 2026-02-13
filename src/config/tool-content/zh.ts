@@ -2054,35 +2054,6 @@ export const toolContentZh: Record<string, ToolContent> = {
     ],
   },
 
-  'find-and-redact': {
-    title: '查找并遮盖',
-    metaDescription: '搜索并批量遮盖PDF中的敏感文本。支持正则表达式匹配账号、姓名等敏感信息。',
-    keywords: ['遮盖pdf', '查找并遮盖', '批量遮盖', '删除文本', 'pdf脱敏', '隐藏敏感数据'],
-    description: `
-      <p>查找并遮盖允许您在PDF的所有页面中搜索特定文本、数字或模式，并一次性遮盖所有匹配项。非常适合删除敏感信息，如账号、姓名、地址或任何机密数据。</p>
-      <p>在应用遮盖前预览所有匹配项，并选择性地选择要遮盖的出现次数。支持区分大小写搜索、全词匹配和正则表达式以进行高级模式匹配。</p>
-      <p>所有处理都在您的浏览器中进行，确保您的文档保持私密和安全。</p>
-    `,
-    howToUse: [
-      { step: 1, title: '上传PDF文件', description: '拖放您的PDF文件或点击选择。' },
-      { step: 2, title: '搜索文本', description: '输入要查找和遮盖的文本、数字或正则表达式模式。' },
-      { step: 3, title: '审查并选择', description: '预览所有匹配项并选择要遮盖的项目。' },
-      { step: 4, title: '应用遮盖', description: '自定义遮盖外观并应用于所选匹配项。' },
-    ],
-    useCases: [
-      { title: '隐私合规', description: '遮盖个人信息以符合GDPR、HIPAA或其他法规。', icon: 'shield' },
-      { title: '法律文档', description: '在共享前从法律文档中删除机密数据。', icon: 'scale' },
-      { title: '财务记录', description: '从报表中遮盖账号、社保号或财务数据。', icon: 'credit-card' },
-    ],
-    faq: [
-      { question: '遮盖是永久的吗？', answer: '是的，遮盖会永久删除底层文本。原始内容无法恢复。请始终保留原始文件的备份。' },
-      { question: '可以遮盖图像或扫描文本吗？', answer: '此工具适用于基于文本的PDF。对于扫描文档，您需要使用基于区域的手动遮盖。' },
-      { question: '可以自定义遮盖外观吗？', answer: '是的，您可以设置遮盖颜色、添加边框，并可选择包含替换文本如"[已遮盖]"。' },
-      { question: '正则表达式搜索如何工作？', answer: '启用"使用正则表达式"以使用正则模式搜索。例如，\\d{4}-\\d{4}-\\d{4}-\\d{4}可查找信用卡号。' },
-    ],
-  },
-
-
   'decrypt-pdf': {
     title: '解密PDF',
     metaDescription: '从PDF文件中删除密码。解锁受密码保护的文档。',
@@ -2263,34 +2234,6 @@ export const toolContentZh: Record<string, ToolContent> = {
     ],
   },
 
-  'deskew-pdf': {
-    title: '校正PDF倾斜',
-    metaDescription: '自动校正扫描或倾斜的PDF页面。使用精确的角度检测修复倾斜文档。',
-    keywords: ['校正pdf倾斜', '修正pdf', '修复倾斜扫描', '自动旋转pdf', '校正pdf角度'],
-    description: `
-      <p>校正PDF倾斜使用先进的投影轮廓方差分析自动检测并校正PDF文档中的倾斜或歪斜页面。这对于以一定角度送入扫描仪的扫描文档至关重要。</p>
-      <p>该工具分析不同角度下的文本和内容对齐情况，找到最佳旋转角度，然后应用校正。您可以调整敏感度阈值（1-30）和DPI设置（72-300）以获得最佳结果。</p>
-      <p>所有处理都在您的浏览器中使用WebAssembly技术本地进行，确保您的文档保持私密和安全。</p>
-    `,
-    howToUse: [
-      { step: 1, title: '上传PDF文件', description: '拖放您的扫描PDF文件或点击选择。' },
-      { step: 2, title: '配置设置', description: '如需要，调整阈值敏感度和DPI以获得更好的检测效果。' },
-      { step: 3, title: '处理并下载', description: '点击校正以拉直页面并下载校正后的PDF。' },
-    ],
-    useCases: [
-      { title: '扫描文档', description: '修复从文档进纸器以一定角度扫描的页面。', icon: 'scan' },
-      { title: '手机扫描', description: '校正使用智能手机拍摄的倾斜文档照片。', icon: 'smartphone' },
-      { title: '档案修复', description: '拉直旧扫描档案以提高可读性。', icon: 'archive' },
-    ],
-    faq: [
-      { question: '角度检测有多准确？', answer: '该工具使用投影轮廓方差分析来检测高达±10度的倾斜角度，具有高精度。它会自动跳过角度小于0.3度的页面。' },
-      { question: '文本质量会受到影响吗？', answer: '对于90度的倍数旋转，不会发生质量损失。对于其他角度，工具会四舍五入到最近的度数并保持良好的质量。' },
-      { question: '我可以只校正特定页面吗？', answer: '该工具会分析所有页面，但只校正检测到的倾斜超过敏感度阈值的页面。倾斜最小的页面保持不变。' },
-      { question: '什么是敏感度阈值？', answer: '值1-10仅校正明显的倾斜，11-20检测中等倾斜，21-30捕获细微角度。默认值为10，用于平衡检测。' },
-      { question: '处理需要多长时间？', answer: '处理时间取决于文件大小和DPI。150 DPI（默认值）在速度和准确性之间提供了良好的平衡。更高的DPI更准确但更慢。' },
-    ],
-  },
-
   'pdf-to-pdfa': {
     title: 'PDF转PDF/A',
     metaDescription: '将普通PDF转换为适合长期存档的PDF/A格式。符合ISO标准。',
@@ -2409,60 +2352,6 @@ export const toolContentZh: Record<string, ToolContent> = {
       { question: '文档安全吗？', answer: '是的，完全在浏览器中处理。' },
       { question: '可以编辑吗？', answer: '此工具仅用于查看。' },
       { question: '支持移动设备吗？', answer: '是的。' },
-    ],
-  },
-
-  'digital-sign-pdf': {
-    title: '数字签名',
-    metaDescription: '为PDF文档添加X.509数字签名。使用PFX、P12或PEM证书签署PDF，具有法律效力。',
-    keywords: ['pdf数字签名', 'x509证书', 'pfx签名', 'p12签名', 'pem签名', '电子签名'],
-    description: `
-      <p>数字签名工具允许您为PDF文档添加加密的X.509数字签名。与简单的手绘签名不同，数字签名提供法律效力和文档完整性验证。</p>
-      <p>上传您的证书文件（PFX、P12或PEM格式），输入密码，即可签署PDF。您可以添加带有自定义文本、图像和位置的可见签名，或仅用于文档完整性的不可见签名。</p>
-      <p>所有签名操作都在浏览器本地进行，您的证书和文档永远不会上传到任何服务器。</p>
-    `,
-    howToUse: [
-      { step: 1, title: '上传PDF', description: '上传需要数字签名的PDF文档。' },
-      { step: 2, title: '加载证书', description: '上传X.509证书文件（.pfx、.p12或.pem）并输入密码。' },
-      { step: 3, title: '配置签名', description: '可选添加签名原因、位置，以及带有自定义文本或图像的可见签名。' },
-      { step: 4, title: '签名并下载', description: '点击签名PDF应用数字签名并下载签名后的文档。' },
-    ],
-    useCases: [
-      { title: '法律文件', description: '使用具有法律约束力的数字签名签署合同、协议和法律文件。', icon: 'scale' },
-      { title: '商业审批', description: '数字签署发票、采购订单和审批文件以建立审计跟踪。', icon: 'briefcase' },
-      { title: '文档完整性', description: '确保文档在签名后未被篡改。', icon: 'shield-check' },
-    ],
-    faq: [
-      { question: '支持哪些证书格式？', answer: '支持PFX（.pfx）、PKCS#12（.p12）和PEM（.pem）证书格式。' },
-      { question: '签名具有法律效力吗？', answer: '是的，使用有效证书的X.509数字签名在大多数司法管辖区具有法律认可。' },
-      { question: '可以添加可见签名吗？', answer: '是的，您可以添加带有自定义文本、图像、位置和样式的可见签名。' },
-    ],
-  },
-
-  'validate-signature': {
-    title: '验证签名',
-    metaDescription: '验证PDF文档中的数字签名。检查证书有效性、签名者信息和文档完整性。',
-    keywords: ['验证pdf签名', '验证数字签名', '检查pdf证书', '签名验证'],
-    description: `
-      <p>验证签名工具允许您验证PDF文档中的数字签名。检查签名是否有效，查看证书信息，并确认文档完整性。</p>
-      <p>上传已签名的PDF，查看所有签名、其有效性状态、签名者信息，以及文档在签名后是否被修改。</p>
-      <p>所有验证都在浏览器本地进行，您的文档永远不会上传到任何服务器。</p>
-    `,
-    howToUse: [
-      { step: 1, title: '上传已签名PDF', description: '上传包含数字签名的PDF文档。' },
-      { step: 2, title: '查看结果', description: '查看文档中找到的所有签名及其有效性状态。' },
-      { step: 3, title: '检查详情', description: '查看证书信息、签名者详情和签名时间戳。' },
-      { step: 4, title: '导出报告', description: '可选下载验证结果的JSON报告。' },
-    ],
-    useCases: [
-      { title: '文档验证', description: '验证签名文档是否真实且未被篡改。', icon: 'shield-check' },
-      { title: '合规审计', description: '检查签名有效性以满足合规和审计要求。', icon: 'clipboard-check' },
-      { title: '证书审查', description: '查看已签名文档的证书详情和到期日期。', icon: 'award' },
-    ],
-    faq: [
-      { question: '"有效"是什么意思？', answer: '有效签名意味着文档自签名以来未被修改，且证书链完整。' },
-      { question: '可以验证多个PDF吗？', answer: '是的，您可以上传多个PDF并批量验证所有签名。' },
-      { question: '为什么签名可能无效？', answer: '如果文档被修改、证书过期或证书不受信任，签名可能无效。' },
     ],
   },
 
@@ -2624,32 +2513,6 @@ export const toolContentZh: Record<string, ToolContent> = {
       { question: '文件大小会增加吗？', answer: '文件大小取决于DPI和内容。150 DPI通常产生较小的文件，300 DPI可能增加大小，600 DPI显著增加大小。会自动应用压缩。' },
       { question: '这是可逆的吗？', answer: '不，字体数据被永久删除。如果需要使用原始字体的可编辑文本，请保留原始文件的备份。' },
       { question: '矢量图形怎么办？', answer: '原始PDF中的矢量图形（形状、线条）将与文本一起转换为光栅。视觉质量在您选择的DPI下得以保留。' },
-    ],
-  },
-
-  'pdf-to-markdown': {
-    title: 'PDF转Markdown',
-    metaDescription: '将PDF转换为Markdown格式。提取文本并保留标题和列表等格式。',
-    keywords: ['pdf转markdown', 'pdf转md', 'pdf文本提取', 'markdown转换器', 'pdf转文本'],
-    description: `
-      <p>PDF转Markdown将您的PDF文档转换为干净、结构良好的Markdown文件。该工具智能提取文本内容，并尝试保留标题、列表和段落等格式。</p>
-      <p>非常适合将PDF文档转换为可编辑格式，用于文档编写、笔记记录或支持Markdown的内容管理系统。</p>
-      <p>所有转换都在您的浏览器本地进行，确保您的文档保持私密和安全。</p>
-    `,
-    howToUse: [
-      { step: 1, title: '上传PDF文件', description: '拖放您的PDF文件或点击选择。' },
-      { step: 2, title: '配置选项', description: '设置页面范围，选择是否包含页码，并调整换行设置。' },
-      { step: 3, title: '转换并下载', description: '点击转换生成Markdown文件并下载。' },
-    ],
-    useCases: [
-      { title: '文档编写', description: '将PDF手册和指南转换为Markdown，用于版本控制的文档。', icon: 'file-text' },
-      { title: '笔记记录', description: '从PDF文章和书籍中提取内容到您的笔记系统。', icon: 'edit-3' },
-      { title: '内容迁移', description: '将PDF内容迁移到支持Markdown的CMS平台。', icon: 'copy' },
-    ],
-    faq: [
-      { question: '格式会保留吗？', answer: '该工具会根据字体大小检测标题，以及项目符号/编号列表。复杂布局可能需要手动调整。' },
-      { question: '可以转换特定页面吗？', answer: '是的，您可以指定页面范围如"1-3, 5, 7"以仅转换这些页面。' },
-      { question: '扫描的PDF能用吗？', answer: '扫描的PDF包含图像而非文本。请先使用我们的OCR工具提取文本，然后再转换为Markdown。' },
     ],
   },
 
