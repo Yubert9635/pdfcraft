@@ -542,7 +542,7 @@ export async function executeNode(
                     format: format === 'jpg' ? 'jpeg' : format,
                     quality: Number(settings.quality) || 0.92,
                     scale: Number(settings.scale) || 2,
-                    pages: pages.length > 0 ? pages : undefined,
+                    pages: pages.length > 0 ? pages : [],
                 };
 
                 const imageResult = await processor.process(createProcessInput(files, options), onProgress);

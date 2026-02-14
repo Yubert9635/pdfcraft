@@ -30,6 +30,12 @@ import { WorkerBrowserConverter } from '@matbee/libreoffice-converter/browser';
 
 const LIBREOFFICE_PATH = '/libreoffice-wasm/';
 const ASSET_VERSION = '20240212-3';
+const SOFFICE_WASM_FILE = 'soffice.wasm.gz';
+const SOFFICE_DATA_FILE = 'soffice.data.gz';
+
+function normalizeBasePath(path: string): string {
+    return path.endsWith('/') ? path : `${path}/`;
+}
 
 export interface LoadProgress {
     phase: 'loading' | 'initializing' | 'converting' | 'complete' | 'ready';
@@ -45,48 +51,80 @@ let converterInstance: LibreOfficeConverter | null = null;
 export class LibreOfficeConverter {
     private converter: WorkerBrowserConverter | null = null;
     private initialized = false;
-    private initializing = false;
+    private initPromise: Promise<void> | null = null;
     private basePath: string;
+    /** Total size of all WASM assets in MB, computed during environment check */
+    private totalAssetSizeMB = 0;
+    /** Replaceable progress callback — allows late-binding when preload started without one */
+    private progressCallback?: ProgressCallback;
 
     constructor(basePath?: string) {
-        this.basePath = basePath || LIBREOFFICE_PATH;
+        this.basePath = normalizeBasePath(basePath || LIBREOFFICE_PATH);
     }
 
     async initialize(onProgress?: ProgressCallback): Promise<void> {
+        // Allow hot-swapping the progress callback even if init is already in flight.
+        // This covers the case where preload started silently (no callback), and later
+        // the user clicks "Convert" which provides a real callback.
+        if (onProgress) this.progressCallback = onProgress;
+
         if (this.initialized) return;
 
-        if (this.initializing) {
-            while (this.initializing) {
-                await new Promise(r => setTimeout(r, 100));
-            }
-            return;
-        }
+        // If already initializing, wait for the existing promise
+        if (this.initPromise) return this.initPromise;
 
-        this.initializing = true;
-        let progressCallback = onProgress;
-
+        this.initPromise = this._doInitialize();
         try {
-            progressCallback?.({ phase: 'loading', percent: 0, message: 'Checking environment...' });
+            await this.initPromise;
+        } catch (e) {
+            // Allow retry on failure
+            this.initPromise = null;
+            throw e;
+        }
+    }
+
+    /**
+     * Build a human-readable progress message.
+     * When totalAssetSizeMB is known, shows "Downloading: X MB / Y MB".
+     */
+    private buildProgressMessage(info: { percent: number }): string {
+        if (this.totalAssetSizeMB > 0 && info.percent < 95) {
+            const downloadedMB = (info.percent / 100 * this.totalAssetSizeMB).toFixed(1);
+            const totalMB = this.totalAssetSizeMB.toFixed(1);
+            return `Downloading: ${downloadedMB} MB / ${totalMB} MB`;
+        }
+        if (info.percent >= 95 && info.percent < 100) {
+            return 'Initializing conversion engine...';
+        }
+        return `Loading conversion engine (${Math.round(info.percent)}%)...`;
+    }
+
+    private async _doInitialize(): Promise<void> {
+        try {
+            this.progressCallback?.({ phase: 'loading', percent: 0, message: 'Checking environment...' });
 
             // Fail fast if SharedArrayBuffer / COOP+COEP is missing
             await this.checkEnvironment();
 
-            progressCallback?.({ phase: 'loading', percent: 5, message: 'Loading conversion engine...' });
+            const totalInfo = this.totalAssetSizeMB > 0
+                ? ` (${this.totalAssetSizeMB.toFixed(1)} MB to download)`
+                : '';
+            this.progressCallback?.({ phase: 'loading', percent: 5, message: `Loading conversion engine${totalInfo}...` });
 
             this.converter = new WorkerBrowserConverter({
                 sofficeJs: `${this.basePath}soffice.js?v=${ASSET_VERSION}`,
-                sofficeWasm: `${this.basePath}soffice.wasm?v=${ASSET_VERSION}`,
-                sofficeData: `${this.basePath}soffice.data?v=${ASSET_VERSION}`,
+                sofficeWasm: `${this.basePath}${SOFFICE_WASM_FILE}?v=${ASSET_VERSION}`,
+                sofficeData: `${this.basePath}${SOFFICE_DATA_FILE}?v=${ASSET_VERSION}`,
                 sofficeWorkerJs: `${this.basePath}soffice.worker.js?v=${ASSET_VERSION}`,
                 browserWorkerJs: `${this.basePath}browser.worker.global.js?v=${ASSET_VERSION}`,
                 verbose: false,
                 onProgress: (info: { phase: string; percent: number; message: string }) => {
-                    if (progressCallback && !this.initialized) {
-                        const simplifiedMessage = `Loading conversion engine (${Math.round(info.percent)}%)...`;
-                        progressCallback({
+                    // Use this.progressCallback so a late-arriving callback from the UI gets picked up
+                    if (this.progressCallback && !this.initialized) {
+                        this.progressCallback({
                             phase: info.phase as LoadProgress['phase'],
                             percent: info.percent,
-                            message: simplifiedMessage
+                            message: this.buildProgressMessage(info),
                         });
                     }
                 },
@@ -107,12 +145,14 @@ export class LibreOfficeConverter {
             this.initialized = true;
 
             // Signal completion
-            progressCallback?.({ phase: 'ready', percent: 100, message: 'Conversion engine ready!' });
+            this.progressCallback?.({ phase: 'ready', percent: 100, message: 'Conversion engine ready!' });
 
             // Null out the callback to prevent any late-firing progress updates
-            progressCallback = undefined;
-        } finally {
-            this.initializing = false;
+            this.progressCallback = undefined;
+        } catch (e) {
+            this.converter = null;
+            this.initialized = false;
+            throw e;
         }
     }
 
@@ -151,15 +191,16 @@ export class LibreOfficeConverter {
             );
         }
 
-        // 3. Check file connectivity
+        // 3. Check file connectivity (parallel for speed) & accumulate total size
         const files = [
-            'soffice.wasm',
-            'soffice.data',
+            SOFFICE_WASM_FILE,
+            SOFFICE_DATA_FILE,
             'soffice.js',
             'soffice.worker.js',
             'browser.worker.global.js',
         ];
-        for (const file of files) {
+        let totalBytes = 0;
+        await Promise.all(files.map(async (file) => {
             const url = `${this.basePath}${file}?v=${ASSET_VERSION}`;
             try {
                 const start = performance.now();
@@ -169,7 +210,9 @@ export class LibreOfficeConverter {
                 if (res.ok) {
                     const size = res.headers.get('content-length');
                     const type = res.headers.get('content-type');
-                    const sizeMb = size ? (parseInt(size) / 1024 / 1024).toFixed(2) + 'MB' : 'unknown size';
+                    const sizeNum = size ? parseInt(size) : 0;
+                    if (sizeNum > 0) totalBytes += sizeNum;
+                    const sizeMb = sizeNum > 0 ? (sizeNum / 1024 / 1024).toFixed(2) + 'MB' : 'unknown size';
                     console.warn(
                         `[LibreOffice] ${file}: OK (${res.status}) ${duration}ms | ${sizeMb} | type=${type}`
                     );
@@ -182,8 +225,12 @@ export class LibreOfficeConverter {
                 console.error(`[LibreOffice] ${file}: NETWORK ERROR`, e);
                 throw new Error(`Cannot fetch ${file}: ${e}`);
             }
-        }
+        }));
 
+        this.totalAssetSizeMB = totalBytes / (1024 * 1024);
+        if (this.totalAssetSizeMB > 0) {
+            console.warn(`[LibreOffice] Total asset size: ${this.totalAssetSizeMB.toFixed(1)} MB`);
+        }
         console.warn('[LibreOffice] === Environment Check Passed ✅ ===');
     }
 
@@ -215,9 +262,14 @@ export class LibreOfficeConverter {
             const duration = Date.now() - startTime;
             console.log(`[LibreOffice] Conversion complete! Duration: ${duration}ms, Size: ${result.data.length} bytes`);
 
-            // Create a copy to avoid SharedArrayBuffer type issues
-            const data = new Uint8Array(result.data);
-            return new Blob([data], { type: result.mimeType });
+            // SharedArrayBuffer-backed data cannot be passed to Blob directly;
+            // copy only when necessary to avoid unnecessary allocation.
+            const isSAB = typeof SharedArrayBuffer !== 'undefined'
+                && result.data.buffer instanceof SharedArrayBuffer;
+            const outputData = isSAB
+                ? new Uint8Array(result.data) // copies into a regular ArrayBuffer
+                : result.data;
+            return new Blob([outputData as BlobPart], { type: result.mimeType });
         } catch (error) {
             console.error(`[LibreOffice] Conversion FAILED for ${file.name}:`, error);
             throw error;

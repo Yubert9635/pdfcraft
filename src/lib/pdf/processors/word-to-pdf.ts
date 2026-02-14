@@ -12,6 +12,11 @@ import type {
 import { PDFErrorCode } from '@/types/pdf';
 import { BasePDFProcessor } from '../processor';
 
+/** Maximum file size: 50 MB */
+const MAX_FILE_SIZE = 50 * 1024 * 1024;
+/** Conversion timeout: 5 minutes */
+const CONVERT_TIMEOUT_MS = 5 * 60 * 1000;
+
 export interface WordToPDFOptions {
     /** Reserved for future options */
 }
@@ -40,7 +45,27 @@ async function getConverter(onProgress?: (percent: number, message: string) => v
 }
 
 export class WordToPDFProcessor extends BasePDFProcessor {
+    private conversionProgressTimer: ReturnType<typeof setInterval> | null = null;
+
+    private startConversionProgress(message: string): void {
+        this.stopConversionProgress();
+        // LibreOffice convert() does not expose granular runtime progress.
+        // Keep UI responsive by advancing a bounded pseudo-progress while waiting.
+        this.conversionProgressTimer = setInterval(() => {
+            if (this.progress >= 98) return;
+            this.updateProgress(this.progress + 1, message);
+        }, 800);
+    }
+
+    private stopConversionProgress(): void {
+        if (this.conversionProgressTimer) {
+            clearInterval(this.conversionProgressTimer);
+            this.conversionProgressTimer = null;
+        }
+    }
+
     protected reset(): void {
+        this.stopConversionProgress();
         super.reset();
     }
 
@@ -73,6 +98,15 @@ export class WordToPDFProcessor extends BasePDFProcessor {
             );
         }
 
+        // File size guard
+        if (file.size > MAX_FILE_SIZE) {
+            return this.createErrorOutput(
+                PDFErrorCode.INVALID_OPTIONS,
+                `File is too large (${(file.size / 1024 / 1024).toFixed(1)} MB). Maximum supported size is ${MAX_FILE_SIZE / 1024 / 1024} MB.`,
+                `File size: ${file.size} bytes, limit: ${MAX_FILE_SIZE} bytes`
+            );
+        }
+
         try {
             this.updateProgress(5, 'Loading conversion engine (first time may take 1-2 minutes)...');
 
@@ -85,8 +119,18 @@ export class WordToPDFProcessor extends BasePDFProcessor {
             }
 
             this.updateProgress(85, 'Converting Word document to PDF...');
+            this.startConversionProgress('Converting Word document to PDF...');
 
-            const pdfBlob = await converter.convertToPdf(file);
+            // Convert with timeout protection
+            const pdfBlob = await Promise.race([
+                converter.convertToPdf(file),
+                new Promise<never>((_, reject) =>
+                    setTimeout(() => reject(new Error(
+                        `Conversion timed out after ${CONVERT_TIMEOUT_MS / 60000} minutes. The file may be too complex.`
+                    )), CONVERT_TIMEOUT_MS)
+                ),
+            ]);
+            this.stopConversionProgress();
 
             if (this.checkCancelled()) {
                 return this.createErrorOutput(PDFErrorCode.PROCESSING_CANCELLED, 'Processing was cancelled.');
@@ -98,6 +142,7 @@ export class WordToPDFProcessor extends BasePDFProcessor {
             return this.createSuccessOutput(pdfBlob, `${baseName}.pdf`, { format: 'pdf' });
 
         } catch (error) {
+            this.stopConversionProgress();
             console.error('Conversion error:', error);
             return this.createErrorOutput(
                 PDFErrorCode.PROCESSING_FAILED,

@@ -42,6 +42,7 @@ LABEL org.opencontainers.image.vendor="PDFCraftTool"
 
 # Copy custom nginx configuration
 COPY nginx.conf /etc/nginx/conf.d/default.conf
+COPY security-headers.conf /etc/nginx/security-headers.conf
 
 # Copy the static export from builder stage
 COPY --from=builder /app/out /website/pdfcraft
