@@ -30,8 +30,10 @@ import { WorkerBrowserConverter } from '@matbee/libreoffice-converter/browser';
 
 const LIBREOFFICE_PATH = '/libreoffice-wasm/';
 const ASSET_VERSION = '20240212-3';
-const SOFFICE_WASM_FILE = 'soffice.wasm.gz';
-const SOFFICE_DATA_FILE = 'soffice.data.gz';
+// Request uncompressed names. In production, nginx gzip_static serves the .gz variant
+// with correct Content-Encoding and MIME headers (required for WebAssembly streaming).
+const SOFFICE_WASM_FILE = 'soffice.wasm';
+const SOFFICE_DATA_FILE = 'soffice.data';
 
 function normalizeBasePath(path: string): string {
     return path.endsWith('/') ? path : `${path}/`;
