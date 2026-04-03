@@ -968,14 +968,18 @@ base64.b64encode(pdf_bytes).decode('ascii')
           };
           const settings = qualitySettings[quality] || qualitySettings['medium'];
 
-          pyodide.FS.writeFile('/input.pdf', pdfData);
+          // Use unique file names to avoid race conditions during concurrent processing
+          const uid = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+          const inputPath = `/input_compress_${uid}.pdf`;
+
+          pyodide.FS.writeFile(inputPath, pdfData);
 
           const result = await pyodide.runPythonAsync(`
 import pymupdf
 import base64
 import io
 
-doc = pymupdf.open("/input.pdf")
+doc = pymupdf.open("${inputPath}")
 image_quality = ${settings.imageQuality}
 max_dpi = ${settings.maxDpi}
 remove_metadata = ${removeMetadata ? 'True' : 'False'}
@@ -1072,7 +1076,7 @@ base64.b64encode(pdf_bytes).decode('ascii')
 `);
 
           try {
-            pyodide.FS.unlink('/input.pdf');
+            pyodide.FS.unlink(inputPath);
           } catch {
             // Ignore cleanup errors
           }
@@ -1091,13 +1095,17 @@ base64.b64encode(pdf_bytes).decode('ascii')
           const pdfData = new Uint8Array(arrayBuffer);
           const { dpi = 150, format = 'jpeg', quality = 85 } = options || {};
 
-          pyodide.FS.writeFile('/input.pdf', pdfData);
+          // Use unique file names to avoid race conditions during concurrent processing
+          const uid = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}`;
+          const inputPath = `/input_photon_${uid}.pdf`;
+
+          pyodide.FS.writeFile(inputPath, pdfData);
 
           const result = await pyodide.runPythonAsync(`
 import pymupdf
 import base64
 
-doc = pymupdf.open("/input.pdf")
+doc = pymupdf.open("${inputPath}")
 
 # Create a new document
 new_doc = pymupdf.open()
@@ -1138,7 +1146,7 @@ base64.b64encode(pdf_bytes).decode('ascii')
 `);
 
           try {
-            pyodide.FS.unlink('/input.pdf');
+            pyodide.FS.unlink(inputPath);
           } catch {
             // Ignore cleanup errors
           }
