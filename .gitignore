@@ -69,4 +69,6 @@ comparisons.txt
 public/libreoffice-wasm/soffice.wasm
 public/libreoffice-wasm/soffice.data
 
+# Tauri / Cargo (local build output)
+src-tauri/target/
 
