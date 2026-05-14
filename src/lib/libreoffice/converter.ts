@@ -28,8 +28,9 @@
 
 import { WorkerBrowserConverter } from '@matbee/libreoffice-converter/browser';
 import { fetchAssembledBlob } from '../utils/asset-loader';
+import { withBasePath } from '../utils/path';
 
-const LIBREOFFICE_PATH = '/libreoffice-wasm/';
+const LIBREOFFICE_PATH = withBasePath('/libreoffice-wasm/');
 const ASSET_VERSION = '20240212-3';
 // Request uncompressed names. In production, nginx gzip_static serves the .gz variant
 // with correct Content-Encoding and MIME headers (required for WebAssembly streaming).

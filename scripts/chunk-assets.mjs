@@ -64,6 +64,11 @@ function walkDir(dir, callback) {
 }
 
 async function main() {
+    if (process.env.DOCKER_BUILD === 'true') {
+        console.log('[chunking] DOCKER_BUILD detected, skipping chunking.');
+        return;
+    }
+
     if (!existsSync(OUT_DIR)) {
         console.log('[chunking] Output directory (out/) not found, skipping.');
         return;

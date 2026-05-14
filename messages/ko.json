@@ -1603,15 +1603,23 @@
       "successMessage": "Page sizes fixed successfully!"
     },
     "bookmark": {
-      "uploadLabel": "Upload PDF File",
-      "uploadDescription": "Drag and drop a PDF file to edit bookmarks.",
-      "pdfPreview": "PDF Preview",
-      "bookmarksTitle": "Bookmarks",
-      "addBookmark": "Add Bookmark",
-      "noBookmarks": "No bookmarks yet. Click 'Add Bookmark' to create one.",
-      "hint": "Click a bookmark to preview its page. Use +/✎/× to add child, edit, or delete.",
-      "saveButton": "Save Bookmarks",
-      "successMessage": "Bookmarks saved successfully!"
+      "uploadLabel": "PDF 파일 업로드",
+      "uploadDescription": "책갈피를 편집하려면 PDF 파일을 드래그 앤 드롭하세요.",
+      "pdfPreview": "PDF 미리보기",
+      "bookmarksTitle": "책갈피",
+      "addBookmark": "책갈피 추가",
+      "noBookmarks": "아직 책갈피가 없습니다. '책갈피 추가'를 클릭하여 생성하세요.",
+      "hint": "책갈피를 클릭하면 해당 페이지를 미리 볼 수 있습니다. +/✎/×를 사용하여 하위 항목 추가, 편집 또는 삭제를 할 수 있습니다.",
+      "saveButton": "책갈피 저장",
+      "successMessage": "책갈피가 성공적으로 저장되었습니다!",
+      "sort": "정렬",
+      "sortByPage": "페이지 번호순으로 정렬",
+      "extractExisting": "기존 책갈피 추출",
+      "dragHint": "드래그 앤 드롭으로 책갈피 순서 변경",
+      "extracting": "기존 책갈피를 추출하는 중...",
+      "replaceConfirm": "현재 책갈피가 대체됩니다. 계속하시겠습니까?",
+      "noBookmarksFound": "이 PDF에서 책갈피를 찾을 수 없습니다.",
+      "failedExtract": "책갈피 추출에 실패했습니다."
     },
     "pageNumbers": {
       "uploadLabel": "PDF 파일 업로드",
@@ -1682,6 +1690,8 @@
       "repeatEnable": "전체 페이지에 워터마크 타일 배치",
       "repeatSpacingX": "가로 간격",
       "repeatSpacingY": "세로 간격",
+      "staggerTitle": "지그재그 배치",
+      "staggerDescription": "행을 번갈아 가며 오프셋하여 더 전문적인 느낌을 줍니다",
       "type": "유형",
       "position": "위치",
       "posCenter": "중앙",
@@ -1752,11 +1762,12 @@
       "uploadLabel": "Upload PDF File",
       "uploadDescription": "Drag and drop a PDF file.",
       "optionsTitle": "Removal Options",
-      "removeButton": "Remove Annotations",
       "successMessage": "Annotations removed successfully!",
       "removeComments": "댓글 제거",
       "removeHighlights": "하이라이트 제거",
-      "removeLinks": "링크 제거"
+      "removeLinks": "링크 제거",
+      "removeAllLabel": "모든 주석 제거 (댓글, 강조 표시, 링크 등)",
+      "processButton": "주석 제거"
     },
     "formFiller": {
       "uploadLabel": "Upload PDF File",

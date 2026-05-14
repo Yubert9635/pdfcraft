@@ -8,6 +8,7 @@ import { DownloadButton } from '../DownloadButton';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { ocrPDF, type OCROptions, type OCRLanguage, OCR_LANGUAGE_NAMES } from '@/lib/pdf/processors/ocr';
+import { Select } from '@/components/ui/FormField';
 import type { UploadedFile, ProcessOutput } from '@/types/pdf';
 
 /**
@@ -311,15 +312,14 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
                 <label className="block text-sm font-medium text-[hsl(var(--color-foreground))] mb-2">
                   {tTools('ocrPdf.outputFormat') || 'Output Format'}
                 </label>
-                <select
+                <Select
                   value={outputFormat}
                   onChange={(e) => setOutputFormat(e.target.value as OCROptions['outputFormat'])}
                   disabled={isProcessing}
-                  className="w-full px-3 py-2 rounded-[var(--radius-md)] border border-[hsl(var(--color-border))] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
                 >
                   <option value="text">{tTools('ocrPdf.formatText') || 'Text File (.txt)'}</option>
                   <option value="searchable-pdf">{tTools('ocrPdf.formatPdf') || 'Searchable PDF'}</option>
-                </select>
+                </Select>
               </div>
 
               {/* Quality/Scale */}
@@ -327,16 +327,15 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
                 <label className="block text-sm font-medium text-[hsl(var(--color-foreground))] mb-2">
                   {tTools('ocrPdf.quality') || 'Quality'}
                 </label>
-                <select
+                <Select
                   value={scale}
                   onChange={(e) => setScale(parseFloat(e.target.value))}
                   disabled={isProcessing}
-                  className="w-full px-3 py-2 rounded-[var(--radius-md)] border border-[hsl(var(--color-border))] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
                 >
                   <option value="1">{tTools('ocrPdf.qualityLow') || 'Low (Faster)'}</option>
                   <option value="2">{tTools('ocrPdf.qualityMedium') || 'Medium (Recommended)'}</option>
                   <option value="3">{tTools('ocrPdf.qualityHigh') || 'High (Slower)'}</option>
-                </select>
+                </Select>
               </div>
 
               {/* Page Range */}
@@ -350,7 +349,7 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
                   onChange={(e) => setPageRange(e.target.value)}
                   placeholder={tTools('ocrPdf.pageRangePlaceholder') || 'e.g., 1-3, 5, 7'}
                   disabled={isProcessing}
-                  className="w-full px-3 py-2 rounded-[var(--radius-md)] border border-[hsl(var(--color-border))] bg-white text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
+                  className="w-full px-3 py-2 rounded-[var(--radius-md)] border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] text-sm focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
                 />
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">
                   {tTools('ocrPdf.pageRangeHint') || 'Leave empty for all pages'}

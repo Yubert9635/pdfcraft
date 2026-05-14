@@ -962,6 +962,25 @@
       },
       "successMessage": "OCR Berhasil! Dokumen Anda sekarang memiliki teks yang dapat dicari/diedit."
     },
+    "bookmark": {
+      "uploadLabel": "Unggah File PDF",
+      "uploadDescription": "Seret dan letakkan file PDF untuk mengedit bookmark.",
+      "pdfPreview": "Pratinjau PDF",
+      "bookmarksTitle": "Bookmark",
+      "addBookmark": "Tambah Bookmark",
+      "noBookmarks": "Belum ada bookmark. Klik 'Tambah Bookmark' untuk membuat.",
+      "hint": "Klik pada bookmark untuk melihat pratinjau halamannya. Gunakan +/✎/× untuk menambah sub-item, mengedit, atau menghapus.",
+      "saveButton": "Simpan Bookmark",
+      "successMessage": "Bookmark berhasil disimpan!",
+      "sort": "Urutkan",
+      "sortByPage": "Urutkan berdasarkan nomor halaman",
+      "extractExisting": "Ekstrak bookmark yang ada",
+      "dragHint": "Seret dan lepaskan untuk mengatur ulang bookmark",
+      "extracting": "Mengekstrak bookmark yang ada...",
+      "replaceConfirm": "Ini akan mengganti bookmark saat ini. Lanjutkan?",
+      "noBookmarksFound": "Tidak ada bookmark yang ditemukan di PDF ini.",
+      "failedExtract": "Gagal mengekstrak bookmark."
+    },
     "pageNumbers": {
       "uploadLabel": "Unggah File PDF",
       "uploadDescription": "Seret dan letakkan file PDF.",
@@ -1018,7 +1037,9 @@
       "repeatTitle": "Ulangi Watermark",
       "repeatEnable": "Ulangi watermark di seluruh halaman",
       "repeatSpacingX": "Jarak Horizontal",
-      "repeatSpacingY": "Jarak Vertikal"
+      "repeatSpacingY": "Jarak Vertikal",
+      "staggerTitle": "Tata Letak Berjenjang",
+      "staggerDescription": "Geser baris bergantian untuk tampilan yang lebih profesional"
     },
     "headerFooter": {
       "uploadLabel": "Unggah File PDF",
@@ -1080,11 +1101,12 @@
       "uploadLabel": "Unggah File PDF",
       "uploadDescription": "Seret dan letakkan file PDF.",
       "optionsTitle": "Opsi Penghapusan",
-      "removeButton": "Hapus Anotasi",
       "successMessage": "Anotasi berhasil dihapus!",
       "removeComments": "Hapus Komentar",
       "removeHighlights": "Hapus Sorotan",
-      "removeLinks": "Hapus Tautan"
+      "removeLinks": "Hapus Tautan",
+      "removeAllLabel": "Hapus semua anotasi (komentar, highlight, tautan, dll.)",
+      "processButton": "Hapus Anotasi"
     },
     "formFiller": {
       "uploadLabel": "Unggah File PDF",
@@ -1511,4 +1533,3 @@
     }
   }
 }
-

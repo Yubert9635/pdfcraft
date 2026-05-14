@@ -1,4 +1,7 @@
-import { invoke } from '@tauri-apps/api/core';
+/**
+ * Tauri Bridge
+ * Provides a unified interface for file operations in both Tauri and Browser environments.
+ */
 
 export interface FileFilter {
   name: string;
@@ -11,8 +14,17 @@ export const isTauri = (): boolean => {
   return typeof window !== 'undefined' && '__TAURI__' in window;
 };
 
+/**
+ * Dynamically import Tauri invoke to avoid build-time issues in non-Tauri environments
+ */
+async function getTauriInvoke() {
+  const { invoke } = await import('@tauri-apps/api/core');
+  return invoke;
+}
+
 export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
   if (isTauri()) {
+    const invoke = await getTauriInvoke();
     return invoke<string[]>('open_files', { filters });
   }
 
@@ -44,6 +56,7 @@ export async function openFiles(filters: FileFilter[] = []): Promise<string[]> {
 
 export async function saveFile(suggestedName: string, filters: FileFilter[] = []): Promise<string> {
   if (isTauri()) {
+    const invoke = await getTauriInvoke();
     return invoke<string>('save_file', { suggestedName, filters });
   }
 
@@ -53,6 +66,7 @@ export async function saveFile(suggestedName: string, filters: FileFilter[] = []
 
 export async function readFileBytes(path: string): Promise<Uint8Array> {
   if (isTauri()) {
+    const invoke = await getTauriInvoke();
     const data = await invoke<number[]>('read_file', { path });
     return new Uint8Array(data);
   }
@@ -68,6 +82,7 @@ export async function readFileBytes(path: string): Promise<Uint8Array> {
 
 export async function writeFileBytes(path: string, data: Uint8Array): Promise<void> {
   if (isTauri()) {
+    const invoke = await getTauriInvoke();
     await invoke('write_file', { path, data: Array.from(data) });
     return;
   }

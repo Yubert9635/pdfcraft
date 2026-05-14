@@ -1487,7 +1487,18 @@
       "repeatTitle": "重复水印",
       "repeatEnable": "在整页平铺水印",
       "repeatSpacingX": "水平间距",
-      "repeatSpacingY": "垂直间距"
+      "repeatSpacingY": "垂直间距",
+      "staggerTitle": "交错排列",
+      "staggerDescription": "使相邻行交替错位，效果更专业",
+      "rangeTitle": "页面范围",
+      "rangeAll": "所有页面",
+      "rangeOdd": "奇数页",
+      "rangeEven": "偶数页",
+      "rangeCustom": "自定义页码",
+      "rangePlaceholder": "例如: 1, 3, 5-10",
+      "previewTitle": "预览",
+      "previewNote": "仅展示首页预览以优化性能",
+      "previewGenerating": "正在生成预览..."
     },
     "invertColors": {
       "uploadLabel": "上传PDF文件",
@@ -1925,6 +1936,34 @@
       "applyButton": "修复页面尺寸",
       "successMessage": "页面尺寸修复成功！"
     },
+    "bookmark": {
+      "uploadLabel": "上传 PDF 文件",
+      "uploadDescription": "拖放 PDF 文件到此处以编辑书签。",
+      "pdfPreview": "PDF 预览",
+      "bookmarksTitle": "书签",
+      "addBookmark": "添加书签",
+      "noBookmarks": "暂无书签。点击“添加书签”开始创建。",
+      "hint": "点击书签可预览对应页面。使用 +/✎/× 进行添加子节点、编辑或删除。",
+      "saveButton": "保存书签",
+      "successMessage": "书签保存成功！",
+      "sort": "排序",
+      "sortByPage": "按页码排序",
+      "extractExisting": "抽取现有书签",
+      "dragHint": "拖拽以重新排序书签",
+      "extracting": "正在抽取现有书签...",
+      "replaceConfirm": "这将替换当前书签。是否继续？",
+      "noBookmarksFound": "该 PDF 中未找到书签。",
+      "failedExtract": "抽取书签失败。",
+      "title": "标题",
+      "page": "页码",
+      "color": "颜色",
+      "style": "样式",
+      "normal": "常规",
+      "bold": "加粗",
+      "italic": "倾斜",
+      "boldItalic": "加粗并倾斜",
+      "setToCurrentPage": "设为当前页"
+    },
     "decryptPdf": {
       "uploadLabel": "上传PDF文件",
       "uploadDescription": "拖放加密的PDF文件到此处。",
@@ -2203,6 +2242,17 @@
     "pdfReader": {
       "uploadLabel": "打开PDF文件",
       "uploadDescription": "打开PDF文件进行阅读和查看。"
+    },
+    "removeAnnotations": {
+      "uploadLabel": "上传 PDF 文件",
+      "uploadDescription": "拖放 PDF 文件到此处。",
+      "optionsTitle": "删除选项",
+      "removeAllLabel": "删除所有注释（评论、高亮、链接等）",
+      "processButton": "删除注释",
+      "successMessage": "注释删除成功！",
+      "removeComments": "删除评论",
+      "removeHighlights": "删除高亮",
+      "removeLinks": "删除链接"
     },
     "findAndRedact": {
       "uploadLabel": "上传PDF文件",

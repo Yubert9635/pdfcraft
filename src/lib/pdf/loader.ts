@@ -20,6 +20,8 @@ let pdfjsInstance: PDFJSModule | null = null;
 let pdfLibLoadingPromise: Promise<PDFLibModule> | null = null;
 let pdfjsLoadingPromise: Promise<PDFJSModule> | null = null;
 
+import { withBasePath } from '../utils/path';
+
 // Worker configuration flag
 let workerConfigured = false;
 
@@ -33,7 +35,7 @@ export function configurePdfjsWorker(pdfjsLib: PDFJSModule): void {
   if (typeof window !== 'undefined') {
     // Use the local worker file for offline support
     // The worker file is located in public/workers/pdf.worker.min.mjs
-    pdfjsLib.GlobalWorkerOptions.workerSrc = '/workers/pdf.worker.min.mjs';
+    pdfjsLib.GlobalWorkerOptions.workerSrc = withBasePath('/workers/pdf.worker.min.mjs');
     workerConfigured = true;
   }
 }

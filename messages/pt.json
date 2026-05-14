@@ -1611,7 +1611,15 @@
       "noBookmarks": "Ainda não há marcadores. Clique em 'Adicionar marcador' para criar um.",
       "hint": "Clique em um marcador para visualizar sua página. Use +/✎/× para adicionar um subitem, editar ou excluir.",
       "saveButton": "Salvar marcadores",
-      "successMessage": "Marcadores salvos com sucesso!"
+      "successMessage": "Marcadores salvos com sucesso!",
+      "sort": "Ordenar",
+      "sortByPage": "Ordenar por número de página",
+      "extractExisting": "Extrair marcadores existentes",
+      "dragHint": "Arraste e solte para reordenar os marcadores",
+      "extracting": "Extraindo marcadores existentes...",
+      "replaceConfirm": "Isso substituirá os marcadores atuais. Continuar?",
+      "noBookmarksFound": "Nenhum marcador encontrado neste PDF.",
+      "failedExtract": "Falha ao extrair marcadores."
     },
     "pageNumbers": {
       "uploadLabel": "Enviar arquivo PDF",
@@ -1682,6 +1690,8 @@
       "repeatEnable": "Mosaico de marca d'água em toda a página",
       "repeatSpacingX": "Espaçamento horizontal",
       "repeatSpacingY": "Espaçamento vertical",
+      "staggerTitle": "Layout escalonado",
+      "staggerDescription": "Desloque as linhas alternadas para uma aparência mais profissional",
       "type": "Tipo",
       "position": "Posição",
       "posCenter": "Centro",
@@ -1752,11 +1762,12 @@
       "uploadLabel": "Enviar arquivo PDF",
       "uploadDescription": "Arraste e solte um arquivo PDF.",
       "optionsTitle": "Opções de remoção",
-      "removeButton": "Remover anotações",
       "successMessage": "Anotações removidas com sucesso!",
       "removeComments": "Remover Comentários",
       "removeHighlights": "Remover Destaques",
-      "removeLinks": "Remover Links"
+      "removeLinks": "Remover Links",
+      "removeAllLabel": "Remover todas as anotações (comentários, destaques, links, etc.)",
+      "processButton": "Remover anotações"
     },
     "formFiller": {
       "uploadLabel": "Enviar arquivo PDF",

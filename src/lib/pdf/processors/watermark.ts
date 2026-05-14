@@ -25,6 +25,8 @@ export interface WatermarkOptions {
   pages?: number[] | 'all' | 'odd' | 'even';
   /** If true, tile the watermark across the entire page */
   repeat?: boolean;
+  /** If true, offset alternating rows for a staggered pattern */
+  stagger?: boolean;
   /** Horizontal spacing between repeated watermarks (points) */
   repeatSpacingX?: number;
   /** Vertical spacing between repeated watermarks (points) */
@@ -140,6 +142,7 @@ export class WatermarkProcessor extends BasePDFProcessor {
       color: inputOptions.color ?? { r: 0.5, g: 0.5, b: 0.5 },
       pages: inputOptions.pages ?? 'all',
       repeat: inputOptions.repeat ?? false,
+      stagger: inputOptions.stagger ?? true,
       repeatSpacingX: inputOptions.repeatSpacingX ?? 200,
       repeatSpacingY: inputOptions.repeatSpacingY ?? 150,
     };
@@ -365,15 +368,22 @@ function tileTextWatermark(
   const spacingY = wmOptions.repeatSpacingY ?? 150;
   const stepX = textWidth + spacingX;
   const stepY = textHeight + spacingY;
-  // Extend the tiling area beyond page bounds to cover rotated watermarks
-  const margin = Math.max(pageWidth, pageHeight);
+  const stagger = wmOptions.stagger ?? true;
+
+  // Calculate the diagonal to ensure full coverage when rotated
+  const diagonal = Math.sqrt(pageWidth * pageWidth + pageHeight * pageHeight);
+  const margin = Math.max(textWidth, textHeight, 200);
+
+  // We start from a negative offset to ensure coverage even with rotation
   const startX = -margin;
   const startY = -margin;
   const endX = pageWidth + margin;
   const endY = pageHeight + margin;
 
+  let rowIndex = 0;
   for (let y = startY; y < endY; y += stepY) {
-    for (let x = startX; x < endX; x += stepX) {
+    const offsetX = (stagger && rowIndex % 2 === 1) ? stepX / 2 : 0;
+    for (let x = startX - offsetX; x < endX; x += stepX) {
       page.drawText(text, {
         x,
         y,
@@ -384,6 +394,7 @@ function tileTextWatermark(
         rotate: pdfLib.degrees(rotation),
       });
     }
+    rowIndex++;
   }
 }
 
@@ -404,14 +415,18 @@ function tileImageWatermark(
   const spacingY = wmOptions.repeatSpacingY ?? 150;
   const stepX = imgWidth + spacingX;
   const stepY = imgHeight + spacingY;
-  const margin = Math.max(pageWidth, pageHeight);
+  const stagger = wmOptions.stagger ?? true;
+  const margin = Math.max(imgWidth, imgHeight, 200);
+
   const startX = -margin;
   const startY = -margin;
   const endX = pageWidth + margin;
   const endY = pageHeight + margin;
 
+  let rowIndex = 0;
   for (let y = startY; y < endY; y += stepY) {
-    for (let x = startX; x < endX; x += stepX) {
+    const offsetX = (stagger && rowIndex % 2 === 1) ? stepX / 2 : 0;
+    for (let x = startX - offsetX; x < endX; x += stepX) {
       page.drawImage(embeddedImage, {
         x,
         y,
@@ -421,6 +436,7 @@ function tileImageWatermark(
         rotate: pdfLib.degrees(wmOptions.rotation || 0),
       });
     }
+    rowIndex++;
   }
 }
 

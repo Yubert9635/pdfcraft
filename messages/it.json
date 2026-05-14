@@ -1607,10 +1607,18 @@
       "pdfPreview": "Anteprima PDF",
       "bookmarksTitle": "Segnalibri",
       "addBookmark": "Aggiungi segnalibro",
-      "noBookmarks": "Nessun segnalibro presente. Clicca 'Aggiungi segnalibro' per crearne uno.",
-      "hint": "Clicca un segnalibro per vedere l'anteprima della sua pagina. Usa +/✎/× per aggiungere figli, modificare o eliminare.",
+      "noBookmarks": "Ancora nessun segnalibro. Clicca su 'Aggiungi segnalibro' per crearne uno.",
+      "hint": "Clicca su un segnalibro per visualizzare la sua pagina. Usa +/✎/× per aggiungere un sotto-segnalibro, modificare o eliminare.",
       "saveButton": "Salva segnalibri",
-      "successMessage": "Segnalibri salvati con successo!"
+      "successMessage": "Segnalibri salvati con successo!",
+      "sort": "Ordina",
+      "sortByPage": "Ordina per numero di pagina",
+      "extractExisting": "Estrai segnalibri esistenti",
+      "dragHint": "Trascina e rilascia per riordinare i segnalibri",
+      "extracting": "Estrazione dei segnalibri esistenti...",
+      "replaceConfirm": "Questo sostituirà i segnalibri attuali. Continuare?",
+      "noBookmarksFound": "Nessun segnalibro trovato in questo PDF.",
+      "failedExtract": "Estrazione dei segnalibri fallita."
     },
     "pageNumbers": {
       "uploadLabel": "Carica file PDF",
@@ -1689,7 +1697,9 @@
       "repeatTitle": "Ripeti filigrana",
       "repeatEnable": "Ripeti la filigrana su tutta la pagina",
       "repeatSpacingX": "Spaziatura orizzontale",
-      "repeatSpacingY": "Spaziatura verticale"
+      "repeatSpacingY": "Spaziatura verticale",
+      "staggerTitle": "Layout sfalsato",
+      "staggerDescription": "Sfalsa le righe alternate per un aspetto più professionale"
     },
     "headerFooter": {
       "uploadLabel": "Carica file PDF",
@@ -1755,11 +1765,12 @@
       "uploadLabel": "Carica file PDF",
       "uploadDescription": "Trascina e rilascia un file PDF.",
       "optionsTitle": "Opzioni di rimozione",
-      "removeButton": "Rimuovi annotazioni",
       "successMessage": "Annotazioni rimosse con successo!",
       "removeComments": "Rimuovi commenti",
       "removeHighlights": "Rimuovi evidenziazioni",
-      "removeLinks": "Rimuovi link"
+      "removeLinks": "Rimuovi link",
+      "removeAllLabel": "Rimuovi tutte le annotazioni (commenti, evidenziazioni, collegamenti, ecc.)",
+      "processButton": "Rimuovi annotazioni"
     },
     "formFiller": {
       "uploadLabel": "Carica file PDF",

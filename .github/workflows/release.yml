@@ -5,14 +5,12 @@
 name: Build and Release
 
 on:
-  push:
+  workflow_run:
+    workflows: ["Build Tauri"]
+    types:
+      - completed
     branches:
       - main
-    # Optional: Only trigger on specific file changes
-    # paths:
-    #   - 'src/**'
-    #   - 'public/**'
-    #   - 'package.json'
 
 # Prevent concurrent builds
 concurrency:
@@ -22,6 +20,7 @@ concurrency:
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
+    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
     
     permissions:
       contents: write  # Required for creating releases
@@ -69,6 +68,34 @@ jobs:
           echo "📦 Release package created: pdfcraft-${{ steps.version.outputs.version }}.zip"
           echo "📊 Package size: $(du -h pdfcraft-${{ steps.version.outputs.version }}.zip | cut -f1)"
 
+      # Download Tauri desktop builds from the completed Tauri workflow
+      - name: Download Tauri macOS build
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-macos-latest
+          path: tauri-bundles/macos
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Download Tauri Windows build
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-windows-latest
+          path: tauri-bundles/windows
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
+      - name: Download Tauri Linux build
+        uses: actions/download-artifact@v4
+        with:
+          name: tauri-ubuntu-latest
+          path: tauri-bundles/linux
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+        continue-on-error: true
+
       # Create GitHub Release with auto-generated notes from commits
       - name: Create Release
         uses: softprops/action-gh-release@v2
@@ -77,32 +104,25 @@ jobs:
           name: PDFCraft ${{ steps.version.outputs.version }}
           body: |
             ## 🚀 PDFCraft Release ${{ steps.version.outputs.version }}
-            
-            ### 📦 Download & Usage
-            1. Download `pdfcraft-${{ steps.version.outputs.version }}.zip`
-            2. Extract to any directory
-            3. Serve with any static HTTP server
-            
-            **Quick start:**
-            ```bash
-            # Using Python
-            cd pdfcraft
-            python -m http.server 8080
-            
-            # Or using Node.js
-            npx serve .
-            
-            # Or use any static file server (nginx, apache, etc.)
-            ```
-            
-            Then visit http://localhost:8080 to use the application.
-            
+
+            ### 📦 Download & Install
+            Download the appropriate file for your platform:
+            - **Windows:** `.msi` or `.exe`
+            - **macOS:** `.dmg`
+            - **Linux:** `.deb` or `.AppImage`
+
+            Install and run like any desktop application.
+
             ---
-            
-            **Commit:** `${{ github.sha }}`  
+            **Commit:** `${{ github.sha }}`
             **Build Time:** ${{ steps.version.outputs.build_time }}
           files: |
             pdfcraft-${{ steps.version.outputs.version }}.zip
+            tauri-bundles/**/*.dmg
+            tauri-bundles/**/*.msi
+            tauri-bundles/**/*.exe
+            tauri-bundles/**/*.deb
+            tauri-bundles/**/*.AppImage
           draft: false
           prerelease: false
           generate_release_notes: true

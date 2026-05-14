@@ -11,6 +11,11 @@ const withNextIntl = createNextIntlPlugin('./src/i18n/request.ts');
 const nextConfig = {
   // Enable static export for deployment flexibility
   output: 'export',
+  
+  // Support deployment under a subpath (e.g., /pdfcraft/)
+  // Use BASE_PATH or NEXT_PUBLIC_BASE_PATH environment variable
+  basePath: process.env.BASE_PATH || process.env.NEXT_PUBLIC_BASE_PATH || '',
+  
   assetPrefix: process.env.TAURI_ENV ? '/' : undefined,
 
   // Webpack configuration for WASM modules

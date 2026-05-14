@@ -18,7 +18,13 @@ import { join } from 'path';
 import { createGunzip } from 'zlib';
 import { pipeline } from 'stream/promises';
 
-const WASM_DIR = join(process.cwd(), 'out', 'libreoffice-wasm');
+const BASE_PATH = process.env.BASE_PATH || process.env.NEXT_PUBLIC_BASE_PATH || '';
+const CLEAN_BASE_PATH = BASE_PATH.startsWith('/') ? BASE_PATH.slice(1) : BASE_PATH;
+
+const WASM_DIR_STANDARD = join(process.cwd(), 'out', 'libreoffice-wasm');
+const WASM_DIR_SUBPATH = CLEAN_BASE_PATH ? join(process.cwd(), 'out', CLEAN_BASE_PATH, 'libreoffice-wasm') : null;
+
+const WASM_DIR = (WASM_DIR_SUBPATH && existsSync(WASM_DIR_SUBPATH)) ? WASM_DIR_SUBPATH : WASM_DIR_STANDARD;
 
 async function decompressFile(gzPath, outPath) {
     const gunzip = createGunzip();
@@ -28,6 +34,11 @@ async function decompressFile(gzPath, outPath) {
 }
 
 async function main() {
+    if (process.env.DOCKER_BUILD === 'true') {
+        console.log('[postbuild] DOCKER_BUILD detected, skipping decompression.');
+        return;
+    }
+
     if (!existsSync(WASM_DIR)) {
         console.log('[postbuild] No libreoffice-wasm directory found in out/, skipping.');
         return;
