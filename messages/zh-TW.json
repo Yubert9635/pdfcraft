@@ -40,11 +40,11 @@
     "navigation": {
       "home": "首頁",
       "tools": "工具",
+      "workflow": "工作流",
       "about": "關於",
       "faq": "常見問題",
       "privacy": "隱私",
-      "contact": "聯絡我們",
-      "workflow": "工作流"
+      "contact": "聯絡我們"
     },
     "buttons": {
       "upload": "上傳檔案",
@@ -159,7 +159,7 @@
     },
     "options": {
       "auto": "自動",
-      "portrait": "縱向",
+      "portrait": "直向",
       "landscape": "橫向"
     }
   },
@@ -202,8 +202,8 @@
           "answer": "是的，PDFCraft 完全免費使用。沒有隱藏費用，沒有高階會員，也無需註冊。所有功能對每個人開放。"
         },
         "account": {
-          "question": "我需要建立賬戶嗎？",
-          "answer": "不需要，您無需建立賬戶或註冊即可使用 PDFCraft。只需訪問網站即可立即開始使用任何工具。"
+          "question": "我需要建立帳戶嗎？",
+          "answer": "不需要，您無需建立帳戶或註冊即可使用 PDFCraft。只需訪問網站即可立即開始使用任何工具。"
         }
       },
       "privacy": {
@@ -223,19 +223,19 @@
       "features": {
         "operations": {
           "question": "我可以執行哪些 PDF 操作？",
-          "answer": "PDFCraft 提供 67+ 個工具，包括：合併、分割、壓縮、轉換（轉為/來自影象、文字、JSON）、編輯、註釋、簽名、新增水印、加密/解密、OCR 等等。"
+          "answer": "PDFCraft 提供 67+ 個工具，包括：合併、分割、壓縮、轉換（轉為/來自影像、文字、JSON）、編輯、註釋、簽名、新增浮水印、加密/解密、OCR 等等。"
         },
         "merge": {
           "question": "我可以合併多個 PDF 檔案嗎？",
           "answer": "是的，您可以將多個 PDF 檔案合併為一個。只需使用合併 PDF 工具，上傳您的檔案，按所需順序排列，然後點選合併。"
         },
         "images": {
-          "question": "我可以將影象轉換為 PDF 嗎？",
-          "answer": "是的，PDFCraft 支援將各種影象格式（JPG、PNG、WebP、BMP、TIFF、SVG、HEIC）轉換為 PDF。您可以一次轉換單個或多個影象。"
+          "question": "我可以將影像轉換為 PDF 嗎？",
+          "answer": "是的，PDFCraft 支援將各種影像格式（JPG、PNG、WebP、BMP、TIFF、SVG、HEIC）轉換為 PDF。您可以一次轉換單個或多個影像。"
         },
         "edit": {
           "question": "我可以編輯 PDF 中的文字嗎？",
-          "answer": "PDFCraft 提供註釋和編輯工具，包括高亮、新增文字、形狀、影象和簽名。如需全文編輯，PDF 編輯器工具提供全面的註釋功能。"
+          "answer": "PDFCraft 提供註釋和編輯工具，包括高亮、新增文字、形狀、影像和簽名。如需全文編輯，PDF 編輯器工具提供全面的註釋功能。"
         }
       },
       "technical": {
@@ -249,7 +249,7 @@
         },
         "slow": {
           "question": "為什麼大檔案處理速度慢？",
-          "answer": "由於所有處理都在瀏覽器中進行，效能取決於您裝置的能力。大檔案需要更多的記憶體和處理能力。為了獲得最佳結果，請關閉其他瀏覽器標籤頁和應用程式。"
+          "answer": "由於所有處理都在瀏覽器中進行，效能取決於您裝置的能力。大檔案需要更多的記憶體和處理能力。為了獲得最佳結果，請關閉其他瀏覽器分頁和應用程式。"
         },
         "offline": {
           "question": "PDFCraft 可以離線工作嗎？",
@@ -396,7 +396,7 @@
   },
   "errors": {
     "fileTooLarge": "檔案太大。最大大小為{maxSize}MB。",
-    "fileTypeInvalid": "無效的檔案型別。請上傳{acceptedTypes}檔案。",
+    "fileTypeInvalid": "無效的檔案格式。請上傳{acceptedTypes}檔案。",
     "fileCorrupted": "檔案似乎已損壞或無法讀取。",
     "fileEmpty": "檔案為空。",
     "fileNotPdf": "檔案不是有效的PDF。",
@@ -404,7 +404,7 @@
     "processingCancelled": "操作已取消。",
     "networkError": "網路錯誤。請檢查您的連線。",
     "pdfEncrypted": "此PDF受密碼保護。請先解密。",
-    "pdfMalformed": "PDF結構無效。請先嚐試修復工具。",
+    "pdfMalformed": "PDF結構無效。請先嘗試修復工具。",
     "processingTimeout": "操作時間過長。請嘗試使用較小的檔案。",
     "memoryExceeded": "瀏覽器記憶體不足。請關閉其他標籤頁後重試。",
     "workerFailed": "處理工作器崩潰。請重新整理頁面後重試。",
@@ -418,12 +418,12 @@
     "hero": {
       "title": "專業PDF工具",
       "highlight": "專業工具",
-      "subtitle": "在瀏覽器中免費、私密、強大的PDF處理",
+      "subtitle": "在瀏覽器中免費、隱私、強大的PDF處理",
       "cta": "開始使用"
     },
     "features": {
       "privacy": {
-        "title": "100%私密",
+        "title": "100%隱私",
         "description": "所有處理都在您的瀏覽器中進行。您的檔案永遠不會離開您的裝置。"
       },
       "free": {
@@ -465,7 +465,7 @@
       "convertToPdf": "轉換為PDF",
       "convertFromPdf": "從PDF轉換",
       "organizeManage": "整理與管理",
-      "optimizeRepair": "最佳化與修復",
+      "optimizeRepair": "優化與修復",
       "securePdf": "PDF安全"
     }
   },
@@ -484,7 +484,7 @@
     "allCategories": "全部",
     "common": "常用",
     "conversion": "轉換",
-    "optimization": "最佳化",
+    "optimization": "優化",
     "security": "安全",
     "noSavedWorkflows": "暫無已儲存的工作流程",
     "saveWorkflowHint": "建立並儲存您的第一個工作流程",
@@ -558,7 +558,7 @@
     "workflowTemplates": {
       "mergeCompress": {
         "name": "合併並壓縮",
-        "description": "合併多個 PDF 文件並壓縮結果以減小文件大小"
+        "description": "合併多個 PDF 文檔並壓縮結果以減小文件大小"
       },
       "imagesToWatermarkedPdf": {
         "name": "圖片轉帶浮水印 PDF",
@@ -570,11 +570,11 @@
       },
       "securePdf": {
         "name": "創建安全 PDF",
-        "description": "合併 PDF、添加浮水印並使用密碼加密"
+        "description": "合併 PDF、添加浮水印並使用加密保護"
       },
       "documentPrep": {
         "name": "文檔準備",
-        "description": "合併 PDF、添加頁碼並添加頁首/頁尾"
+        "description": "合併 PDF、添加頁碼並添加頁首頁尾"
       },
       "optimizeForWeb": {
         "name": "網頁優化",
@@ -586,7 +586,7 @@
       },
       "officeToMergedPdf": {
         "name": "Office 文件轉合併 PDF",
-        "description": "將 Word 文檔轉換為 PDF 並合併它們"
+        "description": "將 Word 文檔轉換為 PDF 並合併"
       },
       "rotateAndNumber": {
         "name": "旋轉並添加頁碼",
@@ -594,11 +594,11 @@
       },
       "printReady": {
         "name": "打印就緒文檔",
-        "description": "準備用於打印的 PDF，添加頁碼並扁平化"
+        "description": "添加頁碼並扁平化以方便列印"
       },
       "grayscaleCompress": {
         "name": "灰階並壓縮",
-        "description": "轉換為灰階並壓縮以減小大小"
+        "description": "轉換為灰階並壓縮以減小文檔大小"
       },
       "extractAndMerge": {
         "name": "提取並合併頁面",
@@ -634,11 +634,11 @@
       },
       "archivePrep": {
         "name": "存檔準備",
-        "description": "刪除元數據、扁平化並壓縮以便長期存儲"
+        "description": "刪除後設資料、扁平化並壓縮以便長期儲存"
       },
       "reportAssembly": {
         "name": "報告組裝",
-        "description": "合併文檔、添加頁碼、頁首/頁尾和目錄"
+        "description": "合併文檔、添加頁碼、頁首頁尾和目錄"
       },
       "invoiceProcessing": {
         "name": "發票處理",
@@ -675,11 +675,11 @@
       "hint": "點擊任意工具上的星形圖示可將其加入收藏，方便快速存取。"
     },
     "quality": {
-      "title": "輸出質量",
+      "title": "輸出品質",
       "low": "低",
       "medium": "中",
       "high": "高",
-      "hint": "更高的質量會產生更大的檔案，轉換時間更長。"
+      "hint": "更高的品質會產生更大的檔案，轉換時間更長。"
     },
     "mergePdf": {
       "uploadLabel": "上傳PDF檔案",
@@ -779,7 +779,7 @@
       "evenOddHint": "奇數頁: 1, 3, 5... 偶數頁: 2, 4, 6...",
       "everyPageInfo": "每頁將被提取為單獨的PDF檔案。這將建立 {count} 個檔案。",
       "visualInfo": "點選下方頁面縮圖選擇要提取的頁面。選中的頁面將合併為單個PDF或拆分為單獨檔案。",
-      "bookmarksNotice": "注意：按書籤拆分需要PDF中存在書籤。如果未找到書籤，將返回整個PDF作為單個檔案。",
+      "bookmarksNotice": "注意：按書籤拆分需要PDF中存在書籤。如果未找到書籤，將以整個PDF作為單個檔案。",
       "splitCountLabel": "拆分份數",
       "splitCountHint": "拆分為 {count} 等份（每份約 {pages} 頁）",
       "pagePreviewTitle": "選擇頁面",
@@ -799,19 +799,19 @@
       "warning": "警告",
       "warningText": "選中的頁面將從PDF中永久刪除。至少需要保留一頁。",
       "deleteButton": "刪除頁面",
-      "successMessage": "頁面刪除成功！點選下載按鈕儲存檔案。",
       "pageRange": "頁面範圍",
-      "pageRangePlaceholder": "例如：1, 3-5, 8"
+      "pageRangePlaceholder": "例如：1, 3-5, 8",
+      "successMessage": "頁面刪除成功！點選下載按鈕儲存檔案。"
     },
     "extractPages": {
       "uploadLabel": "上傳PDF檔案",
       "uploadDescription": "拖放PDF檔案到此處，或點選瀏覽。",
       "selectTitle": "選擇要提取的頁面",
       "selectHint": "點選頁面選擇，或在上方輸入頁碼/範圍。",
-      "extractButton": "提取頁面",
-      "successMessage": "頁面提取成功！點選下載按鈕儲存檔案。",
       "pageRange": "頁面範圍",
-      "pageRangePlaceholder": "例如：1-5, 8, 10-12"
+      "pageRangePlaceholder": "例如：1-5, 8, 10-12",
+      "extractButton": "提取頁面",
+      "successMessage": "頁面提取成功！點選下載按鈕儲存檔案。"
     },
     "posterizePdf": {
       "uploadLabel": "上傳PDF檔案",
@@ -830,6 +830,81 @@
       "previewInfo": "每頁將被分割為 {rows}×{cols} = {total} 個圖塊。",
       "createButton": "海報化PDF",
       "successMessage": "PDF海報化成功！點選下載按鈕儲存檔案。"
+    },
+    "digitalSign": {
+      "uploadLabel": "上傳要簽名的 PDF",
+      "uploadDescription": "將 PDF 檔案拖放到此處，或點擊瀏覽。",
+      "certificateTitle": "證書",
+      "uploadCertificateLabel": "上傳證書（.pfx, .p12, 或 .pem）",
+      "certificateLoaded": "證書已加載",
+      "enterPassword": "輸入密碼以解鎖",
+      "certificatePasswordLabel": "證書密碼",
+      "unlockButton": "解鎖",
+      "subject": "主題",
+      "issuer": "頒發者",
+      "valid": "有效期",
+      "warningExpired": "警告：證書已過期或尚未生效。簽名可能仍然有效，但顯示為無效。",
+      "signatureOptionsTitle": "簽名選項",
+      "reasonLabel": "原因",
+      "reasonPlaceholder": "例如：文件審核",
+      "locationLabel": "地點",
+      "locationPlaceholder": "例如：北京，中國",
+      "contactInfoLabel": "聯繫資訊",
+      "contactInfoPlaceholder": "例如：email@example.com",
+      "visibleSignatureLabel": "新增可見簽名",
+      "xPosition": "X 座標",
+      "yPosition": "Y 座標",
+      "width": "寬度",
+      "height": "高度",
+      "pageLabel": "頁面",
+      "firstPage": "第一頁",
+      "lastPage": "最後一頁",
+      "allPages": "所有頁面",
+      "signatureImageLabel": "簽名圖片（可選，PNG/JPEG）",
+      "signatureTextLabel": "簽名文字（可選，留空自動生成）",
+      "signatureTextPlaceholder": "留空自動生成",
+      "textColorLabel": "文字顏色",
+      "textSizeLabel": "文字大小",
+      "signButton": "簽名 PDF",
+      "successMessage": "PDF 簽名成功！可以在任何 PDF 閱讀器中驗證簽名。",
+      "errorFetch": "取得證書鏈失敗。請檢查網路連線並重試。",
+      "errorParse": "解析證書失敗",
+      "errorPEM": "讀取 PEM 檔案失敗。",
+      "errorType": "請選擇 .pfx, .p12, 或 .pem 檔案。",
+      "errorImgType": "請選擇 PNG 或 JPEG 圖片。"
+    },
+    "validateSign": {
+      "uploadLabel": "上傳已簽名的 PDF",
+      "uploadDescription": "將已簽名的 PDF 檔案拖放到此處，或點選瀏覽。",
+      "trustedCertTitle": "受信任證書（可選）",
+      "trustedCertDescription": "上傳受信任的 CA 證書以驗證簽名鏈。",
+      "trustedCertLoaded": "受信任證書已載入：{name}",
+      "analyzing": "正在分析簽名...",
+      "noSignaturesTitle": "未找到簽名",
+      "noSignaturesDescription": "此 PDF 不包含任何數位簽名。",
+      "signaturesFound": "找到 {count} 個簽名",
+      "validCount": "{count} 個有效",
+      "trustedCount": "{count}/{total} 個受信任",
+      "validSignature": "簽名有效",
+      "invalidSignature": "簽名無效",
+      "certificateExpired": "證書已過期",
+      "selfSigned": "自簽名證書",
+      "fullCoverage": "完全覆蓋",
+      "partialCoverage": "部分覆蓋",
+      "trusted": "受信任",
+      "notTrusted": "不在信任鏈中",
+      "signedBy": "簽名者",
+      "issuer": "頒發者",
+      "signedOn": "簽名時間",
+      "validFrom": "有效期始於",
+      "validUntil": "有效期至",
+      "reason": "原因",
+      "location": "地點",
+      "technicalDetails": "技術細節",
+      "serialNumber": "序號",
+      "digestAlgorithm": "摘要算法",
+      "signatureAlgorithm": "簽名演算法",
+      "errorType": "請選擇 .pem, .crt, .cer, 或 .der 證書檔案。"
     },
     "pdfMultiTool": {
       "uploadLabel": "上傳PDF檔案",
@@ -945,6 +1020,7 @@
       "convertButton": "轉換為PDF",
       "optionsTitle": "PDF選項",
       "pageSize": "頁面大小",
+      "fitToImage": "適應圖片尺寸",
       "orientation": "方向",
       "orientationAuto": "自動（匹配圖片）",
       "orientationPortrait": "縱向",
@@ -956,23 +1032,22 @@
       "marginLarge": "大（1英寸）",
       "centerImage": "圖片居中",
       "scaleToFit": "縮放圖片以適應頁面",
-      "imageQuality": "圖片質量",
+      "imageQuality": "圖片品質",
       "fitMode": "適應模式",
       "fitPage": "適應頁面",
       "fillPage": "填充頁面",
       "originalSize": "原始大小",
-      "svgQuality": "SVG匯出質量",
+      "svgQuality": "SVG匯出品質",
       "svgQualityLow": "低（1x - 檔案較小）",
       "svgQualityMedium": "中（2x - 平衡）",
-      "svgQualityHigh": "高（3x - 質量更好）",
-      "svgQualityVeryHigh": "最高（4x - 最佳質量）",
-      "svgQualityHint": "更高的質量會產生更清晰的影象，但檔案更大。",
+      "svgQualityHigh": "高（3x - 品質更好）",
+      "svgQualityVeryHigh": "最高（4x - 最佳品質）",
+      "svgQualityHint": "更高的品質會產生更清晰的影像，但檔案更大。",
       "batchMode": "拆分為多個PDF",
       "imagesPerPdf": "每個PDF的圖片數",
       "batchModeHint": "將創建 {pdfCount} 個PDF檔案，打包為ZIP壓縮檔。",
       "batchSuccessMessage": "已成功從 {imageCount} 張圖片創建 {pdfCount} 個PDF檔案！點擊下載按鈕保存ZIP壓縮檔。",
-      "successMessage": "圖片已成功轉換為PDF！點選下載按鈕儲存檔案。",
-      "fitToImage": "適應圖片尺寸"
+      "successMessage": "圖片已成功轉換為PDF！點選下載按鈕儲存檔案。"
     },
     "compressPdf": {
       "uploadLabel": "上傳PDF檔案",
@@ -980,7 +1055,7 @@
       "batchUploadDescription": "拖放PDF檔案到此處。一次最多可壓縮10個檔案。",
       "filesTitle": "要壓縮的檔案",
       "optionsTitle": "壓縮選項",
-      "qualityLabel": "壓縮質量",
+      "qualityLabel": "壓縮品質",
       "qualityLow": "低",
       "qualityLowDesc": "最大壓縮，最佳化物件流結構",
       "qualityMedium": "中",
@@ -988,7 +1063,7 @@
       "qualityHigh": "高",
       "qualityHighDesc": "適度壓縮，保留更多結構",
       "qualityMaximum": "最高",
-      "qualityMaximumDesc": "最小壓縮，保留原始質量",
+      "qualityMaximumDesc": "最小壓縮，保留原始品質",
       "optimizeImages": "最佳化嵌入圖片",
       "removeMetadata": "移除後設資料（標題、作者等）",
       "compressButton": "壓縮PDF",
@@ -1005,9 +1080,9 @@
       "algorithmStandardDesc": "使用對象流的通用壓縮",
       "algorithmCondenseDesc": "優化結構，同時保留交互性",
       "algorithmPhotonDesc": "柵格化頁面 —— 最適合圖片較多的 PDF",
-      "photonWarning": "注意：Photon 會將頁面轉換為圖片，這可能會降低文字質量並丟失交互性（如連結、表單）。",
+      "photonWarning": "注意：Photon 會將頁面轉換為圖片，這可能會降低文字解析度並丟失交互性（如連結、表單）。",
       "photonDpiLabel": "輸出 DPI",
-      "photonDpiDesc": "更高的 DPI = 更好的質量，更大的文件大小"
+      "photonDpiDesc": "DPI 越高，品質越好，檔案越大"
     },
     "signPdf": {
       "uploadLabel": "上傳PDF檔案",
@@ -1135,14 +1210,14 @@
       "rotateAll": "旋轉所有頁面",
       "rotateButton": "旋轉PDF",
       "successMessage": "PDF頁面旋轉成功！點選下載按鈕儲存檔案。",
-      "angle": "旋转角度",
-      "rotateRight": "向右旋转 90°",
-      "rotateLeft": "向左旋转 90°",
-      "rotate180": "旋转 180°",
-      "applyTo": "应用于",
-      "allPages": "所有页面",
-      "oddPages": "奇数页",
-      "evenPages": "偶数页"
+      "angle": "旋轉角度",
+      "rotateRight": "向右旋轉 90°",
+      "rotateLeft": "向左旋轉 90°",
+      "rotate180": "旋轉 180°",
+      "applyTo": "應用於",
+      "allPages": "所有頁面",
+      "oddPages": "奇數頁",
+      "evenPages": "偶數頁"
     },
     "rotateCustom": {
       "title": "自定義旋轉",
@@ -1162,13 +1237,13 @@
       "positionHint": "輸入 0 在開頭插入，或輸入 {total} 在末尾插入。",
       "countLabel": "空白頁數量",
       "position": "位置",
-      "pageSize": "頁面大小",
-      "addButton": "新增空白頁",
-      "successMessage": "空白頁新增成功！點選下載按鈕儲存檔案。",
       "positionStart": "文檔開頭",
       "positionEnd": "文檔結尾",
       "positionAfterEach": "每頁之後",
-      "matchSource": "匹配源文件"
+      "pageSize": "頁面大小",
+      "matchSource": "匹配源文件",
+      "addButton": "新增空白頁",
+      "successMessage": "空白頁新增成功！點選下載按鈕儲存檔案。"
     },
     "reversePages": {
       "uploadLabel": "上傳PDF檔案",
@@ -1177,19 +1252,6 @@
       "infoDescription": "這將反轉PDF中所有頁面的順序。最後一頁將變成第一頁，依此類推。",
       "reverseButton": "反轉頁面",
       "successMessage": "頁面順序反轉成功！點選下載按鈕儲存檔案。"
-    },
-    "bookmark": {
-      "uploadLabel": "上傳 PDF 文件",
-      "uploadDescription": "拖放 PDF 文件到此處以編輯書籤。",
-      "pdfPreview": "PDF 預覽",
-      "bookmarksTitle": "書籤",
-      "addBookmark": "添加書籤",
-      "noBookmarks": "暫無書籤。點擊「添加書籤」開始建立。",
-      "hint": "點擊書籤可預覽對應頁面。使用 +/✎/× 進行添加子節點、編輯或刪除。",
-      "saveButton": "儲存書籤",
-      "successMessage": "書籤儲存成功！",
-      "sort": "排序",
-      "sortByPage": "按頁碼排序"
     },
     "alternateMerge": {
       "uploadLabel": "上傳PDF檔案",
@@ -1227,7 +1289,7 @@
       "attachmentsTitle": "附件",
       "selectAll": "全選",
       "deselectAll": "取消全選",
-      "removeButton": "移除選中",
+      "removeButton": "移除選取",
       "noAttachments": "此PDF檔案中沒有附件。",
       "selectedCount": "已選擇 {count} 個附件待移除",
       "selectAtLeastOne": "請至少選擇一個附件進行移除。",
@@ -1260,7 +1322,7 @@
       "uploadDescription": "拖放PDF檔案到此處進行轉換。",
       "optionsTitle": "轉換選項",
       "format": "圖片格式",
-      "quality": "質量",
+      "quality": "品質",
       "dpi": "解析度（DPI）",
       "resolution": "解析度",
       "pageRange": "頁面範圍",
@@ -1303,7 +1365,7 @@
       "methodLuminosity": "亮度法（推薦）",
       "methodAverage": "平均法",
       "methodLightness": "明度法",
-      "quality": "質量",
+      "quality": "品質",
       "qualityLow": "低（更快）",
       "qualityMedium": "中（推薦）",
       "qualityHigh": "高（較慢）",
@@ -1331,22 +1393,22 @@
     "flattenPdf": {
       "uploadLabel": "上傳PDF檔案",
       "uploadDescription": "拖放PDF檔案到此處進行扁平化。",
-      "flattenButton": "扁平化PDF",
-      "successMessage": "PDF扁平化成功！",
       "optionsTitle": "扁平化選項",
-      "flattenForms": "扁平化表單字段",
-      "flattenAnnotations": "扁平化註釋"
+      "flattenForms": "扁平化表單欄位",
+      "flattenAnnotations": "扁平化註釋",
+      "flattenButton": "扁平化PDF",
+      "successMessage": "PDF扁平化成功！"
     },
     "bookmark": {
-      "uploadLabel": "上傳PDF檔案",
-      "uploadDescription": "拖放PDF檔案到此處以編輯書籤。",
-      "pdfPreview": "PDF預覽",
+      "uploadLabel": "上傳 PDF 文件",
+      "uploadDescription": "拖放 PDF 文件到此處以編輯書籤。",
+      "pdfPreview": "PDF 預覽",
       "bookmarksTitle": "書籤",
-      "addBookmark": "新增書籤",
-      "noBookmarks": "暫無書籤。點選「新增書籤」建立一個。",
-      "hint": "點選書籤預覽其頁面。使用 +/✎/× 新增子書籤、編輯或刪除。",
-      "saveButton": "儲存書籤",
-      "successMessage": "書籤儲存成功！"
+      "addBookmark": "添加書籤",
+      "noBookmarks": "暫無書籤。點擊“添加書籤”開始創建。",
+      "hint": "點擊書籤可預覽對應頁面。使用 +/✎/× 進行添加子節點、編輯或刪除。",
+      "saveButton": "保存書籤",
+      "successMessage": "書籤保存成功！"
     },
     "pageNumbers": {
       "uploadLabel": "上傳PDF檔案",
@@ -1398,21 +1460,30 @@
     "watermark": {
       "uploadLabel": "上傳PDF檔案",
       "uploadDescription": "拖放PDF檔案到此處。",
-      "optionsTitle": "水印選項",
-      "textWatermark": "文字水印",
-      "imageWatermark": "圖片水印",
-      "watermarkText": "水印文字",
-      "watermarkImage": "水印圖片 (PNG/JPG)",
+      "optionsTitle": "浮水印選項",
+      "type": "類型",
+      "textWatermark": "文字浮水印",
+      "imageWatermark": "圖片浮水印",
+      "watermarkText": "浮水印文字",
+      "watermarkImage": "浮水印圖片 (PNG/JPG)",
+      "position": "位置",
+      "posCenter": "居中",
+      "posDiagonal": "對角線",
+      "posTopLeft": "左上角",
+      "posTopRight": "右上角",
+      "posBottomLeft": "左下角",
+      "posBottomRight": "右下角",
       "fontSize": "字型大小",
       "color": "顏色",
       "opacity": "透明度",
       "angle": "角度",
-      "enterText": "請輸入水印文字。",
-      "selectImage": "請選擇水印圖片。",
+      "enterText": "請輸入浮水印文字。",
+      "textPlaceholder": "例如：CONFIDENTIAL",
+      "selectImage": "請選擇浮水印圖片。",
       "unsupportedImage": "不支援的圖片格式，請使用 PNG 或 JPG。",
-      "failed": "新增水印失敗。",
-      "addButton": "新增水印",
-      "successMessage": "水印新增成功！",
+      "failed": "新增浮水印失敗。",
+      "addButton": "新增浮水印",
+      "successMessage": "浮水印新增成功！",
       "repeatTitle": "重複水印",
       "repeatEnable": "在整頁平鋪水印",
       "repeatSpacingX": "水平間距",
@@ -1427,16 +1498,7 @@
       "rangePlaceholder": "例如: 1, 3, 5-10",
       "previewTitle": "預覽",
       "previewNote": "僅展示首頁預覽以優化性能",
-      "previewGenerating": "正在生成預覽...",
-      "type": "類型",
-      "position": "位置",
-      "posCenter": "居中",
-      "posDiagonal": "對角線",
-      "posTopLeft": "左上",
-      "posTopRight": "右上",
-      "posBottomLeft": "左下",
-      "posBottomRight": "右下",
-      "textPlaceholder": "例如：CONFIDENTIAL"
+      "previewGenerating": "正在生成預覽..."
     },
     "invertColors": {
       "uploadLabel": "上傳PDF檔案",
@@ -1459,7 +1521,7 @@
       "modeDark": "深色文字（淺色背景）",
       "modeLight": "淺色文字（深色背景）",
       "thresholdLabel": "亮度閾值",
-      "thresholdHint": "調整以控制哪些畫素會被改變",
+      "thresholdHint": "調整以控制哪些像素會被改變",
       "applyButton": "應用文字顏色",
       "successMessage": "文字顏色應用成功！"
     },
@@ -1481,7 +1543,6 @@
       "uploadLabel": "上傳PDF檔案",
       "uploadDescription": "拖放PDF檔案到此處。",
       "optionsTitle": "移除選項",
-      "removeAllLabel": "移除所有註釋（評論、高亮、連結等）",
       "processButton": "移除註釋",
       "successMessage": "註釋移除成功！",
       "removeComments": "移除評論",
@@ -1499,10 +1560,10 @@
       "uploadDescription": "拖放PDF檔案到此處。",
       "toolbarTitle": "工具列",
       "selectTool": "選擇",
-      "textFieldTool": "文字欄位",
+      "textFieldTool": "文字方塊",
       "checkboxTool": "核取方塊",
       "dropdownTool": "下拉選單",
-      "radioTool": "選項按鈕",
+      "radioTool": "單選按鈕",
       "deleteTool": "刪除",
       "pageNavigation": "第 {current} / {total} 頁",
       "selectHint": "點選欄位選取，拖曳移動，拖曳角落調整大小",
@@ -1523,10 +1584,64 @@
       "page": "第 {number} 頁",
       "createButton": "建立表單",
       "successMessage": "表單建立成功！",
+      "formOptions": "表單選項",
+      "flattenForm": "扁平化表單",
+      "flattenFormHint": "使表單欄位不可編輯（轉換為靜態內容）",
+      "projectManagement": "項目管理",
+      "saveProject": "保存項目",
+      "savedProjects": "已保存項目",
+      "loadProject": "加載",
+      "deleteProject": "刪除",
+      "saveProjectTitle": "保存項目",
+      "projectName": "項目名稱",
+      "projectNamePlaceholder": "輸入項目名稱...",
+      "saveInfo": "將保存 {fields} 個表單欄位。",
+      "saveNote": "項目會本地保存在您的瀏覽器中。",
+      "undo": "復原 (Ctrl+Z)",
+      "redo": "重做 (Ctrl+Y)",
+      "duplicate": "複製 (Ctrl+D)",
+      "align": "對齊",
+      "alignLeft": "左對齊",
+      "alignCenter": "居中對齊",
+      "alignRight": "右對齊",
+      "alignTop": "頂部對齊",
+      "alignMiddle": "垂直居中",
+      "alignBottom": "底部對齊",
+      "defaultValue": "默認值",
+      "defaultValuePlaceholder": "輸入默認文字...",
+      "defaultChecked": "默認選中",
+      "defaultSelection": "默認選擇",
+      "noDefault": "-- 無 --",
+      "required": "必填欄位",
+      "shortcutsHint": "快捷鍵：Ctrl+Z (復原) | Ctrl+Y (重做) | Ctrl+D (複製) | Ctrl+A (全選) | Delete (刪除)",
+      "buttonTool": "按鈕",
+      "signatureTool": "簽名",
+      "dateTool": "日期",
+      "listboxTool": "列表框",
+      "buttonLabel": "按鈕標籤",
+      "buttonLabelPlaceholder": "提交",
+      "signatureLabel": "簽名提示",
+      "signatureLabelPlaceholder": "在此簽名",
+      "dateFormat": "日期格式",
+      "defaultDate": "默認日期",
+      "multiSelect": "允許複選",
+      "basicTools": "基本",
+      "advancedTools": "更多",
+      "properties": "屬性",
+      "fieldsTab": "欄位",
+      "optionsTab": "選項",
+      "addField": "添加",
+      "clickToAdd": "點擊 PDF 添加欄位",
+      "pages": "頁",
+      "processingButton": "處理中...",
+      "cancelButton": "取消",
+      "saveButton": "保存",
+      "orCreateBlank": "或",
+      "createBlankPdf": "創建空白PDF",
       "createBlankPdfTitle": "建立空白PDF",
       "pageSize": "頁面大小",
       "pageCount": "頁數",
-      "blankPdfNote": "將建立空白PDF以新增表單欄位。",
+      "blankPdfNote": "將建立一個空白PDF，您可以在其中新增表單欄位。",
       "addBlankPage": "新增空白頁",
       "addPageBefore": "在當前頁之前",
       "addPageAfter": "在當前頁之後",
@@ -1546,61 +1661,7 @@
       "fieldLabelPlaceholder": "輸入標籤文字...",
       "labelPosition": "位置",
       "labelAbove": "上方",
-      "labelLeft": "左側",
-      "formOptions": "表單選項",
-      "flattenForm": "扁平化表單",
-      "flattenFormHint": "使表單字段不可編輯（轉換為靜態內容）",
-      "projectManagement": "項目管理",
-      "saveProject": "保存項目",
-      "savedProjects": "已保存項目",
-      "loadProject": "加載",
-      "deleteProject": "刪除",
-      "saveProjectTitle": "保存項目",
-      "projectName": "項目名稱",
-      "projectNamePlaceholder": "輸入項目名稱...",
-      "saveInfo": "將保存 {fields} 個表單字段。",
-      "saveNote": "項目會本地保存在您的瀏覽器中。",
-      "undo": "撤銷 (Ctrl+Z)",
-      "redo": "重做 (Ctrl+Y)",
-      "duplicate": "復制 (Ctrl+D)",
-      "align": "對齊",
-      "alignLeft": "左對齊",
-      "alignCenter": "居中對齊",
-      "alignRight": "右對齊",
-      "alignTop": "頂部對齊",
-      "alignMiddle": "垂直居中",
-      "alignBottom": "底部對齊",
-      "defaultValue": "默認值",
-      "defaultValuePlaceholder": "輸入默認文字...",
-      "defaultChecked": "默認選中",
-      "defaultSelection": "默認選擇",
-      "noDefault": "-- 無 --",
-      "required": "必填字段",
-      "shortcutsHint": "快捷鍵：Ctrl+Z (撤銷) | Ctrl+Y (重做) | Ctrl+D (復制) | Ctrl+A (全選) | Delete (移除)",
-      "buttonTool": "按鈕",
-      "signatureTool": "簽名",
-      "dateTool": "日期",
-      "listboxTool": "列表框",
-      "buttonLabel": "按鈕標籤",
-      "buttonLabelPlaceholder": "提交",
-      "signatureLabel": "簽名標籤",
-      "signatureLabelPlaceholder": "在此簽名",
-      "dateFormat": "日期格式",
-      "defaultDate": "默認日期",
-      "multiSelect": "允許複選",
-      "basicTools": "基本",
-      "advancedTools": "更多",
-      "properties": "屬性",
-      "fieldsTab": "字段",
-      "optionsTab": "選項",
-      "addField": "添加",
-      "clickToAdd": "點擊 PDF 添加字段",
-      "pages": "頁",
-      "processingButton": "處理中...",
-      "cancelButton": "取消",
-      "saveButton": "保存",
-      "orCreateBlank": "或",
-      "createBlankPdf": "創建空白 PDF"
+      "labelLeft": "左側"
     },
     "removeBlankPages": {
       "uploadLabel": "上傳PDF檔案",
@@ -1617,41 +1678,13 @@
       "successMessage": "目錄生成成功！",
       "options": "目錄選項",
       "tocTitle": "目錄標題",
+      "tocTitlePlaceholder": "輸入目錄標題...",
       "fontSize": "字型大小",
       "fontFamily": "字型",
       "addBookmark": "將目錄新增到書籤",
       "bookmarkRequired": "此工具從現有PDF書籤生成可點選的目錄。請確保您的PDF已有書籤。您可以使用「編輯書籤」工具新增書籤。",
       "generate": "生成目錄",
-      "success": "目錄生成成功！",
-      "tocTitlePlaceholder": "輸入目錄標題..."
-    },
-    "bookmark": {
-      "uploadLabel": "上傳 PDF 文件",
-      "uploadDescription": "拖放 PDF 文件到此處以編輯書籤。",
-      "pdfPreview": "PDF 預覽",
-      "bookmarksTitle": "書籤",
-      "addBookmark": "添加書籤",
-      "noBookmarks": "暫無書籤。點擊“添加書籤”開始創建。",
-      "hint": "點擊書籤可預覽對應頁面。使用 +/✎/× 進行添加子節點、編輯或刪除。",
-      "saveButton": "保存書籤",
-      "successMessage": "書籤保存成功！",
-      "sort": "排序",
-      "sortByPage": "按頁碼排序",
-      "extractExisting": "抽取現有書籤",
-      "dragHint": "拖拽以重新排序書籤",
-      "extracting": "正在抽取現有書籤...",
-      "replaceConfirm": "這將替換當前書籤。是否繼續？",
-      "noBookmarksFound": "該 PDF 中未找到書籤。",
-      "failedExtract": "抽取書籤失敗。",
-      "title": "標題",
-      "page": "頁碼",
-      "color": "顏色",
-      "style": "樣式",
-      "normal": "常規",
-      "bold": "加粗",
-      "italic": "傾斜",
-      "boldItalic": "加粗並傾斜",
-      "setToCurrentPage": "設為當前頁"
+      "success": "目錄生成成功！"
     },
     "ocrPdf": {
       "uploadLabel": "上傳PDF檔案",
@@ -1662,7 +1695,7 @@
       "outputFormat": "輸出格式",
       "formatText": "文字檔案 (.txt)",
       "formatPdf": "可搜尋PDF",
-      "quality": "質量",
+      "quality": "品質",
       "qualityLow": "低（更快）",
       "qualityMedium": "中（推薦）",
       "qualityHigh": "高（較慢）",
@@ -1673,7 +1706,7 @@
       "previewTitle": "提取文字預覽",
       "successMessage": "OCR完成！點選下載按鈕儲存檔案。",
       "infoTitle": "關於OCR",
-      "infoText": "OCR（光學字元識別）從掃描文件和影象中提取文字。為獲得最佳效果，請使用高質量掃描件並選擇正確的語言。"
+      "infoText": "OCR（光學字元識別）從掃描文件和影像中提取文字。為獲得最佳效果，請使用高品質掃描文件並選擇正確的語言。"
     },
     "textToPdf": {
       "uploadLabel": "上傳文字檔案",
@@ -1729,18 +1762,18 @@
       "uploadLabel": "上傳PDF檔案",
       "uploadDescription": "拖放PDF檔案到此處。",
       "headerTitle": "頁首",
+      "headerText": "頁首文字",
+      "headerTextPlaceholder": "輸入頁首文字...",
       "footerTitle": "頁尾",
+      "footerText": "頁尾文字",
+      "footerTextPlaceholder": "輸入頁尾文字...",
       "styleTitle": "樣式",
+      "fontSize": "字體大小",
+      "fontColor": "字體顏色",
       "preview": "預覽",
       "previewHint": "輸入頁首或頁尾文字以檢視預覽",
       "addButton": "新增頁首頁尾",
-      "successMessage": "頁首頁尾新增成功！",
-      "headerText": "頁首文字",
-      "headerTextPlaceholder": "輸入頁首文字...",
-      "footerText": "頁尾文字",
-      "footerTextPlaceholder": "輸入頁尾文字...",
-      "fontSize": "字體大小",
-      "fontColor": "字體顏色"
+      "successMessage": "頁首頁尾新增成功！"
     },
     "removeMetadata": {
       "uploadLabel": "上傳PDF檔案",
@@ -1781,12 +1814,12 @@
       "info": "注意：許可權執行需要PDF加密。請在下方設定所有者密碼以執行限制。",
       "allowPrinting": "允許列印",
       "allowPrintingDesc": "使用者可以列印文件",
-      "allowHighQualityPrinting": "允許高質量列印",
+      "allowHighQualityPrinting": "允許高品質列印",
       "allowHighQualityPrintingDesc": "使用者可以高解析度列印",
       "allowModifying": "允許修改",
       "allowModifyingDesc": "使用者可以編輯文件",
       "allowCopying": "允許複製",
-      "allowCopyingDesc": "使用者可以複製文字和影象",
+      "allowCopyingDesc": "使用者可以複製文字和影像",
       "allowAnnotating": "允許註釋",
       "allowAnnotatingDesc": "使用者可以新增評論和註釋",
       "allowFillingForms": "允許填寫表單",
@@ -1823,7 +1856,7 @@
       "pdfUploadDescription": "選擇要新增附件的PDF檔案。",
       "attachmentsTitle": "2. 選擇要附加的檔案",
       "attachmentsUploadLabel": "上傳附件",
-      "attachmentsUploadDescription": "選擇要嵌入PDF的檔案。支援任何檔案型別。",
+      "attachmentsUploadDescription": "選擇要嵌入PDF的檔案。支援任何檔案格式。",
       "optionsTitle": "附件選項",
       "attachmentLevel": "附件級別",
       "documentLevel": "文件級別",
@@ -1846,11 +1879,11 @@
       "sideBySide": "並排顯示",
       "overlay": "疊加顯示",
       "differences": "差異顯示",
-      "opacity": "不透明度：",
+      "opacity": "透明度：",
       "diffView": "差異檢視（紅色區域顯示變化）",
       "pageOverview": "頁面概覽",
-      "fullscreen": "全屏",
-      "exitFullscreen": "退出全屏",
+      "fullscreen": "全螢幕",
+      "exitFullscreen": "退出全螢幕",
       "successMessage": "比較完成！使用檢視模式和頁面導航來探索差異。"
     },
     "pageDimensions": {
@@ -1902,6 +1935,34 @@
       "maintainAspectRatio": "保持縱橫比",
       "applyButton": "修復頁面尺寸",
       "successMessage": "頁面尺寸修復成功！"
+          },
+    "bookmark": {
+      "uploadLabel": "上傳 PDF 檔案",
+      "uploadDescription": "將 PDF 檔案拖放到此處以編輯書籤。",
+      "pdfPreview": "PDF 預覽",
+      "bookmarksTitle": "書籤",
+      "addBookmark": "新增書籤",
+      "noBookmarks": "暫無書籤。點選「新增書籤」開始建立。",
+      "hint": "點選書籤可預覽對應頁面。使用 +/✎/× 新增子節點、編輯或刪除。",
+      "saveButton": "儲存書籤",
+      "successMessage": "書籤已儲存！",
+      "sort": "排序",
+      "sortByPage": "依頁碼排序",
+      "extractExisting": "擷取現有書籤",
+      "dragHint": "拖曳以重新排序書籤",
+      "extracting": "正在擷取現有書籤...",
+      "replaceConfirm": "這會取代目前的書籤。是否繼續？",
+      "noBookmarksFound": "在此 PDF 中未找到書籤。",
+      "failedExtract": "擷取書籤失敗。",
+      "title": "標題",
+      "page": "頁碼",
+      "color": "顏色",
+      "style": "樣式",
+      "normal": "一般",
+      "bold": "粗體",
+      "italic": "斜體",
+      "boldItalic": "粗體斜體",
+      "setToCurrentPage": "設為目前頁面"
     },
     "decryptPdf": {
       "uploadLabel": "上傳PDF檔案",
@@ -1910,6 +1971,7 @@
       "privacyNotice": "🔒 您的密碼在本地處理，永遠不會傳送到任何伺服器。",
       "passwordLabel": "PDF密碼",
       "passwordPlaceholder": "輸入PDF密碼",
+      "password": "密码",
       "passwordHint": "如果PDF僅有所有者密碼限制，可留空。",
       "decryptButton": "解密PDF",
       "successMessage": "PDF解密成功！",
@@ -1924,7 +1986,7 @@
       "ownerPasswordPlaceholder": "如果知道所有者密碼請輸入",
       "ownerPasswordHint": "如果PDF有所有者密碼，在此輸入可獲得更好的結果。",
       "info": "此工具可移除阻止列印、複製和編輯的所有者密碼限制。它適用於有許可權限制的PDF，但無法移除開啟文件所需的使用者密碼。",
-      "warning": "請僅對您擁有或有權修改的PDF使用此工具。未經授權移除受版權保護材料的限制可能違反版權法。",
+      "warning": "請僅對您擁有或有權修改的PDF使用此工具。未經授權移除受著作權保護材料的限制可能違反著作權法。",
       "removeButton": "移除限制",
       "successMessage": "PDF限制已成功移除！",
       "originalSize": "原始大小：",
@@ -1947,11 +2009,43 @@
       "successMessage": "PDF清理成功！",
       "removedItems": "已移除："
     },
+    "markdownToPdf": {
+      "uploadLabel": "上傳 Markdown 檔案",
+      "uploadDescription": "拖放 .md 或 .markdown 檔案以轉換為 PDF。",
+      "manualInput": "編寫 Markdown",
+      "uploadFile": "上傳檔案",
+      "editorLabel": "Markdown 編輯器",
+      "previewLabel": "預覽",
+      "showPreview": "顯示預覽",
+      "hidePreview": "隱藏預覽",
+      "optionsTitle": "轉換選項",
+      "themeLabel": "主題",
+      "pageSizeLabel": "頁面大小",
+      "gfmLabel": "啟用 GitHub 風格 Markdown (表格、任務列表等)",
+      "syntaxHighlightLabel": "啟用代碼塊語法高亮",
+      "convertButton": "轉換為 PDF",
+      "successMessage": "PDF 建立成功！按一下下載儲存檔案。"
+    },
     "pdfToDocx": {
       "uploadLabel": "上傳 PDF 文件",
       "uploadDescription": "拖放 PDF 文件到這裡，或點擊瀏覽選擇文件。",
       "convertButton": "轉換為 DOCX",
       "successMessage": "您的 PDF 已成功轉換為 DOCX！請點擊下載按鈕保存文件。"
+    },
+    "pdfToMarkdown": {
+      "uploadLabel": "上傳 PDF 文件",
+      "uploadDescription": "拖放 PDF 文件到此處，或點擊瀏覽。",
+      "optionsTitle": "轉換選項",
+      "pageRange": "頁面範圍",
+      "pageRangePlaceholder": "例如：1-3, 5, 7",
+      "pageRangeHint": "留空則導出所有頁面",
+      "includePageNumbers": "包含頁碼作為標題",
+      "preserveLineBreaks": "保留換行符",
+      "convertButton": "轉換為 Markdown",
+      "previewTab": "預覽",
+      "sourceTab": "Markdown 原始碼",
+      "successMessage": "您的 PDF 已成功轉換為 Markdown！點擊下載按鈕保存文件。",
+      "failed": "將 PDF 轉換為 Markdown 失敗。"
     },
     "pdfToExcel": {
       "uploadLabel": "上傳 PDF 文件",
@@ -1965,8 +2059,8 @@
       "uploadLabel": "上傳 PDF 文件",
       "uploadDescription": "拖放 PDF 文件到這裡，或點擊瀏覽選擇文件。",
       "optionsTitle": "轉換選項",
-      "dpiLabel": "圖像質量 (DPI)",
-      "dpiHint": "DPI 越高，幻燈片質量越好，但文件體積也會越大。",
+      "dpiLabel": "圖像品質 (DPI)",
+      "dpiHint": "DPI 越高，幻燈片品質越好，但文件體積也會越大。",
       "lowSet": "低 (72 DPI - 文件最小)",
       "mediumSet": "中 (150 DPI - 標準)",
       "highSet": "高 (200 DPI - 高清)",
@@ -2082,29 +2176,12 @@
       "convertButton": "轉換為圖片",
       "successMessage": "圖片建立成功！按一下下載儲存檔案。"
     },
-    "markdownToPdf": {
-      "uploadLabel": "上傳 Markdown 檔案",
-      "uploadDescription": "拖放 .md 或 .markdown 檔案以轉換為 PDF。",
-      "manualInput": "編寫 Markdown",
-      "uploadFile": "上傳檔案",
-      "editorLabel": "Markdown 編輯器",
-      "previewLabel": "預覽",
-      "showPreview": "顯示預覽",
-      "hidePreview": "隱藏預覽",
-      "optionsTitle": "轉換選項",
-      "themeLabel": "主題",
-      "pageSizeLabel": "頁面大小",
-      "gfmLabel": "啟用 GitHub Flavored Markdown (表格、任務列表等)",
-      "syntaxHighlightLabel": "啟用代碼塊語法高亮",
-      "convertButton": "轉換為 PDF",
-      "successMessage": "PDF 建立成功！按一下下載儲存檔案。"
-    },
     "emailToPdf": {
       "uploadLabel": "上傳電子郵件檔案",
       "uploadDescription": "拖放電子郵件檔案 (.eml) 以轉換為 PDF。",
       "optionsTitle": "轉換選項",
       "pageSizeLabel": "頁面大小",
-      "includeCcBccLabel": "包含抄送/密送欄位",
+      "includeCcBccLabel": "包含副本/密件副本欄位",
       "includeAttachmentsLabel": "包含附件清單",
       "timezoneLabel": "時區",
       "convertButton": "轉換為 PDF",
@@ -2164,22 +2241,18 @@
     },
     "pdfReader": {
       "uploadLabel": "開啟 PDF 檔案",
-      "uploadDescription": "開啟 PDF 檔案進行閱讀和查看。"
+      "uploadDescription": "開啟 PDF 檔案以供閱讀與檢視。"
     },
-    "pdfToMarkdown": {
-      "uploadLabel": "上傳 PDF 文件",
-      "uploadDescription": "拖放 PDF 文件到此處，或點擊瀏覽。",
-      "optionsTitle": "轉換選項",
-      "pageRange": "頁面範圍",
-      "pageRangePlaceholder": "例如：1-3, 5, 7",
-      "pageRangeHint": "留空則導出所有頁面",
-      "includePageNumbers": "包含頁碼作為標題",
-      "preserveLineBreaks": "保留換行符",
-      "convertButton": "轉換為 Markdown",
-      "previewTab": "預覽",
-      "sourceTab": "Markdown 原始碼",
-      "successMessage": "您的 PDF 已成功轉換為 Markdown！點擊下載按鈕保存文件。",
-      "failed": "將 PDF 轉換為 Markdown 失敗。"
+    "removeAnnotations": {
+      "uploadLabel": "上傳 PDF 檔案",
+      "uploadDescription": "將 PDF 檔案拖放到此處。",
+      "optionsTitle": "刪除選項",
+      "removeAllLabel": "刪除所有註解（評論、標註、連結等）",
+      "processButton": "刪除註解",
+      "successMessage": "註解已刪除！",
+      "removeComments": "刪除評論",
+      "removeHighlights": "刪除高亮",
+      "removeLinks": "刪除連結"
     },
     "findAndRedact": {
       "uploadLabel": "上傳 PDF 檔案",

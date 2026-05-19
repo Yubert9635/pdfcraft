@@ -10,6 +10,7 @@ export { toolContentEs } from './es';
 export { toolContentFr } from './fr';
 export { toolContentDe } from './de';
 export { toolContentZh } from './zh';
+export { toolContentZhTW } from './zh-TW';
 export { toolContentPt } from './pt';
 export { toolContentAr } from './ar';
 export { toolContentIt } from './it';
@@ -23,6 +24,7 @@ import { toolContentEs } from './es';
 import { toolContentFr } from './fr';
 import { toolContentDe } from './de';
 import { toolContentZh } from './zh';
+import { toolContentZhTW } from './zh-TW';
 import { toolContentPt } from './pt';
 import { toolContentAr } from './ar';
 import { toolContentIt } from './it';
@@ -47,6 +49,7 @@ export function getToolContent(locale: Locale, toolId: string): ToolContent | un
     fr: toolContentFr,
     de: toolContentDe,
     zh: toolContentZh,
+    'zh-TW': toolContentZhTW,
     pt: toolContentPt,
     ar: toolContentAr,
     it: toolContentIt,
@@ -54,11 +57,7 @@ export function getToolContent(locale: Locale, toolId: string): ToolContent | un
     vi: toolContentVn,
   };
 
-  // Map zh-TW to zh (use Simplified Chinese content for Traditional Chinese)
-  const effectiveLocale: Exclude<Locale, 'zh-TW'> =
-    locale === 'zh-TW' ? 'zh' : locale;
-
-  const localeContent = contentMap[effectiveLocale];
+  const localeContent = contentMap[locale];
   if (localeContent && localeContent[toolId]) {
     return localeContent[toolId];
   }
