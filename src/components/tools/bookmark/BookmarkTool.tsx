@@ -313,10 +313,14 @@ export function BookmarkTool({ className = '' }: BookmarkToolProps) {
 
   // Update bookmark
   const handleUpdateBookmark = useCallback((updated: BookmarkNode) => {
+    // Ensure pageNumber is a valid number
+    const pageNum = typeof updated.pageNumber === 'string' ? 1 : (updated.pageNumber || 1);
+    const finalUpdate = { ...updated, pageNumber: pageNum };
+
     const updateIn = (nodes: BookmarkNode[]): BookmarkNode[] => {
       return nodes.map(node => {
-        if (node.id === updated.id) {
-          return { ...updated, children: node.children };
+        if (node.id === finalUpdate.id) {
+          return { ...finalUpdate, children: node.children };
         }
         return { ...node, children: updateIn(node.children) };
       });
@@ -578,19 +582,27 @@ export function BookmarkTool({ className = '' }: BookmarkToolProps) {
                 </div>
                 <div>
                   <label className="block text-[10px] text-gray-500 uppercase font-bold mb-1">{tTools('bookmark.page') || 'Page'}</label>
-                  <div className="relative flex items-center">
+                  <div className="flex items-center gap-1">
                     <input
-                      type="number"
+                      type="text"
+                      inputMode="numeric"
                       value={editingBookmark.pageNumber}
-                      onChange={(e) => setEditingBookmark({ ...editingBookmark, pageNumber: parseInt(e.target.value) || 1 })}
-                      min={1}
-                      max={totalPages}
-                      className="w-20 px-2 py-1 border rounded text-sm pr-7"
-                      title={tTools('bookmark.page') || 'Page'}
+                      onChange={(e) => {
+                        const val = e.target.value;
+                        if (/^\d*$/.test(val)) {
+                          setEditingBookmark({ 
+                            ...editingBookmark, 
+                            pageNumber: val === '' ? '' : Math.min(totalPages, parseInt(val)) 
+                          } as any);
+                        }
+                      }}
+                      className="w-14 px-2 py-1 border rounded text-sm h-8"
+                      placeholder="1"
                     />
                     <button
+                      type="button"
                       onClick={() => setEditingBookmark({ ...editingBookmark, pageNumber: currentPage })}
-                      className="absolute right-1 p-1 text-blue-500 hover:text-blue-700 bg-white"
+                      className="p-1 text-blue-500 hover:text-blue-700 bg-white border rounded h-8 w-8 flex items-center justify-center transition-colors"
                       title={tTools('bookmark.setToCurrentPage') || 'Set to current page'}
                     >
                       📍

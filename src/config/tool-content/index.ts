@@ -32,7 +32,7 @@ import { toolContentId } from './id';
 import { toolContentVn } from './vi';
 import { ToolContent } from '@/types/tool';
 
-export type Locale = 'en' | 'ja' | 'ko' | 'es' | 'fr' | 'de' | 'zh' | 'zh-TW' | 'pt' | 'ar' | 'it' | 'id' | 'vi';
+export type Locale = 'en' | 'ja' | 'ko' | 'es' | 'fr' | 'de' | 'zh' | 'zh-TW' | 'pt' | 'ar' | 'it' | 'id' | 'vi' | 'ro';
 
 /**
  * Get tool content for a specific locale
@@ -55,6 +55,7 @@ export function getToolContent(locale: Locale, toolId: string): ToolContent | un
     it: toolContentIt,
     id: toolContentId,
     vi: toolContentVn,
+    ro: toolContentEn, // Fallback to English for Romanian tool content for now
   };
 
   const localeContent = contentMap[locale];
