@@ -174,6 +174,20 @@ const nextConfig = {
         ],
       },
       {
+        // MJS files (ES modules) - correct MIME for module scripts
+        source: '/:path*.mjs',
+        headers: [
+          {
+            key: 'Content-Type',
+            value: 'application/javascript; charset=utf-8',
+          },
+          {
+            key: 'Cache-Control',
+            value: 'public, max-age=31536000, immutable',
+          },
+        ],
+      },
+      {
         // HTML pages - short cache with revalidation
         source: '/:path*',
         headers: [

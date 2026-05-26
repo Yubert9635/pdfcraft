@@ -6,7 +6,7 @@
  * Libraries are lazy-loaded to optimize initial page load.
  */
 
-/**
+/**The file at 'blob:http://pdfcrafts.test/7e5bc74f-8bb7-4280-8a23-96852ad1356f' was loaded over an insecure connection. This file should be served over HTTPS.
  * PDF.js configuration
  */
 export const PDFJS_CONFIG = {
