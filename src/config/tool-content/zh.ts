@@ -986,7 +986,7 @@ export const toolContentZh: Record<string, ToolContent> = {
     keywords: ['powerpoint转pdf', 'pptx转pdf', '转换pptx', '演示文稿转pdf', '幻灯片转pdf'],
     description: `
       <p>PowerPoint转PDF将Microsoft PowerPoint演示文稿转换为PDF格式，保留幻灯片内容和文本以便轻松分享和查看。</p>
-      <p>每张幻灯片成为PDF中的一页，保持演示流程。非常适合与没有安装PowerPoint的人分享演示文稿。</p>
+      <p>每张幻灯片成为PDF中的一页，保持演示流。非常适合与没有安装PowerPoint的人分享演示文稿。</p>
       <p>所有转换都在您的浏览器本地进行，确保您的演示文稿保持私密和安全。</p>
     `,
     howToUse: [
@@ -1003,6 +1003,32 @@ export const toolContentZh: Record<string, ToolContent> = {
       { question: '动画会保留吗？', answer: 'PDF是静态格式，因此动画和过渡不会保留。每张幻灯片变成静态页面。' },
       { question: '支持.ppt格式吗？', answer: '目前仅支持.pptx格式。请先将.ppt文件转换为.pptx。' },
       { question: '演讲者备注会包含吗？', answer: '目前演讲者备注不会包含在PDF输出中。' },
+    ],
+  },
+
+  'add-page-labels': {
+    title: '添加页面标签',
+    metaDescription: '为 PDF 添加自定义页面标签。支持罗马数字、阿拉伯数字、大写/小写字母和自定义前缀，并且支持非连续的不相交页码范围。',
+    keywords: ['pdf页面标签', '罗马数字页码', 'pdf分卷标签', '不相交范围页码', 'pdf前缀页码'],
+    description: `
+      <p>PDF 页面标签工具允许您修改 PDF 树的 Catalog 目录，写入完全符合 PDF 标准规范的 /PageLabels 属性。它可以让 PDF 阅读器的导航框中清晰地显示诸如罗马数字的前言、阿拉伯数字的正文，以及带有特定前缀（如 A-0, A-1）的分册标签。</p>
+      <p>支持多条规则动态合并。最重要的是，我们开发了创新的<strong>不相交页码分裂算法</strong>，即使您设置了极其复杂的非连续规则（例如：奇数页应用样式 A，偶数页应用样式 B），系统也能智能进行边界切片，保证转换出的 PDF 在任意专业阅读器中完美呈现，绝不发生样式溢出。</p>
+      <p>所有操作均在浏览器本地安全运行，绝不上传文件，给您极致的安全保障。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传 PDF 文档', description: '上传您想要注入页面标签的 PDF 文件。' },
+      { step: 2, title: '配置多标签规则', description: '添加一条或多条标签规则，指定页码范围（如 1-5, odd 等）、前缀、起始数值及编号样式。' },
+      { step: 3, title: '实时预览与下载', description: '在下方预览每一页被注入的最终标签效果，确认无误后点击开始，即可一键下载已注入标签的 PDF。' },
+    ],
+    useCases: [
+      { title: '正规书籍与论文排版', description: '为前言/目录部分应用罗马数字 (i, ii, iii)，为主体部分恢复阿拉伯数字，呈现极其专业的排版效果。', icon: 'book' },
+      { title: '工程图纸与分册前缀', description: '在图纸中为指定页面添加如 "A-100", "E-200" 等大类前缀，便于工程师在阅读器中极速检索。', icon: 'layout' },
+      { title: '特殊页码跳跃与奇偶映射', description: '为奇数页与偶数页或 disjoint 的页码段映射完全不同的前缀与编码，极富定制自由度。', icon: 'shuffle' },
+    ],
+    faq: [
+      { question: '什么是页面标签？它和普通的页码（Page Numbers）有什么区别？', answer: '普通的页码是在 PDF 页面内容层直接绘制的文本（打印可见）；而页面标签则是写入 PDF 字典的元数据（物理标签）。它决定了用户在使用 Adobe Acrobat 等 PDF 阅读器时，缩略图下方以及顶部页码跳转框内显示什么，更方便电子化检索。' },
+      { question: '留空“页码范围”会发生什么？', answer: '如果您将页码范围留空，则该条规则将自动应用到文档的所有页面中。' },
+      { question: '如果我不小心定义了重叠的页码规则，系统会如何处理？', answer: '我们的算法会按照规则的添加顺序进行最终覆盖，后添加的规则若与先前的规则范围重叠，会优先覆盖重叠的页面，其余部分继续正常保留。' },
     ],
   },
 
@@ -1291,6 +1317,32 @@ export const toolContentZh: Record<string, ToolContent> = {
       { question: '可以创建多页TIFF吗？', answer: '是的，您可以将所有PDF页面合并成一个多页TIFF。' },
       { question: '有哪些压缩选项？', answer: 'LZW、ZIP和无压缩选项可用。' },
       { question: '打印应该使用什么DPI？', answer: '专业打印使用300 DPI或更高。' },
+    ],
+  },
+
+  'pdf-to-cbz': {
+    title: 'PDF 转 CBZ 漫画包',
+    metaDescription: '将 PDF 转换为高清漫画压缩包 (.cbz)。集成 Calibre OPF、ComicInfo XML 及 Comment 三合一元数据，完美兼容各大漫画阅读器。',
+    keywords: ['pdf转cbz', 'pdf转漫画', 'cbz打包', 'calibre漫画', 'comicinfo xml'],
+    description: `
+      <p>PDF 转 CBZ 工具专为漫画爱好者及数字化归档设计。它能将您的 PDF 电子书/扫描本的每一页渲染为高清图像，打包为标准的漫画压缩包（.cbz 文件）。</p>
+      <p>为了打通 Calibre、Komga、Kavita、CDisplayEx 等所有主流漫画管理和阅读软件，我们自动在压缩包内注入了 <strong>ComicInfo.xml</strong>、<strong>metadata.opf</strong> 规范数据，并把 <strong>ComicBookInfo JSON</strong> 作为 ZIP 文件的全局注释写入，实现全方位的元数据秒级识别分类。</p>
+      <p>支持从右向左阅读切换（Manga 读向）、全彩/灰度双模式、画质和缩放比例调节，给您殿堂级的掌上漫画享受。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传漫画 PDF', description: '上传您想要转换为 CBZ 格式的漫画、画集或插页 PDF 原始文件。' },
+      { step: 2, title: '完善漫画元数据', description: '录入漫画的书名、系列、期数、作者、发行商，勾选读向（从左至右 / 从右至左）并按需开启灰度处理。' },
+      { step: 3, title: '生成并下载', description: '点击开始打包，转换出的 .cbz 文件可导入任意漫画阅读器或 Calibre 中完美归类。' },
+    ],
+    useCases: [
+      { title: '漫画与画集转档', description: '将扫描版的 PDF 格式漫画极速转换为各大漫画软件完美兼容 of CBZ 归档格式。', icon: 'book' },
+      { title: 'Calibre 漫画柜完美管理', description: '自动生成的 metadata.opf 可让 Calibre 完美提取分类，避免手动刮削，强迫症福音。', icon: 'database' },
+      { title: '墨水屏阅读器深度优化', description: '开启灰度脱色功能，预先过滤电子书色彩，大幅提升墨水屏阅读器在刷新和对比度上的视觉表现。', icon: 'eye' },
+    ],
+    faq: [
+      { question: '什么是 .cbz 格式？', answer: 'CBZ (Comic Book Zip) 是标准的漫画图像归档文件，本质上是一个包含图像序列以及元数据 XML 文件的 ZIP 压缩包，被主流电子书和漫画阅读器普遍采用。' },
+      { question: '元数据是如何生效的？', answer: '我们在导出的 ZIP 内部直接写入了 ComicInfo.xml（Komga/Kavita 识别）、metadata.opf（Calibre 识别）并将 ComicBookInfo 写入 ZIP 注释，真正做到了对全平台多端阅读工具的元数据 100% 极速兼容。' },
+      { question: '为什么要开启灰度处理？', answer: '如果您的阅读设备是黑白电子墨水屏（E-ink），开启灰度脱色处理会在输出时直接在底层将图片渲染为灰阶，以极优的对比度提升漫画的实际表现，并同时缩小压缩包体积。' },
     ],
   },
 
@@ -1685,6 +1737,59 @@ export const toolContentZh: Record<string, ToolContent> = {
       { question: '可以对不同页面进行不同的旋转吗？', answer: '是的，您可以对不同页面应用不同的旋转。' },
       { question: '旋转会影响打印质量吗？', answer: '不会，旋转保留所有内容质量。' },
       { question: '可以按自定义角度旋转吗？', answer: '旋转限于90度增量（90、180、270）。' },
+    ],
+  },
+
+  'overlay-pdf': {
+    title: 'PDF 覆叠与垫底',
+    metaDescription: '将一个 PDF 的页面作为前景覆叠或背景垫底合并到另一个 PDF 上。非常适合添加公章、信头或图层拼版。',
+    keywords: ['pdf覆叠', 'pdf垫底', 'pdf盖章', 'pdf信笺', '合并图层'],
+    description: `
+      <p>PDF 覆叠与垫底工具允许您将一个 PDF 的页面以图层形式覆盖在另一个 PDF 的页面上方或下方。它非常适合为发票添加精美的公司信笺抬头、盖章、添加图纸背景网格或融合不同的排版草案。</p>
+      <p>支持前景覆叠 (Overlay) 和背景垫底 (Underlay) 两种堆叠顺序。您可以指定复杂非连续的目标页面范围，也可以在覆叠文档较短时选择自动循环套用，从而完美对齐文档。</p>
+      <p>所有处理都在您的浏览器本地完成，绝对确保您的设计和文件保持私密与安全。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传主文档', description: '上传您作为骨架的主要 base PDF 文件。' },
+      { step: 2, title: '上传图层文档', description: '上传需要作为前景或背景叠放的图层 PDF 文件。' },
+      { step: 3, title: '配置覆叠规则', description: '选择叠放层级、指定适用的页码范围并选择是否开启循环套用。' },
+      { step: 4, title: '拼版编译并下载', description: '点击开始按钮，生成覆叠好的 PDF 并一键下载。' },
+    ],
+    useCases: [
+      { title: '公司正规信笺抬头', description: '将发票或报告内容完美覆叠到标准的信头信尾模版上。', icon: 'file-text' },
+      { title: '电子签章与水印', description: '在指定的页面上覆叠公章、签名印记或防伪背景。', icon: 'shield' },
+      { title: '设计草稿比对', description: '将背景网格或测绘底图垫在文字和图表下方以供校验。', icon: 'layout' },
+    ],
+    faq: [
+      { question: '前景覆叠 (Overlay) 和背景垫底 (Underlay) 有什么区别？', answer: '前景覆叠会将图层覆盖在您原有的文字和图像上方；背景垫底则是将图层放在最底层作为背景图版，原有的文字和图形会在其上方显示。' },
+      { question: '图层文件的页数少于主文件时会怎样？', answer: '如果开启了“循环重复”，系统会自动循环套用图层页面（如 1、2、1、2 页交替）；如果关闭，则超出图层页数的后续页面将不进行任何覆盖。' },
+      { question: '页码范围怎么填写？', answer: '您可留空应用到全部页面，或输入如 "1-5", "odd" (奇数页), "even" (偶数页) 或用逗号分隔的不连续页码如 "1-3, 5, 8"。' },
+    ],
+  },
+
+  'timestamp-pdf': {
+    title: 'PDF 可信时间戳',
+    metaDescription: '为 PDF 文档添加 RFC 3161 可信时间戳。无需证书，即可在司法上确凿证明文档在特定时间点存在且未被篡改。',
+    keywords: ['pdf时间戳', 'rfc 3161', 'tsa服务器', '可信时间戳', '存在性证明'],
+    description: `
+      <p>PDF 可信时间戳工具利用外部权威时间戳机构 (TSA)，为您的 PDF 文件追加符合 RFC 3161 标准的安全时间戳。这能为您的电子文件在司法、知识产权确权或合规审计上，提供无可辩驳的数学和法律凭证，客观证明该文件在某个精确的历史时间点就已完整存在且未经任何改动。</p>
+      <p>支持选择 MeSign、DigiCert、Sectigo、SSL.com、FreeTSA 等全球知名时间戳服务器。整个签名操作不依赖任何个人私钥证书，轻松对文档加锁，保障长久安全性。</p>
+      <p>安全加密原则：在与外部服务器通信握手前，只会在本地计算文档的安全 SHA-256 哈希值并发送，您的文档具体内容绝对不会泄露给任何外部网络。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传待签名 PDF', description: '选择并上传您要进行时间戳确权签名的 PDF 文件。' },
+      { step: 2, title: '选择时间戳服务器', description: '在列表中选择一家全球受信任的权威时间戳服务商 (TSA)。' },
+      { step: 3, title: '签署并下载', description: '点击开始签署，系统会快速向 TSA 握手获取可信 TST 令牌并完美嵌入 PDF 中。' },
+    ],
+    useCases: [
+      { title: '知识产权与版权证明', description: '在发明、设计底稿、小说草稿公开发布前抢先签署，提供绝对的原创时间证明。', icon: 'lightbulb' },
+      { title: '电子合同与法律文书', description: '为双方签署的电子协议加上可信时间锁，防止发生任何篡改或事后倒签日期的纠纷。', icon: 'file-check' },
+      { title: '财务报表与合规日志', description: '对历史账目、合规审计日志进行时间戳锚定，满足行业严苛的档案完整性审查。', icon: 'activity' },
+    ],
+    faq: [
+      { question: '什么是 RFC 3161 可信时间戳？', answer: 'RFC 3161 时间戳是由第三方权威时间戳服务商 (TSA) 采用私钥对您的文件哈希值和权威原子钟时间联合签署生成的加密令牌，具有极高的法律证明效力。' },
+      { question: '我需要自己去申请数字证书吗？', answer: '完全不需要。签名证书是由 TSA 时间戳机构提供的，您作为文档拥有者不需要具备任何证书，只需一键点击即可完成签署。' },
+      { question: '时间戳服务器会看到我的机密文件内容吗？', answer: '绝对不会。该工具在浏览器本地计算文件的哈希摘要（SHA-256），只把这串无规律的 64 位字符发送给时间戳服务器，服务器无法倒推出您的任何文件内容，隐私万无一失。' },
     ],
   },
 

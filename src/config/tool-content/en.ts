@@ -1323,6 +1323,33 @@ export const toolContentEn: Record<string, ToolContent> = {
     ],
   },
 
+  'pdf-to-cbz': {
+    title: 'PDF to CBZ',
+    metaDescription: 'Convert PDF documents to high-definition Comic Book ZIP archives (.cbz). Built-in Calibre OPF, ComicInfo XML, and ZIP Comment metadata for perfect multi-reader cataloging.',
+    keywords: ['pdf to cbz', 'pdf to comic', 'cbz packaging', 'calibre comic archive', 'comicinfo metadata'],
+    description: `
+      <p>PDF to CBZ is custom-engineered for comic enthusiasts and digital ebook archivists. It renders every page of your PDF volumes into high-fidelity rasterized graphics and compiles them into a standard Comic Book ZIP (.cbz) bundle.</p>
+      <p>To eliminate frustrating manual scraping in systems like Calibre, Komga, Kavita, or CDisplayEx, the processor automatically generates and injects both <strong>ComicInfo.xml</strong> and <strong>metadata.opf</strong> files internally, while simultaneously writing a standardized <strong>ComicBookInfo JSON</strong> payload directly into the ZIP file comment metadata.</p>
+      <p>Includes complete configuration sliders for image compression quality, page dimension scale, right-to-left layout reading toggles (Manga mode), and black-and-white grayscale color filtering.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload Comic PDF', description: 'Drag and drop your primary comic, artbook, or manga PDF file.' },
+      { step: 2, title: 'Input Comic Metadata', description: 'Fill out Series, Volume, Title, Writer, and Publisher fields, and toggle layout or grayscale optimization.' },
+      { step: 3, title: 'Compile and Download', description: 'Click Convert to compile and retrieve your metadata-rich .cbz file instantly ready for Calibre.' },
+    ],
+    useCases: [
+      { title: 'Retrograde Comic Packaging', description: 'Transform raw scanned PDF books into compact, standard-compliant CBZ comic files easily scrapable by comic library managers.', icon: 'book' },
+      { title: 'Zero-Effort Calibre Integration', description: 'The built-in metadata.opf schema allows Calibre to fetch and classify creators and volume issues without manual lookup.', icon: 'database' },
+      { title: 'E-Ink Screen Enhancement', description: 'Pre-filter graphic color channels into high-contrast grayscale on compile, boosting visual refresh and clarity on E-ink screens while saving storage.', icon: 'eye' },
+    ],
+    faq: [
+      { question: 'What is a .cbz file?', answer: 'A CBZ file is a specialized archive container format for comic book series. It is internally formatted as a ZIP package containing sequentially numbered page images alongside structural metadata XML files.' },
+      { question: 'How is metadata compatible?', answer: 'We compile and embed ComicInfo.xml, metadata.opf, and ZIP File Comments in one pass. This guarantees absolute compliance across multiple comic and e-book ecosystems.' },
+      { question: 'Why use Grayscale mode?', answer: 'If you read on a grayscale E-ink reader (like Kindle or Kobo), compiling directly in Grayscale reduces artifact ghosting, delivers superior contrast levels, and shrinks the final CBZ file size.' },
+    ],
+  },
+
+
   'pdf-to-svg': {
     title: 'PDF to SVG',
     metaDescription: 'Convert PDF pages to SVG vector graphics. Perfect scalability at any size with individual page export.',
@@ -1715,6 +1742,85 @@ export const toolContentEn: Record<string, ToolContent> = {
       { question: 'Can I rotate different pages differently?', answer: 'Yes, you can apply different rotations to different pages.' },
       { question: 'Does rotation affect print quality?', answer: 'No, rotation preserves all content quality.' },
       { question: 'Can I rotate by custom angles?', answer: 'Rotation is limited to 90-degree increments (90, 180, 270).' },
+    ],
+  },
+
+  'overlay-pdf': {
+    title: 'Overlay PDF',
+    metaDescription: 'Overlay or underlay pages from one PDF onto another. Perfect for stamps, letterheads, and layout composition.',
+    keywords: ['overlay pdf', 'underlay pdf', 'stamp pdf', 'watermark pdf', 'combine layers'],
+    description: `
+      <p>Overlay PDF allows you to layer pages of one PDF document on top or underneath another PDF document. It is perfect for applying letterheads, adding background grids, stamping watermarks, or fusing layout drafts together.</p>
+      <p>Supports both Overlay mode (layer goes on top) and Underlay mode (layer goes underneath). Specify custom target page ranges or loop shorter overlay documents to cover the entire base file automatically.</p>
+      <p>All processing is executed entirely inside your web browser locally, guaranteeing total security and data privacy.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload Main PDF', description: 'Drag and drop your primary base PDF document.' },
+      { step: 2, title: 'Upload Layer PDF', description: 'Provide the overlay/underlay document that acts as the layer.' },
+      { step: 3, title: 'Configure Layering', description: 'Choose overlay or underlay mode, specify page ranges, and enable page looping.' },
+      { step: 4, title: 'Compile and Download', description: 'Click Compile to process and download the layered result PDF.' },
+    ],
+    useCases: [
+      { title: 'Corporate Letterheads', description: 'Layer invoice contents on top of standard company letterhead templates.', icon: 'file-text' },
+      { title: 'Watermarks & Seals', description: 'Overlay security stamps, signature seals, or backgrounds across documents.', icon: 'shield' },
+      { title: 'Drawing Blueprints', description: 'Combine draft architectures or layout grids underneath text blocks.', icon: 'layout' },
+    ],
+    faq: [
+      { question: 'What is the difference between Overlay and Underlay?', answer: 'Overlay places the secondary layer on top of your main content. Underlay places it at the very bottom, acting as a background template.' },
+      { question: 'Can I loop the overlay layer?', answer: 'Yes, if the layer PDF is shorter than the base document, enabling Loop will cycle it (e.g. page 1, 2, 1, 2) to cover all base pages.' },
+      { question: 'Is page range supported?', answer: 'Yes, you can target specific pages using range syntax such as "1-5", "odd", "even", or comma-separated lists.' },
+    ],
+  },
+
+  'timestamp-pdf': {
+    title: 'Timestamp PDF',
+    metaDescription: 'Add RFC 3161 trusted timestamps to PDF documents. Prove document existence at a specific point in time without certificates.',
+    keywords: ['timestamp pdf', 'rfc 3161', 'tsa server', 'trusted timestamping', 'proof of existence'],
+    description: `
+      <p>Timestamp PDF adds RFC 3161 compliant trusted timestamps to your PDF documents using external Time Stamping Authorities (TSA). It provides legally-binding mathematical proof that a document existed in a specific, unaltered state at a precise instant in time.</p>
+      <p>Select from global trusted TSA servers such as DigiCert, Sectigo, SSL.com, FreeTSA, or MeSign. No personal signing certificates are required to secure your documents against future tampering.</p>
+      <p>Supports fully secure local hashing before handshake, guaranteeing absolute document contents remain 100% confidential.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload PDF Document', description: 'Select the target PDF file you want to timestamp.' },
+      { step: 2, title: 'Select TSA Server', description: 'Choose a trusted global Time Stamping Authority from the list.' },
+      { step: 3, title: 'Apply and Timestamp', description: 'Click Timestamp to fetch secure response from TSA and embed the token.' },
+    ],
+    useCases: [
+      { title: 'Intellectual Property', description: 'Establish clear priority proof of patents, drafts, and ideas before public release.', icon: 'lightbulb' },
+      { title: 'Financial Auditing', description: 'Provide certified tamper-proof logging of ledger archives and balance reports.', icon: 'activity' },
+      { title: 'Legal Contracts', description: 'Lock legal agreements with a trusted time proof to avoid backdating arguments.', icon: 'file-check' },
+    ],
+    faq: [
+      { question: 'What is a trusted timestamp (RFC 3161)?', answer: 'An RFC 3161 timestamp is a cryptographically signed token issued by a recognized third-party authority (TSA) that links a document hash to a specific, verified clock source.' },
+      { question: 'Do I need a digital certificate?', answer: 'No, the cryptographic signature is provided directly by the trusted TSA server, making the process effortless for document owners.' },
+      { question: 'Does the TSA see my document contents?', answer: 'Never. The tool only sends a secure SHA-256 hash of your document to the TSA server, keeping your actual document completely private.' },
+    ],
+  },
+
+  'add-page-labels': {
+    title: 'Add Page Labels',
+    metaDescription: 'Apply custom page labels to your PDF catalog. Supports Roman numerals, prefixes, and complex disjoint ranges.',
+    keywords: ['pdf page labels', 'roman numerals pdf', 'pdf prefix labels', 'disjoint range page labels', 'pdf indexing'],
+    description: `
+      <p>Add Page Labels allows you to inject custom page labeling metadata (/PageLabels) into your PDF\'s root Catalog dictionary. This customizes the labels displayed in professional PDF reader navigation sidebars and top page number jump panels (e.g. using Roman numerals for front matter, decimal sequences for main body, or custom prefixes such as A-0, A-1 for technical subsections).</p>
+      <p>Supports combining multiple custom rules seamlessly. Crucially, we\'ve built a highly optimized <strong>disjoint-range slicing algorithm</strong>: even if you declare complex alternating patterns (e.g., odd pages style A, even pages style B), the tool will elegantly dissect and compose boundaries to ensure proper standard-compliant display without leaking formats into unmapped pages.</p>
+      <p>All operations are processed entirely inside your local browser sandbox, securing absolute data privacy.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload PDF Document', description: 'Provide the target PDF document you wish to label.' },
+      { step: 2, title: 'Configure Labeling Rules', description: 'Add one or more rules specifying page ranges (e.g., "1-5", "odd", or comma-separated lists), prefix, style, and starting sequence.' },
+      { step: 3, title: 'Preview and Download', description: 'Review the live page label list preview below, then compile and download your updated PDF document.' },
+    ],
+    useCases: [
+      { title: 'Academic Thesis Formatting', description: 'Set lowercase Roman numerals (i, ii, iii) for introductory front matter and transition to decimal for main chapters.', icon: 'book' },
+      { title: 'Engineering Blueprint Prefixes', description: 'Attach subsystem abbreviations (e.g., "A-1", "M-5") as page label prefixes, letting teams search and locate pages in seconds.', icon: 'layout' },
+      { title: 'Custom Alternating Layouts', description: 'Apply highly specific page range indexing to odd/even sequences or non-contiguous sections with maximum freedom.', icon: 'shuffle' },
+    ],
+    faq: [
+      { question: 'What are page labels vs page numbers?', answer: 'Ordinary page numbers are visual text blocks rendered directly on the paper canvas (visible when printed). Page labels, however, are structural metadata injected into the PDF catalog. They control what is displayed underneath thumbnails and in the page lookup box inside software like Adobe Acrobat or Apple Preview.' },
+      { question: 'What happens if I leave the Page Range empty?', answer: 'Leaving the page range empty causes the rule to apply globally to all pages of the document.' },
+      { question: 'How are overlapping rules handled?', answer: 'Rules are evaluated sequentially in the order they are listed. If a page range of a later rule overlaps with an earlier one, the later rule takes priority and overrides the label for that page.' },
     ],
   },
 

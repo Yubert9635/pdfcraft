@@ -67,6 +67,9 @@ import { PDFToDocxTool } from '@/components/tools/pdf-to-docx';
 import { PDFToPptxTool } from '@/components/tools/pdf-to-pptx';
 import { PDFToExcelTool } from '@/components/tools/pdf-to-excel';
 import { RotateCustomTool } from '@/components/tools/rotate-custom/RotateCustomTool';
+import { OverlayPDFTool } from '@/components/tools/overlay/OverlayPDFTool';
+import { TimestampPDFTool } from '@/components/tools/timestamp/TimestampPDFTool';
+import { AddPageLabelsTool } from '@/components/tools/page-labels/AddPageLabelsTool';
 import { WordToPDFTool } from '@/components/tools/word-to-pdf';
 import { ExcelToPDFTool } from '@/components/tools/excel-to-pdf';
 import { PPTXToPDFTool } from '@/components/tools/pptx-to-pdf';
@@ -84,6 +87,8 @@ import { RasterizePDFTool } from '@/components/tools/rasterize';
 import { MarkdownToPDFTool } from '@/components/tools/markdown-to-pdf';
 import { EmailToPDFTool } from '@/components/tools/email-to-pdf';
 import { CBZToPDFTool } from '@/components/tools/cbz-to-pdf';
+import { PDFToCBZTool } from '@/components/tools/pdf-to-cbz/PDFToCBZTool';
+import { PDFToTIFFTool } from '@/components/tools/pdf-to-tiff/PDFToTIFFTool';
 import { PDFToPDFATool } from '@/components/tools/pdf-to-pdfa';
 import { FontToOutlineTool } from '@/components/tools/font-to-outline';
 import { ExtractTablesTool } from '@/components/tools/extract-tables';
@@ -224,6 +229,12 @@ export default async function ToolPageRoute({ params }: ToolPageParams) {
         return <RotatePDFTool />;
       case 'rotate-custom':
         return <RotateCustomTool />;
+      case 'overlay-pdf':
+        return <OverlayPDFTool />;
+      case 'add-page-labels':
+        return <AddPageLabelsTool />;
+      case 'timestamp-pdf':
+        return <TimestampPDFTool />;
       case 'add-blank-page':
         return <AddBlankPageTool />;
       case 'reverse-pages':
@@ -331,7 +342,7 @@ export default async function ToolPageRoute({ params }: ToolPageParams) {
       case 'pdf-to-bmp':
         return <PDFToImageTool outputFormat="bmp" />;
       case 'pdf-to-tiff':
-        return <PDFToImageTool outputFormat="tiff" />;
+        return <PDFToTIFFTool />;
       case 'pdf-to-svg':
         return <PDFToSVGTool />;
       case 'pdf-to-greyscale':
@@ -402,6 +413,8 @@ export default async function ToolPageRoute({ params }: ToolPageParams) {
         return <EmailToPDFTool />;
       case 'cbz-to-pdf':
         return <CBZToPDFTool />;
+      case 'pdf-to-cbz':
+        return <PDFToCBZTool />;
       case 'pdf-to-pdfa':
         return <PDFToPDFATool />;
       case 'font-to-outline':

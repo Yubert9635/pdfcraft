@@ -598,6 +598,22 @@ export {
   type CbzPageSize,
 } from './cbz-to-pdf';
 
+// PDF to CBZ processor
+export {
+  PDFToCBZProcessor,
+  createPDFToCBZProcessor,
+  pdfToCbz,
+  type CBZMetadataOptions,
+} from './pdf-to-cbz';
+
+// PDF to TIFF processor
+export {
+  PDFToTIFFProcessor,
+  createPDFToTIFFProcessor,
+  pdfToTiff,
+  type PDFToTIFFOptions,
+} from './pdf-to-tiff';
+
 // PDF to PDF/A processor
 export {
   PdfToPdfAProcessor,
@@ -652,3 +668,29 @@ export {
   pdfToMarkdown,
   type PDFToMarkdownOptions,
 } from './pdf-to-markdown';
+
+// PDF Overlay & Underlay processor
+export {
+  OverlayPDFProcessor,
+  createOverlayProcessor,
+  overlayPDF,
+  type OverlayOptions,
+} from './overlay';
+
+// PDF Trusted Timestamp processor
+export {
+  TimestampPDFProcessor,
+  createTimestampProcessor,
+  timestampPDF,
+  type TimestampOptions,
+} from './timestamp';
+
+// PDF Page Labels processor
+export {
+  PageLabelsProcessor,
+  createPageLabelsProcessor,
+  addPageLabels,
+  type PageLabelRule,
+  type PageLabelsOptions,
+} from './page-labels';
+
