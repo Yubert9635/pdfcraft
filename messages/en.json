@@ -1998,8 +1998,17 @@
       "uploadLabel": "Upload PDF File",
       "uploadDescription": "Drag and drop a PDF file.",
       "optionsTitle": "Detection Options",
-      "removeButton": "Remove Blank Pages",
-      "successMessage": "Blank pages removed successfully!"
+      "removeButton": "Apply & Remove Blank Pages",
+      "successMessage": "Blank pages removed successfully!",
+      "analyzingPages": "Reading pages and computing information entropy...",
+      "sensitivity": "Sensitivity Threshold (0-100)",
+      "sensitivityHint": "Higher sensitivity is more lenient, making pages with slight scanning noise/watermarks easily marked as blank. Recommended blank pages are greyed out with a red diagonal bar. Click cards directly to override: force keep or force delete.",
+      "autoBlank": "Detected Blank",
+      "manualKeep": "Forced Keep",
+      "manualRemove": "Forced Delete",
+      "entropy": "Entropy",
+      "page": "Page {number}",
+      "noBlankPages": "No blank pages found."
     },
     "tableOfContents": {
       "uploadLabel": "Upload PDF File",

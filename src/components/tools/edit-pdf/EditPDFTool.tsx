@@ -104,8 +104,138 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
                   setupCloudFix();
                   setupColorPickerAndStroke();
                   setupUndoRedoAndAuthorPatch();
+                  setupSnapping();
+                  setupChineseFontPatch();
                 }
               }, 200);
+
+              function setupSnapping() {
+                const ext = window.pdfjsAnnotationExtensionInstance;
+                const stage = ext?.stage || ext?.konvaStage || (window.Konva && window.Konva.stages[0]);
+                if (!stage) return;
+                
+                console.log('[PDFCraft Patch] Setting up Konva Snapping Alignment...');
+                
+                stage.on('dragmove', function(e) {
+                  const activeShape = e.target;
+                  if (!activeShape || activeShape === stage) return;
+                  
+                  const shapes = stage.find('.annotation') || stage.find('Group') || stage.getChildren();
+                  const snapOffset = 8;
+                  let snapX = null;
+                  let snapY = null;
+                  
+                  const activeBox = activeShape.getClientRect();
+                  if (!activeBox) return;
+
+                  shapes.forEach(shape => {
+                    if (shape === activeShape || shape.name() === 'guideline') return;
+                    const box = shape.getClientRect();
+                    if (!box) return;
+                    
+                    // X-axis alignment
+                    if (Math.abs(activeBox.x - box.x) < snapOffset) snapX = box.x;
+                    if (Math.abs((activeBox.x + activeBox.width/2) - (box.x + box.width/2)) < snapOffset) {
+                      snapX = box.x + box.width/2 - activeBox.width/2;
+                    }
+                    if (Math.abs((activeBox.x + activeBox.width) - (box.x + box.width)) < snapOffset) {
+                      snapX = box.x + box.width - activeBox.width;
+                    }
+                    
+                    // Y-axis alignment
+                    if (Math.abs(activeBox.y - box.y) < snapOffset) snapY = box.y;
+                    if (Math.abs((activeBox.y + activeBox.height/2) - (box.y + box.height/2)) < snapOffset) {
+                      snapY = box.y + box.height/2 - activeBox.height/2;
+                    }
+                    if (Math.abs((activeBox.y + activeBox.height) - (box.y + box.height)) < snapOffset) {
+                      snapY = box.y + box.height - activeBox.height;
+                    }
+                  });
+                  
+                  // Snap coordinates
+                  if (snapX !== null) activeShape.x(snapX);
+                  if (snapY !== null) activeShape.y(snapY);
+                  
+                  // Render red guide dashed lines as DOM overlays
+                  drawGuides(stage, snapX, snapY);
+                });
+                
+                stage.on('dragend', function() {
+                  clearGuides();
+                });
+                
+                function drawGuides(stg, sx, sy) {
+                  let container = document.getElementById('pdfcraft-alignment-guides');
+                  if (!container) {
+                    container = document.createElement('div');
+                    container.id = 'pdfcraft-alignment-guides';
+                    container.style.cssText = 'position:absolute; inset:0; pointer-events:none; z-index:99999;';
+                    stg.container().appendChild(container);
+                  }
+                  container.innerHTML = '';
+                  
+                  if (sx !== null) {
+                    const l = document.createElement('div');
+                    l.style.cssText = 'position:absolute; left:' + sx + 'px; top:0; bottom:0; border-left:1.5px dashed red;';
+                    container.appendChild(l);
+                  }
+                  if (sy !== null) {
+                    const l = document.createElement('div');
+                    l.style.cssText = 'position:absolute; top:' + sy + 'px; left:0; right:0; border-top:1.5px dashed red;';
+                    container.appendChild(l);
+                  }
+                }
+                
+                function clearGuides() {
+                  const container = document.getElementById('pdfcraft-alignment-guides');
+                  if (container) container.innerHTML = '';
+                }
+              }
+
+              function setupChineseFontPatch() {
+                const ext = window.pdfjsAnnotationExtensionInstance;
+                const pdfLib = window.pdfLib || ext?.pdfLib;
+                if (!pdfLib) return;
+
+                const originalSave = pdfLib.PDFDocument.prototype.save;
+                pdfLib.PDFDocument.prototype.save = async function(saveOptions) {
+                  console.log('[PDFCraft Patch] Intercepting save to inspect for Chinese text...');
+                  
+                  let hasChinese = false;
+                  
+                  // Inspect the annotation store inside PDFJS Annotation Extension
+                  const store = window.pdfjsAnnotationExtensionInstance?.getAnnotationStore();
+                  if (store && store.annotations) {
+                    store.annotations.forEach(ann => {
+                      if (ann.name === 'freeText' && /[\u4e00-\u9fa5]/.test(ann.text || '')) {
+                        hasChinese = true;
+                      }
+                    });
+                  }
+
+                  if (hasChinese) {
+                    try {
+                      console.log('[PDFCraft Patch] Chinese text found. Embedding NotoSansSC-Regular font...');
+                      const fontBytes = await fetch('/fonts/NotoSansSC-Regular.ttf').then(res => res.arrayBuffer());
+                      const customFont = await this.embedFont(fontBytes, { subset: true });
+                      
+                      // Intercept subsequent font loading requests for Helvetica inside pdf-lib
+                      const originalEmbedFont = this.embedFont;
+                      this.embedFont = async function(fontToEmbed, embedOpts) {
+                        if (fontToEmbed === pdfLib.StandardFonts.Helvetica || fontToEmbed === 'Helvetica') {
+                          console.log('[PDFCraft Patch] Redirected Helvetica embed to NotoSansSC font');
+                          return customFont;
+                        }
+                        return originalEmbedFont.call(this, fontToEmbed, embedOpts);
+                      };
+                    } catch (e) {
+                      console.error('[PDFCraft Patch] Failed to embed Chinese font subset', e);
+                    }
+                  }
+
+                  return originalSave.call(this, saveOptions);
+                };
+              }
 
               function setupCloudFix() {
                 // Ensure double-click bypasses text layer blocking to complete drawing

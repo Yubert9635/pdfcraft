@@ -2724,5 +2724,105 @@ export const toolContentEn: Record<string, ToolContent> = {
       { question: 'Why might a signature be invalid?', answer: 'Signatures may be invalid if the document was modified, the certificate expired, or the certificate is not trusted.' },
     ],
   },
+  'ai-pdf-reflower': {
+    title: 'AI PDF Layout Reflower',
+    metaDescription: 'Re-typeset PDF documents into responsive mobile-friendly layouts. Support Markdown and EPUB export for enhanced small-screen reading.',
+    keywords: ['pdf reflow', 'responsive pdf', 'pdf to markdown', 'epub export', 'mobile pdf reader'],
+    description: `
+      <p>AI PDF Layout Reflower is your ultimate companion for reading PDF documents on mobile devices. Traditional PDFs use a fixed layout, which often requires endless zooming and horizontal scrolling on smartphones or tablets, resulting in a tedious reading experience.</p>
+      <p>This tool intelligently parses the text flow, line spacing, and physical coordinates of the PDF pages, reconstructing the semantic paragraphs and heading hierarchies. For multi-column or dual-column documents, it intelligently merges column flows into a single responsive flow, ensuring smooth reading.</p>
+      <p>Additionally, it supports rendering mathematical formulas into LaTeX/MathJax and offers multiple reading themes (Sepia, Dark, Eye-protecting Green). You can export the reflowed layout as Markdown or a standard EPUB ebook with a single click.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload PDF File', description: 'Drag and drop your PDF file or click to browse and select it.' },
+      { step: 2, title: 'Select Reading Theme', description: 'Choose your preferred font size and theme colors in the 3D mobile simulator on the right.' },
+      { step: 3, title: 'Export Document', description: 'Once satisfied, use the physical pull-rope to export the document as Markdown or EPUB.' },
+    ],
+    useCases: [
+      { title: 'Mobile Literature Reading', description: 'Read academic papers and research reports on your phone seamlessly without constant zooming.', icon: 'smartphone' },
+      { title: 'Ebook Conversion', description: 'Convert text-heavy PDFs into EPUB files and import them into Kindle or other ebook readers.', icon: 'book' },
+      { title: 'Note Archive', description: 'Directly convert structured PDF content into clean Markdown files for your personal knowledge base.', icon: 'file-text' },
+    ],
+    faq: [
+      { question: 'Does it handle dual-column PDFs correctly?', answer: 'Yes, the layout reflower detects the horizontal coordinates of text blocks and structures left and right columns sequentially, preventing line interleaving.' },
+      { question: 'Will images and math formulas be lost?', answer: 'Mathematical formulas are converted to LaTeX/MathJax syntax for clean web rendering, and images are preserved in their corresponding semantic positions.' },
+      { question: 'Is the conversion done in the cloud?', answer: 'No, all layout analysis and format packaging are performed locally in your browser to guarantee the absolute privacy of your documents.' },
+    ],
+  },
+  'citation-linker': {
+    title: 'Citation Linker',
+    metaDescription: 'Scan and activate citation markers in PDFs, converting them into clickable DOI links or page-jump targets.',
+    keywords: ['citation linker', 'pdf hyperlink', 'doi matching', 'academic helper', 'pdf references'],
+    description: `
+      <p>Citation Linker is designed specifically for academic researchers. In many PDF papers, citation markers (e.g., [1], [2]) are plain text, forcing readers to scroll back and forth to the reference list at the end of the document, interrupting their focus.</p>
+      <p>This tool reads PDF text locally, uses pattern recognition to match citation markers to their corresponding reference entries, and overlays clickable PDF link annotations using DOI lookups or page-jump coordinates.</p>
+      <p>It also generates an interactive citation relationship map to visually navigate the document\'s reference network.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload Academic PDF', description: 'Upload a PDF paper or thesis containing a bibliography/reference section.' },
+      { step: 2, title: 'Review Citations', description: 'Inspect the citation pairs in the interactive map and manually edit or add DOI links if necessary.' },
+      { step: 3, title: 'Inject Links', description: 'Click the activate button to overlay hyperlinks onto the PDF and download the updated document.' },
+    ],
+    useCases: [
+      { title: 'Deep Literature Reading', description: 'Click citation markers to immediately view reference details or navigate to external DOI pages.', icon: 'link' },
+      { title: 'Pre-publication Preparation', description: 'Ensure your written academic papers have fully active hyperlink navigations before final submission.', icon: 'award' },
+      { title: 'Reference Map Analysis', description: 'Understand literature hierarchies and connections via the interactive network topology map.', icon: 'git-network' },
+    ],
+    faq: [
+      { question: 'What if a reference has no DOI?', answer: 'If a DOI cannot be found, the tool falls back to an internal "GoTo Page" action, allowing you to click the marker and jump directly to the reference page.' },
+      { question: 'Which citation formats are supported?', answer: 'It supports common numeric brackets (e.g., [1], [1-3]) and author-year citations (e.g., Author et al., 202X).' },
+      { question: 'Will it modify the appearance of my PDF?', answer: 'No, it injects invisible Link annotations on top of the text, preserving the original layout, fonts, and styling of your document.' },
+    ],
+  },
+  'vector-extractor': {
+    title: 'PDF Vector Extractor',
+    metaDescription: 'Convert PDF into high-fidelity SVG, allowing you to select, recolor, and export vector charts, logos, and graphics.',
+    keywords: ['extract vectors from pdf', 'pdf to svg', 'pdf vector charts', 'extract logo', 'vector drawings'],
+    description: `
+      <p>PDF Vector Extractor unlocks vector paths and artwork embedded inside PDF files. Easily extract vector charts, diagrams, or logos from documents for design work or printing.</p>
+      <p>Under the hood, it utilizes high-fidelity SVG rendering to deconstruct PDF vector paths into clean, standard SVG element trees without loss of precision.</p>
+      <p>The interface highlights hover elements with a Z-axis 3D layer explosion effect, complete with a color picker panel for designers to adjust and extract vector nodes.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload PDF Document', description: 'Upload a PDF containing vector assets, diagrams, charts, or logos.' },
+      { step: 2, title: 'Select Elements', description: 'Hover over the vector canvas to highlight elements, then click to select a node.' },
+      { step: 3, title: 'Customize and Export', description: 'Adjust path attributes in the panel, then download as SVG or copy SVG source code.' },
+    ],
+    useCases: [
+      { title: 'Design Asset Extraction', description: 'Quickly extract company logos, icons, and illustrations from brand guidelines or brochures.', icon: 'bezier' },
+      { title: 'Scientific Chart Export', description: 'Extract vector charts from research papers to use in high-resolution printing or presentations.', icon: 'presentation' },
+      { title: 'Vector Asset Recoloring', description: 'Modify the stroke and fill colors of extracted assets before saving them for web projects.', icon: 'crown' },
+    ],
+    faq: [
+      { question: 'Why can\'t I select certain images?', answer: 'PDFs contain both raster images (like photos or scanned pages) and vector artwork (like shapes and curves). Only vector paths can be deconstructed into SVG paths.' },
+      { question: 'Does the output SVG contain styles?', answer: 'Yes, the exported SVG retains all original properties including fills, strokes, opacity, gradients, and coordinate transforms.' },
+      { question: 'Will large files lag?', answer: 'We use WebAssembly acceleration, but PDFs with extremely complex CAD drawings or thousands of vector paths may take a few seconds to render.' },
+    ],
+  },
+  'deep-sanitize': {
+    title: 'Deep Metadata Sanitizer',
+    metaDescription: 'Thoroughly wipe author metadata, modification logs, hidden layers, and orphan objects from PDFs for maximum privacy.',
+    keywords: ['pdf sanitization', 'clear metadata', 'anonymize pdf', 'strip hidden watermark', 'secure pdf'],
+    description: `
+      <p>Deep Metadata Sanitizer is your ultimate defense against metadata leaks and hidden tracking. Simply drawing black boxes over visible text in PDF files is not enough to protect commercial secrets.</p>
+      <p>This tool scans the PDF binary structure to completely erase author info, creator software, editing logs (XMP Metadata), proprietary PieceInfo caches, and OCG optional content groups (often used for invisible watermarks).</p>
+      <p>It also rewrites the cross-reference tables (xref) completely, discarding all incremental update blocks to ensure that deleted or modified historical data cannot be restored.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload PDF', description: 'Select the PDF file containing sensitive data or modification history.' },
+      { step: 2, title: 'Run Scanner', description: 'Trigger the 3D containment scanner to check the file for hidden metadata and layers.' },
+      { step: 3, title: 'Deep Sanitize', description: 'Click sanitize to wipe out tracking elements and download the fully clean PDF.' },
+    ],
+    useCases: [
+      { title: 'Contract Sharing', description: 'Remove drafting records, paths, and previous revisions before sharing business contracts with third parties.', icon: 'file-signature' },
+      { title: 'Anonymized Publishing', description: 'Wipe invisible annotations and watermarks to publish documents anonymously and securely.', icon: 'eye-off' },
+      { title: 'PDF Optimization', description: 'Remove orphaned objects and garbage data streams to make files load faster on the web.', icon: 'zap' },
+    ],
+    faq: [
+      { question: 'How is this different from standard metadata removal?', answer: 'Standard tools only clear basic fields like title or author. Deep Sanitizer reconstructs the entire PDF xref table, wiping PieceInfo, hidden watermarks, and historical incremental revisions.' },
+      { question: 'Will this affect document layout or text?', answer: 'No, it only strips hidden description streams and structure data. The visible layout, texts, and graphics remain unchanged.' },
+      { question: 'Does this remove PDF passwords?', answer: 'No, if a PDF is encrypted, you must unlock it first before performing a deep sanitization.' },
+    ],
+  },
 };
 

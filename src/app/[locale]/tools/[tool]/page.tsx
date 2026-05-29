@@ -96,6 +96,10 @@ import { OCGManagerTool } from '@/components/tools/ocg-manager';
 import { PDFReaderTool } from '@/components/tools/pdf-reader';
 import { DigitalSignPDFTool } from '@/components/tools/digital-sign';
 import { ValidateSignatureTool } from '@/components/tools/validate-signature';
+import { AIPDFReflowerTool } from '@/components/tools/ai-pdf-reflower/AIPDFReflowerTool';
+import { CitationLinkerTool } from '@/components/tools/citation-linker/CitationLinkerTool';
+import { PDFVectorExtractorTool } from '@/components/tools/vector-extractor/PDFVectorExtractorTool';
+import { DeepSanitizeTool } from '@/components/tools/deep-sanitize/DeepSanitizeTool';
 import { generateToolMetadata } from '@/lib/seo/metadata';
 import { JsonLd } from '@/components/seo/JsonLd';
 import {
@@ -429,6 +433,14 @@ export default async function ToolPageRoute({ params }: ToolPageParams) {
         return <DigitalSignPDFTool />;
       case 'validate-signature':
         return <ValidateSignatureTool />;
+      case 'ai-pdf-reflower':
+        return <AIPDFReflowerTool />;
+      case 'citation-linker':
+        return <CitationLinkerTool />;
+      case 'vector-extractor':
+        return <PDFVectorExtractorTool />;
+      case 'deep-sanitize':
+        return <DeepSanitizeTool />;
       // Add more tool cases here as they are implemented
       default:
         return (

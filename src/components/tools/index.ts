@@ -105,3 +105,9 @@ export { PDFReaderTool, type PDFReaderToolProps } from './pdf-reader';
 // PDF Overlay Tool
 export { OverlayPDFTool, type OverlayPDFToolProps } from './overlay/OverlayPDFTool';
 
+// New Upgrade Tools
+export { AIPDFReflowerTool } from './ai-pdf-reflower/AIPDFReflowerTool';
+export { CitationLinkerTool } from './citation-linker/CitationLinkerTool';
+export { PDFVectorExtractorTool } from './vector-extractor/PDFVectorExtractorTool';
+export { DeepSanitizeTool } from './deep-sanitize/DeepSanitizeTool';
+

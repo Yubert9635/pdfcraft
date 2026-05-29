@@ -2778,5 +2778,105 @@ export const toolContentZh: Record<string, ToolContent> = {
       { question: '可以从特定页面提取吗？', answer: '是的，指定页面范围以将提取限制在某些页面。' },
     ],
   },
+  'ai-pdf-reflower': {
+    title: 'AI 智能自适应重排',
+    metaDescription: '将PDF文档重新排版为响应式移动端布局，支持Markdown和EPUB导出，改善小屏阅读体验。',
+    keywords: ['pdf重排', '自适应pdf', 'pdf转markdown', 'epub导出', '移动端阅读pdf'],
+    description: `
+      <p>AI 智能自适应重排工具是您在移动设备上阅读PDF的最佳伴侣。传统的PDF文档采用固定版面，在手机或平板电脑上查看时往往需要不断缩放和横向滚动，体验极差。</p>
+      <p>该工具智能解析PDF页面上的文本流、行高以及空间分布坐标，重建段落与标题结构。如果是多栏或双栏文档，它会智能归并栏目顺序，输出为自适应宽度的文字流。</p>
+      <p>此外，它支持将数学公式完美转化为 MathJax 格式渲染，并提供多种阅读主题（纸张黄、极客黑、护眼绿），支持一键导出为 EPUB 电子书或 Markdown 格式。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传PDF文件', description: '将PDF拖放到上传区或点击浏览选择文件。' },
+      { step: 2, title: '选择阅读主题', description: '在右侧3D移动端模拟器中配置字号和阅读配色方案。' },
+      { step: 3, title: '导出文档', description: '预览满意后，点击拉绳按钮导出为Markdown或EPUB格式。' },
+    ],
+    useCases: [
+      { title: '手机端文献阅读', description: '在手机上轻松流畅地阅读学术论文与研究报告，告别频繁缩放。', icon: 'smartphone' },
+      { title: '电子书转换', description: '将文字类PDF转换为EPUB格式，导入到Kindle等电子书阅读器中。', icon: 'book' },
+      { title: '笔记整理', description: '将结构化的PDF内容直接导出为干净的Markdown文件进行笔记归档。', icon: 'file-text' },
+    ],
+    faq: [
+      { question: '双栏PDF能正确识别阅读顺序吗？', answer: '是的，重排算法会分析文本块的横坐标区间，将双栏布局拆解为左栏和右栏的纵向级联，不会出现左右行错乱。' },
+      { question: '图片和公式会丢失吗？', answer: '数学公式会被转换为可被前端渲染的LaTeX/MathJax语法，图片会保留其上下文关联位置。' },
+      { question: '转换是在云端进行的吗？', answer: '不，所有的排版解析和EPUB/Markdown编译都在您的浏览器本地完成，保护敏感文档的绝对私密。' },
+    ],
+  },
+  'citation-linker': {
+    title: '引文链接激活器',
+    metaDescription: '扫描并激活PDF中的引文标记，将其转化为可点击的DOI或页内跳转链接。',
+    keywords: ['引文激活', 'pdf超链接', 'doi匹配', '学术pdf助手', 'pdf引文'],
+    description: `
+      <p>引文链接激活器专为学术科研人员打造。许多PDF格式的论文中，正文里的引用符号（如[1]、[2]）仅仅是普通的纯文本，读者需要反复手动翻页到最末尾寻找对应的参考文献，极大打断了阅读流。</p>
+      <p>本工具在本地读取PDF文本，通过模式识别自动抓取正文中的引用符号并与末尾的“参考文献（References）”条目一一关联。通过智能匹配DOI或识别引用页码，为纯文本引文添加可点击的PDF链接注释。</p>
+      <p>同时，我们提供直观的可视化关系拓扑星图，让文档内的引用网络一目了然。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传学术PDF', description: '上传带有参考文献列表的PDF论文文档。' },
+      { step: 2, title: '引文校验与编辑', description: '在右侧玻璃态关系星图中查看识别到的引文对，可手动编辑或修改链接。' },
+      { step: 3, title: '注入链接并下载', description: '点击激活按钮，系统将超链接直接写入PDF中，生成全新PDF。' },
+    ],
+    useCases: [
+      { title: '论文精读', description: '在阅读PDF文献时，一键点击引用即可在侧边弹出原作者及DOI链接，极速追溯。', icon: 'link' },
+      { title: '论文出版准备', description: '确保您撰写的学术论文在转为PDF交付前，所有的交叉引用都具备超链接导航功能。', icon: 'award' },
+      { title: '文献关系梳理', description: '通过交互式拓扑图梳理复杂文献之间的层级网络关系。', icon: 'git-network' },
+    ],
+    faq: [
+      { question: '如果没有DOI，链接能用吗？', answer: '如果参考文献条目中不包含DOI，工具会自动配置为“页内跳转”（GoTo 动作），点击依然可直接翻滚到参考文献所在的页面。' },
+      { question: '它支持哪些引文格式？', answer: '目前支持常见的数字格式（如 [1], [1-3]）以及哈佛格式（如 Author et al., 202X）。' },
+      { question: '会破坏原来的文档样式吗？', answer: '不会。添加链接是在上层注入透明的Link Annotation，不会修改任何现有的文本内容、字体或布局。' },
+    ],
+  },
+  'vector-extractor': {
+    title: 'PDF矢量提取器',
+    metaDescription: '将PDF转换为高保真SVG，允许鼠标拖动、框选并无损提取文档中的任意矢量图形和图表。',
+    keywords: ['pdf提取矢量', 'svg导出', 'pdf矢量图表', '提取logo', 'pdf矢量画'],
+    description: `
+      <p>PDF矢量提取器能够将PDF文档中蕴含的矢量路径和图形还原。无论您是想提取PDF学术海报中的折线图、文档插图，还是提取公司的Logo矢量源文件，本工具都能帮您达成目的。</p>
+      <p>在底层，我们调用高保真 SVGGraphics 将PDF的矢量路径完全解构为标准的 SVG 元素树，保持无损精度。</p>
+      <p>前端运用 3D 爆照图层分离效果，在鼠标悬停时令图形以浮雕高亮脱出，并提供色彩替换面板，方便设计师直接提取和二次加工。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传PDF文件', description: '拖入包含矢量插图、表格或Logo的PDF文件。' },
+      { step: 2, title: '浮空框选元素', description: '鼠标移动到画布上，矢量组会被3D浮空高亮包裹，点击将其激活。' },
+      { step: 3, title: '调色并导出', description: '使用右侧面板调节图形属性，一键导出为SVG或复制SVG源码。' },
+    ],
+    useCases: [
+      { title: '设计师素材提取', description: '快速提取宣传册、招商书PDF中高质量矢量图标与原创插图。', icon: 'bezier' },
+      { title: '科研图表导出', description: '提取论文PDF中复杂图表的矢量源文件，用于高分辨率排版印刷。', icon: 'presentation' },
+      { title: '企业品牌搜集', description: '从合同或报告中提取矢量格式的公司商标和标识，防止失真。', icon: 'crown' },
+    ],
+    faq: [
+      { question: '为什么有些图片无法提取为矢量？', answer: 'PDF中的图片分为位图（如照片、JPG扫描件）和矢量图（如线条、填充区域、数学图表）。位图无法提取为矢量元素，只能提取为图片文件。' },
+      { question: '提取的SVG是否带有CSS样式？', answer: '是的，提取的SVG完全继承并规范了原始PDF里的填充色、描边粗细、渐变以及变换属性。' },
+      { question: '大文件解析会卡顿吗？', answer: '我们使用了WebAssembly进行加速绘制，但页数极多且路径极其复杂的PDF可能需要一些渲染时间。' },
+    ],
+  },
+  'deep-sanitize': {
+    title: '深度元数据清洗',
+    metaDescription: '彻底擦除PDF文档中的作者信息、修改历史、隐藏图层以及未引用的冗余数据，完美保护隐私。',
+    keywords: ['pdf脱敏', '清除元数据', '防溯源', '安全pdf', '擦除水印'],
+    description: `
+      <p>深度元数据清洗是保护商业秘密和个人隐私的终极防线。PDF文件在创建和编辑过程中，往往会在底层默默嵌入大量的敏感隐性信息，仅在视觉上涂黑是远远不够的。</p>
+      <p>该工具深入PDF的二进制对象树，彻底抹除作者、创建软件、修改历史（XMP Metadata）、特定编辑器的 PieceInfo 缓存，以及可选内容图层（OCG，隐性数字水印常用载体）。</p>
+      <p>同时，它会强制全量重构对象交叉引用表（xref），完全抹去任何历史增量更新留下的旧版本数据，确保无法通过“撤销/恢复”来回溯敏感信息。</p>
+    `,
+    howToUse: [
+      { step: 1, title: '上传待脱敏文件', description: '上传需要发布或共享的PDF文件。' },
+      { step: 2, title: '运行粒子扫描', description: '触发3D消毒舱激光扫描，检测文档内隐藏的安全隐患与残留。' },
+      { step: 3, title: '执行净化并下载', description: '点击执行脱敏，伴随消融动效瞬间清空无用残留，生成极致干净的PDF文件。' },
+    ],
+    useCases: [
+      { title: '商业合同共享', description: '在将合同PDF发送给外部伙伴前，抹去起草人、系统路径和以前版本的协商修改记录。', icon: 'file-signature' },
+      { title: '防溯源文件发布', description: '清除文档底层的隐藏图层与不可见批注水印，保护信源隐私。', icon: 'eye-off' },
+      { title: 'PDF优化与瘦身', description: '剥离PDF文件中无用、孤立的废弃对象，加快网络加载速度。', icon: 'zap' },
+    ],
+    faq: [
+      { question: '它和“删除元数据”有什么区别？', answer: '普通“删除元数据”仅修改常规属性（如Title, Author）。“深度元数据清洗”会对整棵PDF对象树执行全面扫描，重构xref，物理剔除 PieceInfo、隐藏图层与增量更新，杜绝一切隐形泄密路径。' },
+      { question: '清洗后文档内容会变吗？', answer: '绝对不会。此工具仅剔除文档描述性的底层元数据，不会修改PDF的可视文本、图形布局和图像。' },
+      { question: '这可以移除密码吗？', answer: '不可以，如果文件有打开密码，请先输入密码解锁后，再使用此工具清洗。' },
+    ],
+  },
 };
 

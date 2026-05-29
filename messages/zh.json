@@ -1667,8 +1667,17 @@
       "uploadLabel": "上传PDF文件",
       "uploadDescription": "拖放PDF文件到此处。",
       "optionsTitle": "检测选项",
-      "removeButton": "移除空白页",
-      "successMessage": "空白页移除成功！"
+      "removeButton": "应用并移除空白页",
+      "successMessage": "空白页移除成功！",
+      "analyzingPages": "正在读取页面并计算信息熵...",
+      "sensitivity": "灵敏度阈值 (0-100)",
+      "sensitivityHint": "值越高判定条件越宽松，即使带有少许墨迹或噪点的页面也会被当成空白页删除。系统推荐删除的页面会显示为置灰和红圈禁止符。你可以直接点击卡片来强行保留或删除某页。",
+      "autoBlank": "检测为空白",
+      "manualKeep": "已强制保留",
+      "manualRemove": "已标记删除",
+      "entropy": "信息熵",
+      "page": "第 {number} 页",
+      "noBlankPages": "未发现空白页。"
     },
     "tableOfContents": {
       "uploadLabel": "上传PDF文件",

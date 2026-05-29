@@ -694,3 +694,35 @@ export {
   type PageLabelsOptions,
 } from './page-labels';
 
+// AI PDF Layout Reflower processor
+export {
+  AIPDFReflowerProcessor,
+  createAIPDFReflowerProcessor,
+  reflowPDF,
+  type AIPDFReflowerOptions,
+} from './ai-pdf-reflower';
+
+// Citation Linker processor
+export {
+  CitationLinkerProcessor,
+  createCitationLinkerProcessor,
+  linkCitations,
+  type CitationLinkerOptions,
+} from './citation-linker';
+
+// Vector Asset Extractor processor
+export {
+  VectorExtractorProcessor,
+  createVectorExtractorProcessor,
+  extractVectors,
+  type VectorExtractorOptions,
+} from './vector-extractor';
+
+// Deep Metadata Sanitizer processor
+export {
+  DeepSanitizeProcessor,
+  createDeepSanitizeProcessor,
+  deepSanitizePDF,
+  type DeepSanitizeOptions,
+} from './deep-sanitize';
+
