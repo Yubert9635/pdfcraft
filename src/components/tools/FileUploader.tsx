@@ -445,7 +445,12 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
             <p className="mb-2">{t('fileUploader.dragDrop')}</p>
             <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-[hsl(var(--color-muted)/0.5)] text-xs font-medium">
               <span className="opacity-70">{t('fileUploader.support')}:</span>
-              <span>{t('fileUploader.paste')}</span>
+              <span>{accept && accept.length > 0 ? accept.join(', ') : t('fileUploader.paste')}</span>
+              {maxSize && maxSize !== Infinity && (
+                <span className="ml-1 opacity-70">
+                  ({Math.round(maxSize / (1024 * 1024))}MB)
+                </span>
+              )}
             </div>
           </>
         )}
@@ -455,7 +460,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
       {multiple && (
         <div className="mt-6 flex flex-wrap gap-2 justify-center">
           <span className="text-xs px-2 py-1 rounded-md bg-[hsl(var(--color-muted))] text-[hsl(var(--color-muted-foreground))]">
-            Files: {maxFiles}
+            Max files: {maxFiles}
           </span>
         </div>
       )}
@@ -509,11 +514,11 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
               </div>
               
               <h3 className="text-lg font-bold text-[hsl(var(--color-foreground))] mb-1">
-                此文档已加密
+                {t('fileUploader.encryptedTitle')}
               </h3>
               
               <p className="text-xs text-[hsl(var(--color-muted-foreground))] mb-4 max-w-[280px] break-all leading-relaxed">
-                请输入密码以解锁并载入：<br/>
+                {t('fileUploader.enterPasswordHelp')}
                 <span className="font-semibold text-[hsl(var(--color-foreground))]">{encryptPendingFiles[encryptCurrentIndex]?.name}</span>
               </p>
               
@@ -526,7 +531,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                 <div className="relative flex items-center">
                   <input
                     type="password"
-                    placeholder="请输入文档密码"
+                    placeholder={t('fileUploader.passwordPlaceholder')}
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     autoFocus
@@ -549,7 +554,7 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                     disabled={isDecrypting}
                     className="flex-1 px-4 py-2 text-xs font-semibold rounded-[var(--radius-md)] border border-[hsl(var(--color-border))] hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] transition-colors disabled:opacity-50"
                   >
-                    取消
+                    {t('fileUploader.cancelButton')}
                   </button>
                   <button
                     type="submit"
@@ -559,10 +564,10 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
                     {isDecrypting ? (
                       <>
                         <Loader2 className="w-3.5 h-3.5 animate-spin" />
-                        解密中...
+                        {t('fileUploader.decrypting')}
                       </>
                     ) : (
-                      '解密并继续'
+                      t('fileUploader.decryptAndContinue')
                     )}
                   </button>
                 </div>

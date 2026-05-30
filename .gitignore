@@ -76,6 +76,8 @@ comparisons.txt
 # LibreOffice WASM decompressed files (large, generated from .gz)
 public/libreoffice-wasm/soffice.wasm
 public/libreoffice-wasm/soffice.data
+public/libreoffice-wasm/soffice.wasm.bin
+public/libreoffice-wasm/soffice.data.bin
 
 # Tauri / Cargo (local build output)
 src-tauri/target/

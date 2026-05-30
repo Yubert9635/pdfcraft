@@ -257,10 +257,10 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
         <Card variant="outlined">
           <div className="flex items-center justify-between mb-4">
             <h3 className="text-sm font-bold text-[hsl(var(--color-foreground))]">
-              待压缩文件列表 ({files.length})
+              {t('compress.waitingList', { count: files.length })}
             </h3>
             <Button variant="ghost" size="sm" onClick={handleClearFile} disabled={isProcessing}>
-              <Trash2 className="w-4 h-4 mr-1.5" /> 清空全部
+              {t('compress.clearAll')}
             </Button>
           </div>
           <div className="space-y-2 max-h-40 overflow-y-auto">
@@ -292,10 +292,10 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
               <div className="flex items-center justify-between pb-3 border-b border-zinc-200 dark:border-zinc-800">
                 <span className="text-xs font-bold text-[hsl(var(--color-foreground))] flex items-center gap-1.5">
                   <Eye className="w-4 h-4 text-zinc-400" />
-                  拖动中间分割滑条查看无级压缩画质对比 (第 1 页)
+                  {t('compress.sliderTooltip')}
                 </span>
                 <span className="text-[10px] text-zinc-400">
-                  左: 原始画质 (100%) | 右: 模拟压缩 ({quality.toUpperCase()})
+                  {t('compress.comparisonLabel', { quality: quality.toUpperCase() })}
                 </span>
               </div>
 
@@ -443,8 +443,8 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
                   </svg>
                   
                   <div className="flex w-full justify-between px-6 text-[10px] font-bold text-zinc-400">
-                    <span>体积缩水率 (轻)</span>
-                    <span>像素清晰度 (重)</span>
+                    {t('compress.sizeShrink')}
+                    {t('compress.pixelSharpness')}
                   </div>
 
                 </div>
@@ -452,7 +452,7 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
                 {/* Quality options */}
                 <div className="space-y-3.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider flex items-center gap-1.5">
-                    <Sliders className="w-4 h-4" /> 压缩质量档位选择
+                    {t('compress.qualityTitle')}
                   </label>
                   <div className="grid grid-cols-4 gap-1.5">
                     {(['low', 'medium', 'high', 'maximum'] as CompressionQuality[]).map((q) => (
@@ -465,18 +465,18 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
                             : 'border-zinc-200 dark:border-zinc-800 bg-white/50 dark:bg-black/20 text-zinc-500'
                         }`}
                       >
-                        {q === 'low' && '低质量'}
-                        {q === 'medium' && '中等'}
-                        {q === 'high' && '高质量'}
-                        {q === 'maximum' && '极限无损'}
+                        {q === 'low' && t('compress.qualityLow')}
+                        {q === 'medium' && t('compress.qualityMedium')}
+                        {q === 'high' && t('compress.qualityHigh')}
+                        {q === 'maximum' && t('compress.qualityMaximum')}
                       </button>
                     ))}
                   </div>
                   <p className="text-[10px] text-zinc-400 leading-normal">
-                    {quality === 'low' && '体积大幅压缩 60%-80%，适合普通发票收据与纯文字汇报。'}
-                    {quality === 'medium' && '均衡型，在保持清晰可读的字体边缘时获得 40% 体积优化。'}
-                    {quality === 'high' && '保证摄影级图片的高对比度和颜色动态，略微减少体积。'}
-                    {quality === 'maximum' && '接近 1:1 的极限高精，只清理隐藏垃圾碎片与未引用块。'}
+                    {quality === 'low' && t('compress.descLow')}
+                    {quality === 'medium' && t('compress.descMedium')}
+                    {quality === 'high' && t('compress.descHigh')}
+                    {quality === 'maximum' && t('compress.descMaximum')}
                   </p>
                 </div>
 
@@ -489,7 +489,7 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
                       onChange={(e) => setOptimizeImages(e.target.checked)}
                       className="w-4 h-4 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
-                    <span className="text-xs font-semibold">优化嵌入的所有图形资产</span>
+                    {t('compress.optimizeGraphics')}
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
@@ -498,7 +498,7 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
                       onChange={(e) => setRemoveMetadata(e.target.checked)}
                       className="w-4 h-4 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
-                    <span className="text-xs font-semibold">强力清空作者/软件描述元数据</span>
+                    {t('compress.clearMetadata')}
                   </label>
                 </div>
 
@@ -518,7 +518,7 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
                     disabled={!canCompress}
                     loading={isProcessing}
                   >
-                    {isProcessing ? '优化执行中...' : '开始优化压缩 PDF'}
+                    {t('compress.processingButton')}
                   </Button>
                 </div>
               </div>
@@ -543,11 +543,11 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
       {/* Download Zip Panel for Batch */}
       {allCompleted && !singleFile && (
         <Card variant="default" className="p-6 rounded-[2rem] text-center space-y-4">
-          <h4 className="text-sm font-bold">压缩操作执行完毕！</h4>
+          {t('compress.successTitle')}
           <div className="flex gap-2 justify-center">
             <Button variant="secondary" onClick={handleDownloadZip}>
               <FileArchive className="w-4 h-4 mr-2" />
-              打包下载 ZIP ({completedCount} 个文件)
+              {t('compress.downloadZip', { count: completedCount })}
             </Button>
           </div>
         </Card>
@@ -563,9 +563,9 @@ export function CompressPDFTool({ className = '' }: CompressPDFToolProps) {
           </div>
           
           <div className="space-y-2 max-w-sm mx-auto">
-            <h3 className="text-base font-extrabold text-[hsl(var(--color-foreground))]">文档优化压缩完毕！</h3>
+            {t('compress.successDone')}
             <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-              原始大小: {(singleFile.size / (1024 * 1024)).toFixed(2)} MB • 成功在本地清理了非必要废弃片段和无用元数据流。
+              {t('compress.successSummary', { size: (singleFile.size / (1024 * 1024)).toFixed(2) })}
             </p>
           </div>
 

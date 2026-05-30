@@ -537,30 +537,30 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10.325 4.317c.426-1.756 2.924-1.756 3.35 0a1.724 1.724 0 002.573 1.066c1.543-.94 3.31.826 2.37 2.37a1.724 1.724 0 001.065 2.572c1.756.426 1.756 2.924 0 3.35a1.724 1.724 0 00-1.066 2.573c.94 1.543-.826 3.31-2.37 2.37a1.724 1.724 0 00-2.572 1.065c-.426 1.756-2.924 1.756-3.35 0a1.724 1.724 0 00-2.573-1.066c-1.543.94-3.31-.826-2.37-2.37a1.724 1.724 0 00-1.065-2.572c-1.756-.426-1.756-2.924 0-3.35a1.724 1.724 0 001.066-2.573c-.94-1.543.826-3.31 2.37-2.37.996.608 2.296.07 2.572-1.065z" />
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                   </svg>
-                  校准控制中心
+                  {t('rotatePdf.calibrationCenter')}
                 </h3>
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">
-                  选择下方页面，使用快调或无极表盘精准矫正歪斜或翻转的文档。
+                  {t('rotatePdf.calibrationHelp')}
                 </p>
               </div>
 
               {/* Selection Summary Block */}
               <div className="px-5 py-3 bg-[hsl(var(--color-muted)/0.3)] border-b border-[hsl(var(--color-border))] flex items-center justify-between">
                 <span className="text-xs font-semibold text-[hsl(var(--color-foreground))]">
-                  已选中 {selectedPages.size} / {totalPages} 页
+                  {t('rotatePdf.selectedPages', { selected: selectedPages.size, total: totalPages })}
                 </span>
                 <div className="flex gap-1.5">
                   <button 
                     onClick={handleSelectAll} 
                     className="text-[10px] px-2 py-1 rounded bg-[hsl(var(--color-card))] border border-[hsl(var(--color-border))] hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] font-medium transition-colors"
                   >
-                    全选
+                    {t('buttons.selectAll')}
                   </button>
                   <button 
                     onClick={handleClearSelection} 
                     className="text-[10px] px-2 py-1 rounded bg-[hsl(var(--color-card))] border border-[hsl(var(--color-border))] hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] font-medium transition-colors"
                   >
-                    清除
+                    {t('buttons.clear')}
                   </button>
                 </div>
               </div>
@@ -573,21 +573,21 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                     onClick={() => setCalibrationTab('preset')}
                     className={`flex-1 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${
                       calibrationTab === 'preset'
-                        ? 'bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] shadow-sm'
+                        ? 'bg-[hsl(var(--card-background, var(--color-card)))] text-[hsl(var(--color-foreground))] shadow-sm'
                         : 'text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]'
                     }`}
                   >
-                    快捷快调
+                    {t('rotatePdf.presetRotation')}
                   </button>
                   <button
                     onClick={() => setCalibrationTab('stepless')}
                     className={`flex-1 py-1.5 text-xs font-semibold rounded-[var(--radius-sm)] transition-all ${
                       calibrationTab === 'stepless'
-                        ? 'bg-[hsl(var(--color-card))] text-[hsl(var(--color-foreground))] shadow-sm'
+                        ? 'bg-[hsl(var(--card-background, var(--color-card)))] text-[hsl(var(--color-foreground))] shadow-sm'
                         : 'text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]'
                     }`}
                   >
-                    无极微调 (细粒度)
+                    {t('rotatePdf.steplessRotation')}
                   </button>
                 </div>
 
@@ -605,7 +605,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                         <svg className="w-5 h-5 text-[hsl(var(--color-primary))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6" />
                         </svg>
-                        左旋 90°
+                        {t('rotatePdf.rotateLeft90')}
                       </Button>
                       <Button 
                         variant="outline" 
@@ -617,7 +617,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                         <svg className="w-5 h-5 text-[hsl(var(--color-primary))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 10H11a8 8 0 00-8 8v2m18-10l-6 6m6-6l-6-6" />
                         </svg>
-                        右旋 90°
+                        {t('rotatePdf.rotateRight90')}
                       </Button>
                       <Button 
                         variant="outline" 
@@ -629,7 +629,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                         <svg className="w-5 h-5 text-zinc-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 1121.21 7.89H17.5" />
                         </svg>
-                        翻转 180°
+                        {t('rotatePdf.rotate180')}
                       </Button>
                       <Button 
                         variant="ghost" 
@@ -641,27 +641,27 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                         <svg className="w-5 h-5 text-red-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                         </svg>
-                        一键清零
+                        {t('rotatePdf.clearAllRotations')}
                       </Button>
                     </div>
 
                     {/* Pre-defined Range Selection Quick Filters */}
                     <div className="pt-2 border-t border-[hsl(var(--color-border))]">
-                      <p className="text-[11px] font-semibold text-[hsl(var(--color-muted-foreground))] mb-2">快速选择页组：</p>
+                      <p className="text-[11px] font-semibold text-[hsl(var(--color-muted-foreground))] mb-2">{t('rotatePdf.quickSelectGroup')}</p>
                       <div className="flex gap-1.5">
                         <button
                           type="button"
                           onClick={handleSelectOdd}
                           className="flex-1 text-[11px] py-1 rounded bg-[hsl(var(--color-muted))] hover:bg-[hsl(var(--color-muted-foreground)/0.2)] text-[hsl(var(--color-foreground))] transition-colors font-medium"
                         >
-                          仅奇数页
+                          {t('rotatePdf.selectOdd')}
                         </button>
                         <button
                           type="button"
                           onClick={handleSelectEven}
                           className="flex-1 text-[11px] py-1 rounded bg-[hsl(var(--color-muted))] hover:bg-[hsl(var(--color-muted-foreground)/0.2)] text-[hsl(var(--color-foreground))] transition-colors font-medium"
                         >
-                          仅偶数页
+                          {t('rotatePdf.selectEven')}
                         </button>
                       </div>
                     </div>
@@ -719,11 +719,11 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
 
                         {/* Inner readout display */}
                         <div className="text-center z-10 pointer-events-none">
-                          <p className="text-[10px] uppercase font-bold tracking-widest text-[hsl(var(--color-muted-foreground))]">校正</p>
+                          <p className="text-[10px] uppercase font-bold tracking-widest text-[hsl(var(--color-muted-foreground))]">{t('rotatePdf.calibrateLabel')}</p>
                           <p className="text-2xl font-black text-[hsl(var(--color-foreground))] tracking-tighter">
                             {parseFloat(steplessAngle) > 0 ? `+${steplessAngle}` : steplessAngle}°
                           </p>
-                          <p className="text-[9px] text-[hsl(var(--color-primary))] font-semibold">滚动滚轮微调</p>
+                          <p className="text-[9px] text-[hsl(var(--color-primary))] font-semibold">{t('rotatePdf.wheelFineTune')}</p>
                         </div>
                       </div>
                     </div>
@@ -731,9 +731,9 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                     {/* Stepless Smooth Slider */}
                     <div className="space-y-2">
                       <div className="flex justify-between items-center text-xs font-semibold text-[hsl(var(--color-muted-foreground))]">
-                        <span>-180.0° (左)</span>
-                        <span className="text-[hsl(var(--color-primary))] font-bold">精细微调滑块</span>
-                        <span>+180.0° (右)</span>
+                        <span>-180.0° ({t('options.left')})</span>
+                        <span className="text-[hsl(var(--color-primary))] font-bold">{t('rotatePdf.fineTuneSlider')}</span>
+                        <span>+180.0° ({t('options.right')})</span>
                       </div>
                       <input
                         type="range"
@@ -749,7 +749,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
 
                     {/* Numeric Precision Input Block with quick -0.5 and +0.5 */}
                     <div className="pt-2 border-t border-[hsl(var(--color-border))] flex items-center justify-between gap-4">
-                      <span className="text-xs font-semibold text-[hsl(var(--color-muted-foreground))]">精密输入：</span>
+                      <span className="text-xs font-semibold text-[hsl(var(--color-muted-foreground))]">{t('rotatePdf.precisionInput')}</span>
                       
                       <div className="flex items-center bg-[hsl(var(--color-muted)/0.4)] border border-[hsl(var(--color-input))] rounded-[var(--radius-md)] overflow-hidden pr-2">
                         <button
@@ -795,7 +795,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
 
                     {/* Range Alert Message */}
                     <div className="text-[10px] text-[hsl(var(--color-muted-foreground))] bg-[hsl(var(--color-muted)/0.25)] p-2.5 rounded-[var(--radius-md)] border border-[hsl(var(--color-border))] leading-relaxed">
-                      💡 <strong>输入提示：</strong>您可以输入任意角度，比如较大值，在失焦或按下回车时系统将<strong>自动取模规范化</strong>在 <code>[-180°, 180°]</code> 的等效区间内。
+                      {t.rich('rotatePdf.inputTip', { b: (chunks) => <strong>{chunks}</strong>, code: (chunks) => <code>{chunks}</code> })}
                     </div>
 
                   </div>
@@ -819,8 +819,8 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                   </svg>
                 )}
                 {isProcessing 
-                  ? '旋转处理中...' 
-                  : `开始旋转 ${rotatedCount} 个已校准页面`
+                  ? t('status.processing')
+                  : t('rotatePdf.startRotate', { count: rotatedCount })
                 }
               </Button>
 
@@ -843,7 +843,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                 role="status"
               >
                 <p className="text-sm font-semibold">
-                  🎉 PDF 页面物理旋转保存成功！点击上方按钮进行下载。
+                  {t('rotatePdf.successMessage')}
                 </p>
               </div>
             )}
@@ -854,10 +854,10 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
             <div className="flex items-center justify-between bg-[hsl(var(--color-card))] px-4 py-3 rounded-[var(--radius-md)] border border-[hsl(var(--color-border))]">
               <div className="flex items-center gap-2">
                 <div className="w-2.5 h-2.5 rounded-full bg-[hsl(var(--color-primary))] animate-pulse" />
-                <span className="text-sm font-semibold text-[hsl(var(--color-foreground))]">实时物理预览视窗</span>
+                <span className="text-sm font-semibold text-[hsl(var(--color-foreground))]">{t('rotatePdf.previewTitle')}</span>
               </div>
               <span className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                点击页面切换选择 • 拖拽左侧控制进行细粒度微调
+                {t('rotatePdf.previewHelp')}
               </span>
             </div>
 
@@ -866,7 +866,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                 <div className="flex flex-col items-center gap-3">
                   <div className="w-10 h-10 border-4 border-[hsl(var(--color-primary))] border-t-transparent rounded-full animate-spin" />
                   <p className="text-sm font-semibold text-[hsl(var(--color-muted-foreground))]">
-                    正在解压并加载 PDF 预览图...
+                    {t('rotatePdf.loadingPreviews')}
                   </p>
                 </div>
               </div>
@@ -932,7 +932,7 @@ export function RotatePDFTool({ className = '' }: RotatePDFToolProps) {
                         {/* Footer details & micro quick rotation buttons */}
                         <div className="w-full px-3 py-2.5 bg-[hsl(var(--color-card))] flex items-center justify-between">
                           <span className="text-xs font-extrabold text-[hsl(var(--color-foreground))]">
-                            第 {preview.pageNumber} 页
+                            {t('comparePdfs.pageNumber', { page: preview.pageNumber })}
                           </span>
                           
                           {/* micro discrete actions block */}

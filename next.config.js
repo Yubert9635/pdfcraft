@@ -118,9 +118,9 @@ const nextConfig = {
   async headers() {
     return [
       {
-        // LibreOffice WASM .wasm.gz — serve as application/wasm with gzip Content-Encoding
+        // LibreOffice WASM .wasm.bin.gz — serve as application/wasm with gzip Content-Encoding
         // Same approach as BentoPDF's nginx config so browser decompresses transparently
-        source: '/libreoffice-wasm/soffice.wasm.gz',
+        source: '/libreoffice-wasm/soffice.wasm.bin.gz',
         headers: [
           { key: 'Content-Type', value: 'application/wasm' },
           { key: 'Content-Encoding', value: 'gzip' },
@@ -131,11 +131,33 @@ const nextConfig = {
         ],
       },
       {
-        // LibreOffice WASM .data.gz — serve as application/octet-stream with gzip Content-Encoding
-        source: '/libreoffice-wasm/soffice.data.gz',
+        // LibreOffice WASM .data.bin.gz — serve as application/octet-stream with gzip Content-Encoding
+        source: '/libreoffice-wasm/soffice.data.bin.gz',
         headers: [
           { key: 'Content-Type', value: 'application/octet-stream' },
           { key: 'Content-Encoding', value: 'gzip' },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
+      {
+        // LibreOffice WASM .wasm.bin (decompressed) — serve as application/wasm
+        source: '/libreoffice-wasm/soffice.wasm.bin',
+        headers: [
+          { key: 'Content-Type', value: 'application/wasm' },
+          { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
+          { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
+          { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
+          { key: 'Cross-Origin-Resource-Policy', value: 'cross-origin' },
+        ],
+      },
+      {
+        // LibreOffice WASM .data.bin (decompressed) — serve as application/octet-stream
+        source: '/libreoffice-wasm/soffice.data.bin',
+        headers: [
+          { key: 'Content-Type', value: 'application/octet-stream' },
           { key: 'Cache-Control', value: 'public, max-age=31536000, immutable' },
           { key: 'Cross-Origin-Embedder-Policy', value: 'require-corp' },
           { key: 'Cross-Origin-Opener-Policy', value: 'same-origin' },
@@ -160,6 +182,18 @@ const nextConfig = {
           {
             key: 'Cache-Control',
             value: 'public, max-age=31536000, immutable',
+          },
+          {
+            key: 'Cross-Origin-Opener-Policy',
+            value: 'same-origin',
+          },
+          {
+            key: 'Cross-Origin-Embedder-Policy',
+            value: 'require-corp',
+          },
+          {
+            key: 'Cross-Origin-Resource-Policy',
+            value: 'cross-origin',
           },
         ],
       },

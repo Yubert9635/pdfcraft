@@ -163,7 +163,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
         {/* Slot A: Base/Underlay PDF */}
         <div className="space-y-3">
           <label className="text-sm font-bold text-[hsl(var(--color-foreground))] block">
-            1. 上传主文档 (Base PDF)
+            {t('overlayPdf.uploadBaseLabel')}
           </label>
           {baseFile ? (
             <Card variant="outlined" className="relative group p-4 flex items-center justify-between border-2 border-[hsl(var(--color-primary)/0.3)] bg-[hsl(var(--color-muted)/0.15)] rounded-2xl">
@@ -178,7 +178,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
                     {baseFile.name}
                   </p>
                   <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                    {basePages > 0 ? `${basePages} 页` : '正在载入...'} • {(baseFile.size / (1024 * 1024)).toFixed(2)} MB
+                    {basePages > 0 ? t('overlayPdf.uploadBaseSuccess', { count: basePages, size: (baseFile.size / (1024 * 1024)).toFixed(2) }) : (t('aiPdfReflower.scanningMetadata') || 'Loading...')}
                   </p>
                 </div>
               </div>
@@ -199,8 +199,8 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
               onFilesSelected={handleBaseSelected}
               onError={setError}
               disabled={isProcessing || isLoadingBase}
-              label="点击上传主 PDF"
-              description="该文档的内容会作为合并的基本骨架"
+              label={t('overlayPdf.uploadBaseButton')}
+              description={t('overlayPdf.uploadBaseDesc')}
               className="min-h-[160px] p-6 rounded-2xl"
             />
           )}
@@ -209,7 +209,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
         {/* Slot B: Overlay Layer PDF */}
         <div className="space-y-3">
           <label className="text-sm font-bold text-[hsl(var(--color-foreground))] block">
-            2. 上传覆叠层文档 (Layer PDF)
+            {t('overlayPdf.uploadLayerLabel')}
           </label>
           {layerFile ? (
             <Card variant="outlined" className="relative group p-4 flex items-center justify-between border-2 border-emerald-500/35 bg-emerald-500/5 rounded-2xl">
@@ -224,7 +224,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
                     {layerFile.name}
                   </p>
                   <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                    {layerPages > 0 ? `${layerPages} 页` : '正在载入...'} • {(layerFile.size / (1024 * 1024)).toFixed(2)} MB
+                    {layerPages > 0 ? t('overlayPdf.uploadLayerSuccess', { count: layerPages, size: (layerFile.size / (1024 * 1024)).toFixed(2) }) : (t('aiPdfReflower.scanningMetadata') || 'Loading...')}
                   </p>
                 </div>
               </div>
@@ -245,8 +245,8 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
               onFilesSelected={handleLayerSelected}
               onError={setError}
               disabled={isProcessing || isLoadingLayer}
-              label="点击上传图层 PDF"
-              description="如公章、带有设计背景的信托网格、信笺等"
+              label={t('overlayPdf.uploadLayerButton')}
+              description={t('overlayPdf.uploadLayerDesc')}
               className="min-h-[160px] p-6 rounded-2xl border-emerald-500/25 hover:border-emerald-500"
             />
           )}
@@ -268,7 +268,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
           <div className="lg:col-span-5 space-y-4">
             <Card variant="outlined" className="p-6 bg-[hsl(var(--color-card))] rounded-2xl flex flex-col items-center justify-center min-h-[300px] overflow-hidden">
               <span className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] mb-8">
-                3D 层叠层级动态预览
+                {t('overlayPdf.previewTitle')}
               </span>
               
               {/* 3D Paper Layer frame container */}
@@ -291,7 +291,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
                   }}
                 >
                   <div className="text-center">
-                    <p className="text-sm">主页面</p>
+                    <p className="text-sm">{t('overlayPdf.basePageLabel')}</p>
                     <p className="text-[10px] opacity-60">Base Document</p>
                   </div>
                 </div>
@@ -308,7 +308,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
                   }}
                 >
                   <div className="text-center">
-                    <p className="text-sm">图层面</p>
+                    <p className="text-sm">{t('overlayPdf.layerPageLabel')}</p>
                     <p className="text-[10px] opacity-70">Overlay Layer</p>
                   </div>
                 </div>
@@ -317,8 +317,8 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
               <div className="mt-8 text-center max-w-xs">
                 <p className="text-xs font-semibold text-[hsl(var(--color-foreground))]">
                   {mode === 'overlay' 
-                    ? '📂 前景层模式 (Overlay)：图层文档渲染在主文档的页面内容之上。'
-                    : '🎨 背景层模式 (Underlay)：图层文档垫在主文档所有页面内容的最底层。'
+                    ? t('overlayPdf.placementModeOverlay')
+                    : t('overlayPdf.placementModeUnderlay')
                   }
                 </p>
               </div>
@@ -329,13 +329,13 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
           <div className="lg:col-span-7 space-y-6">
             <Card variant="default" className="p-6 rounded-2xl space-y-6 backdrop-blur-md bg-white/40 dark:bg-black/30 border border-white/20 dark:border-zinc-800/40">
               <h3 className="text-md font-bold text-[hsl(var(--color-foreground))] border-b border-[hsl(var(--color-border))] pb-3">
-                覆叠拼接配置
+                {t('overlayPdf.optionsTitle')}
               </h3>
 
               {/* Mode Button Switcher */}
               <div className="space-y-2">
                 <span className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                  A. 覆叠层级模式 (Placement Mode)
+                  {t('overlayPdf.placementModeLabel')}
                 </span>
                 <div className="flex bg-[hsl(var(--color-muted)/0.5)] p-1 rounded-xl">
                   <button
@@ -346,7 +346,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
                         : 'text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]'
                     }`}
                   >
-                    前景覆叠 (Overlay)
+                    {t('overlayPdf.placementOverlayBtn')}
                   </button>
                   <button
                     onClick={() => setMode('underlay')}
@@ -356,7 +356,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
                         : 'text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]'
                     }`}
                   >
-                    背景垫底 (Underlay)
+                    {t('overlayPdf.placementUnderlayBtn')}
                   </button>
                 </div>
               </div>
@@ -365,15 +365,15 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
               <div className="space-y-2">
                 <div className="flex justify-between items-center">
                   <span className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                    B. 目标作用页面范围 (Target Page Range)
+                    {t('overlayPdf.targetRangeLabel')}
                   </span>
                   <span className="text-[10px] text-[hsl(var(--color-muted-foreground))]">
-                    空表示应用至全部主页面
+                    {t('overlayPdf.targetRangeHelp')}
                   </span>
                 </div>
                 <input
                   type="text"
-                  placeholder="例如：1-5, 8, odd, even"
+                  placeholder={t('overlayPdf.targetRangePlaceholder')}
                   value={pageRange}
                   onChange={(e) => setPageRange(e.target.value)}
                   className="w-full px-4 py-3 text-sm rounded-xl bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] placeholder:text-zinc-400 focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
@@ -384,10 +384,10 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
               <div className="flex items-center justify-between pt-2 border-t border-[hsl(var(--color-border))]">
                 <div>
                   <span className="text-xs font-bold text-[hsl(var(--color-foreground))] block">
-                    C. 循环重复图层文档 (Loop Shorter Overlay Document)
+                    {t('overlayPdf.loopOverlayLabel')}
                   </span>
                   <span className="text-[10px] text-[hsl(var(--color-muted-foreground))] mt-0.5 block leading-normal max-w-md">
-                    当图层文件总页数短于主 PDF 时，自动循环重复套用该图层（例如信笺背景）。若关闭，则超出页数的页面不再应用覆叠。
+                    {t('overlayPdf.loopOverlayDesc')}
                   </span>
                 </div>
                 <button
@@ -415,7 +415,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
                 disabled={isProcessing}
                 className="w-full py-4 font-bold shadow-lg shadow-[hsl(var(--color-primary)/0.15)]"
               >
-                {isProcessing ? '正在拼版编译中...' : '开始应用覆叠生成 PDF'}
+                {isProcessing ? (t('overlayPdf.processing') || 'Processing...') : t('overlayPdf.processButton')}
               </Button>
 
               {result && (
@@ -434,7 +434,7 @@ export function OverlayPDFTool({ className = '' }: OverlayPDFToolProps) {
             {status === 'complete' && result && (
               <div className="p-4 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/50 text-green-700 dark:text-green-400 text-center animate-in fade-in">
                 <p className="text-sm font-semibold">
-                  🎉 PDF 覆叠拼版处理成功！点击上方按钮进行下载。
+                  {t('overlayPdf.successMessage')}
                 </p>
               </div>
             )}

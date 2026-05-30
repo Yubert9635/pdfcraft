@@ -298,8 +298,8 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
           onFilesSelected={handleFileSelected}
           onError={setError}
           disabled={isProcessing || isLoadingMetadata}
-          label="上传需要脱敏防溯源的 PDF 文档"
-          description="拖放商业合同、机密文件或政府底档。系统将扫描可选图层、PieceInfo 历史并强制重构 xref 树。"
+          label={t('deepSanitize.uploadLabel')}
+          description={t('deepSanitize.uploadDescription')}
         />
       )}
 
@@ -324,7 +324,7 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                 {file.name}
               </p>
               <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                {totalPages > 0 ? `${totalPages} 页` : '深度结构预检中...'} • {(file.size / (1024 * 1024)).toFixed(2)} MB
+                {t('deepSanitize.prechecking')}
               </p>
             </div>
           </div>
@@ -346,7 +346,7 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                 <div className="border-b border-[hsl(var(--color-border))] pb-3">
                   <h3 className="text-base font-bold text-[hsl(var(--color-foreground))] flex items-center gap-2">
                     <Settings2 className="w-5 h-5 text-[hsl(var(--color-primary))]" />
-                    深度擦除控制选项
+                    {t('deepSanitize.optionsTitle')}
                   </h3>
                 </div>
 
@@ -360,8 +360,8 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                       className="w-4.5 h-4.5 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
                     <div className="text-xs">
-                      <p className="font-bold text-[hsl(var(--color-foreground))]">抹除 XMP XML 元数据与常规描述</p>
-                      <p className="text-[10px] text-zinc-400">Title, Author, Producer, 各种修改历史摘要流</p>
+                      {t('deepSanitize.clearXmp')}
+                      {t('deepSanitize.clearXmpDesc')}
                     </div>
                   </label>
 
@@ -374,8 +374,8 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                       className="w-4.5 h-4.5 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
                     <div className="text-xs">
-                      <p className="font-bold text-[hsl(var(--color-foreground))]">清理 PieceInfo 专属编辑器私有属性</p>
-                      <p className="text-[10px] text-zinc-400">Adobe Acrobat 等软件留存的页面节点修改痕迹</p>
+                      {t('deepSanitize.clearPieceInfo')}
+                      {t('deepSanitize.clearPieceInfoDesc')}
                     </div>
                   </label>
 
@@ -388,8 +388,8 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                       className="w-4.5 h-4.5 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
                     <div className="text-xs">
-                      <p className="font-bold text-[hsl(var(--color-foreground))]">剥离 OCProperties 可选内容水印图层</p>
-                      <p className="text-[10px] text-zinc-400">很多公司的防泄密动态不可见水印的底层承载层</p>
+                      {t('deepSanitize.clearOcProperties')}
+                      {t('deepSanitize.clearOcPropertiesDesc')}
                     </div>
                   </label>
 
@@ -402,8 +402,8 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                       className="w-4.5 h-4.5 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
                     <div className="text-xs">
-                      <p className="font-bold text-[hsl(var(--color-foreground))]">彻底擦除所有交互式批注与外链 (慎用)</p>
-                      <p className="text-[10px] text-zinc-400">将删除文档中的可点击外链、手写文字高亮和备注批注</p>
+                      {t('deepSanitize.clearAnnotations')}
+                      {t('deepSanitize.clearAnnotationsDesc')}
                     </div>
                   </label>
                 </div>
@@ -419,7 +419,7 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                   onClick={handleSanitizeProcess}
                 >
                   <EyeOff className="w-5 h-5" />
-                  执行深度净化脱敏
+                  {t('deepSanitize.processButton')}
                 </Button>
               </div>
 
@@ -454,7 +454,7 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
                 <div className="w-full mt-4 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 z-20 space-y-2 animate-in slide-in-from-bottom duration-300">
                   <h4 className="text-[10px] font-black tracking-widest text-purple-400 uppercase flex items-center gap-1.5">
                     <ShieldAlert className="w-4 h-4 text-purple-400" />
-                    扫描发现的安全风险排查报告:
+                    {t('deepSanitize.riskReport')}
                   </h4>
                   <ul className="space-y-1 pl-1">
                     {findings.map((item, idx) => (
@@ -481,9 +481,9 @@ export function DeepSanitizeTool({ className = '' }: DeepSanitizeToolProps) {
           </div>
 
           <div className="space-y-2 max-w-sm mx-auto">
-            <h3 className="text-base font-extrabold text-[hsl(var(--color-foreground))]">深度元数据净化完成！</h3>
+            {t('deepSanitize.successTitle')}
             <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-              已将原始文档的 XMP 元数据、描述字典、PieceInfo 缓冲、可选内容图层（OCG）全部剔除，并完成 xref 的物理重构。旧版本修改残留已不具恢复可能。
+              {t('deepSanitize.successDesc')}
             </p>
           </div>
 

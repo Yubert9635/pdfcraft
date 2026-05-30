@@ -81,7 +81,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
       setTotalPages(pdf.getPageCount());
     } catch (err) {
       console.error(err);
-      setError('无法解析主 PDF 漫画的元数据。该文件可能已损坏。');
+      setError(t('pdfToCbz.errorMetadata'));
     } finally {
       setIsLoadingFile(false);
     }
@@ -99,7 +99,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
    */
   const handleProcess = async () => {
     if (!file) {
-      setError('请上传待转换的漫画 PDF 文件。');
+      setError(t('pdfToCbz.errorUpload'));
       return;
     }
 
@@ -129,7 +129,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
         (prog, message) => {
           if (!cancelledRef.current) {
             setProgress(prog);
-            setProgressMessage(message || '正在提取漫画页面中...');
+            setProgressMessage(message || t('pdfToCbz.progressExtracting'));
           }
         }
       );
@@ -143,12 +143,12 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
         setResult(output.result as Blob);
         setStatus('complete');
       } else {
-        setError(output.error?.message || '编译漫画包 CBZ 失败。');
+        setError(output.error?.message || t('pdfToCbz.errorExtracting'));
         setStatus('error');
       }
     } catch (err) {
       if (!cancelledRef.current) {
-        setError(err instanceof Error ? err.message : '打包转换时发生未知错误。');
+        setError(err instanceof Error ? err.message : t('pdfToCbz.errorUnknown'));
         setStatus('error');
       }
     }
@@ -167,7 +167,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
       {/* File Upload Zone */}
       <div className="space-y-3">
         <label className="text-sm font-bold text-[hsl(var(--color-foreground))] block">
-          1. 上传漫画/插画 (PDF)
+          {t('pdfToCbz.uploadLabel')}
         </label>
         {file ? (
           <Card 
@@ -188,7 +188,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                   {file.name}
                 </p>
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                  {totalPages > 0 ? `${totalPages} 页` : '正在载入...'} • {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  {totalPages > 0 ? t('pdfToCbz.uploadSuccess', { count: totalPages, size: (file.size / (1024 * 1024)).toFixed(2) }) : (t('aiPdfReflower.scanningMetadata') || 'Loading...')}
                 </p>
               </div>
             </div>
@@ -209,8 +209,8 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
             onFilesSelected={handleFileSelected}
             onError={setError}
             disabled={isProcessing || isLoadingFile}
-            label="点击上传漫画 PDF 文档"
-            description="渲染高清页面的同时，自动嵌入 OPF / XML / Comment 漫画专属多维度数据库信息。"
+            label={t('pdfToCbz.uploadButton')}
+            description={t('pdfToCbz.uploadDesc')}
             className="min-h-[160px] p-6 rounded-2xl"
           />
         )}
@@ -235,7 +235,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
             <Card variant="outlined" className="p-6 bg-[hsl(var(--color-card))] rounded-2xl flex flex-col items-center justify-center min-h-[360px] overflow-hidden relative">
               <span className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] mb-8 flex items-center gap-1.5">
                 <BookOpen className="w-4 h-4 text-[hsl(var(--color-primary))]" />
-                3D 漫画体三维动态封面预览
+                {t('pdfToCbz.previewTitle')}
               </span>
               
               <div 
@@ -268,7 +268,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                         {manga === 'YesAndRightToLeft' ? '🇯🇵 MANGA (RTL)' : '📖 COMIC (LTR)'}
                       </span>
                       <h4 className="font-extrabold text-sm line-clamp-2 mt-3 leading-snug">
-                        {series || title || '漫画标题'}
+                        {series || title || t('pdfToCbz.comicTitleDefault')}
                       </h4>
                       {volume && (
                         <p className="text-[10px] font-bold text-zinc-400">
@@ -281,7 +281,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                       <div>
                         <p className="text-[8px] text-zinc-500 uppercase tracking-wider font-bold">Artist / Writer</p>
                         <p className="text-[10px] font-bold truncate max-w-[100px] text-zinc-300">
-                          {writer || '佚名作者'}
+                          {writer || t('pdfToCbz.comicArtistDefault')}
                         </p>
                       </div>
                       <div className="w-7 h-7 rounded bg-emerald-500/10 border border-emerald-500/30 flex items-center justify-center">
@@ -312,8 +312,8 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
               <div className="mt-8 text-center max-w-xs leading-normal">
                 <p className="text-[11px] font-semibold text-[hsl(var(--color-muted-foreground))]">
                   {manga === 'YesAndRightToLeft' 
-                    ? '右翻页模式 (Right to Left)：经典日漫读向，书脊对齐右侧翻开。'
-                    : '左翻页模式 (Left to Right)：标准小说/美漫读向，书脊对齐左侧翻开。'
+                    ? t('pdfToCbz.directionRtlHelp')
+                    : t('pdfToCbz.directionLtrHelp')
                   }
                 </p>
               </div>
@@ -328,7 +328,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
             >
               <h3 className="text-sm font-bold text-[hsl(var(--color-foreground))] border-b border-[hsl(var(--color-border))] pb-3 flex items-center gap-1.5">
                 <Settings2 className="w-4.5 h-4.5 text-[hsl(var(--color-primary))]" />
-                2. 完善书籍信息与元数据 (Metadata)
+                {t('pdfToCbz.metadataTitle')}
               </h3>
 
               {/* Grid properties */}
@@ -336,7 +336,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 {/* Book Title */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                    漫画标题 (Title)
+                    {t('pdfToCbz.fieldTitle')}
                   </label>
                   <input
                     type="text"
@@ -349,11 +349,11 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 {/* Series name */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                    所属系列/书名 (Series)
+                    {t('pdfToCbz.fieldSeries')}
                   </label>
                   <input
                     type="text"
-                    placeholder="如: 海贼王、进击的巨人"
+                    placeholder={t('pdfToCbz.seriesPlaceholder')}
                     value={series}
                     onChange={(e) => setSeries(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
@@ -363,7 +363,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 {/* Issue Number */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                    单册期数/话号 (Issue Number)
+                    {t('pdfToCbz.fieldIssue')}
                   </label>
                   <input
                     type="text"
@@ -376,7 +376,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 {/* Volume Number */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                    分卷号 (Volume)
+                    {t('pdfToCbz.fieldVolume')}
                   </label>
                   <input
                     type="text"
@@ -390,11 +390,11 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] flex items-center gap-1">
                     <User className="w-3.5 h-3.5 text-zinc-400" />
-                    编剧与绘画作者 (Writer/Artist)
+                    {t('pdfToCbz.fieldArtist')}
                   </label>
                   <input
                     type="text"
-                    placeholder="如: 尾田荣一郎"
+                    placeholder={t('pdfToCbz.artistPlaceholder')}
                     value={writer}
                     onChange={(e) => setWriter(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
@@ -404,11 +404,11 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 {/* Publisher */}
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                    发行商/出版社 (Publisher)
+                    {t('pdfToCbz.fieldPublisher')}
                   </label>
                   <input
                     type="text"
-                    placeholder="如: 集英社"
+                    placeholder={t('pdfToCbz.publisherPlaceholder')}
                     value={publisher}
                     onChange={(e) => setPublisher(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
@@ -419,11 +419,11 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] flex items-center gap-1">
                     <Tag className="w-3.5 h-3.5 text-zinc-400" />
-                    题材题材题材 (Genre)
+                    {t('pdfToCbz.fieldGenre')}
                   </label>
                   <input
                     type="text"
-                    placeholder="如: 热血 / 少年 / 动作"
+                    placeholder={t('pdfToCbz.genrePlaceholder')}
                     value={genre}
                     onChange={(e) => setGenre(e.target.value)}
                     className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
@@ -434,15 +434,15 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 <div className="space-y-1.5">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] flex items-center gap-1">
                     <Globe className="w-3.5 h-3.5 text-zinc-400" />
-                    漫画书籍阅读顺序
+                    {t('pdfToCbz.readingOrderLabel')}
                   </label>
                   <select
                     value={manga}
                     onChange={(e) => setManga(e.target.value as any)}
                     className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.35)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
                   >
-                    <option value="No">从左至右 (LTR - 普通电子书)</option>
-                    <option value="YesAndRightToLeft">从右至左 (RTL - 日漫读向)</option>
+                    <option value="No">{t('pdfToCbz.readingOrderLtr')}</option>
+                    <option value="YesAndRightToLeft">{t('pdfToCbz.readingOrderRtl')}</option>
                   </select>
                 </div>
               </div>
@@ -451,7 +451,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
               <div className="border-t border-[hsl(var(--color-border))] pt-4 space-y-4">
                 <h4 className="text-xs font-bold text-[hsl(var(--color-foreground))] flex items-center gap-1.5">
                   <Layers className="w-4 h-4 text-emerald-500" />
-                  3. 图像画质与设备调谐
+                  {t('pdfToCbz.deviceOptimizeTitle')}
                 </h4>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -459,7 +459,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-xs">
                       <label className="font-bold text-[hsl(var(--color-muted-foreground))]">
-                        图像压缩画质 (JPEG/WebP Quality)
+                        {t('pdfToCbz.qualityLabel')}
                       </label>
                       <span className="font-black text-[hsl(var(--color-primary))]">
                         {Math.round(quality * 100)}%
@@ -480,7 +480,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                   <div className="space-y-1.5">
                     <div className="flex justify-between items-center text-xs">
                       <label className="font-bold text-[hsl(var(--color-muted-foreground))]">
-                        分辨率比例 (Scale Multiplier)
+                        {t('pdfToCbz.scaleLabel')}
                       </label>
                       <span className="font-black text-[hsl(var(--color-primary))]">
                         {scale.toFixed(1)}x ({Math.round(scale * 72)} DPI)
@@ -500,7 +500,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                   {/* Format selector */}
                   <div className="space-y-1.5">
                     <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] block">
-                      压缩保存图像格式
+                      {t('pdfToCbz.formatLabel')}
                     </label>
                     <div className="flex bg-[hsl(var(--color-muted)/0.5)] p-0.5 rounded-lg border border-[hsl(var(--color-input)/0.4)]">
                       {(['jpg', 'png', 'webp'] as const).map(fmt => (
@@ -526,10 +526,10 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                       <Eye className="w-4 h-4 text-zinc-400" />
                       <div>
                         <span className="text-[11px] font-bold text-[hsl(var(--color-foreground))] block">
-                          墨水屏灰阶处理
+                          {t('pdfToCbz.einkGreyscale')}
                         </span>
                         <span className="text-[8px] text-[hsl(var(--color-muted-foreground))] block leading-none mt-0.5">
-                          脱色加速墨水屏刷新率与画质对比度
+                          {t('pdfToCbz.einkGreyscaleDesc')}
                         </span>
                       </div>
                     </div>
@@ -562,7 +562,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
                 className="w-full py-4 font-bold shadow-lg shadow-[hsl(var(--color-primary)/0.15)] flex items-center justify-center gap-2"
               >
                 <BookOpen className="w-5 h-5" />
-                {isProcessing ? '正在高清打包编译漫画...' : '开始提取编译 CBZ 漫画包'}
+                {isProcessing ? (t('pdfToCbz.processing') || 'Processing...') : t('pdfToCbz.processButton')}
               </Button>
 
               {result && (
@@ -582,7 +582,7 @@ export function PDFToCBZTool({ className = '' }: PDFToCBZToolProps) {
               <div className="p-4 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/50 text-green-700 dark:text-green-400 text-center animate-in fade-in">
                 <p className="text-sm font-semibold flex items-center justify-center gap-1.5">
                   <Check className="w-5 h-5" />
-                  🎉 漫画 CBZ 打包成功！内置 metadata.opf 与 ComicInfo.xml 元数据。请一键下载。
+                  {t('pdfToCbz.successMessage')}
                 </p>
               </div>
             )}

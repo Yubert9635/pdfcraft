@@ -726,3 +726,197 @@ export {
   type DeepSanitizeOptions,
 } from './deep-sanitize';
 
+// Booklet Folding Simulator processor
+export {
+  BookletFoldingSimulatorProcessor,
+  createBookletFoldingSimulatorProcessor,
+  imposeBookletFolding,
+  type BookletFoldingOptions,
+} from './booklet-folding-simulator';
+
+// PDF To Slide processor
+export {
+  PDFToSlideProcessor,
+  createPDFToSlideProcessor,
+  reconstructPDFToSlide,
+  type PDFToSlideOptions,
+} from './pdf-to-slide';
+
+// Form Logic Designer processor
+export {
+  FormLogicDesignerProcessor,
+  createFormLogicDesignerProcessor,
+  injectFormLogic,
+  type FormLogicOptions,
+} from './form-logic-designer';
+
+// Eink Optimizer processor
+export {
+  EinkOptimizerProcessor,
+  createEinkOptimizerProcessor,
+  optimizeEink,
+  type EinkOptimizerOptions,
+} from './eink-optimizer';
+
+// Cert Cryptor processor
+export {
+  CertCryptorProcessor,
+  createCertCryptorProcessor,
+  encryptAndSignCert,
+  type CertCryptorOptions,
+} from './cert-cryptor';
+
+// Passport ID Composer processor
+export {
+  PassportIdComposerProcessor,
+  createPassportIdComposerProcessor,
+  composePassportId,
+  type PassportIdOptions,
+} from './passport-id-composer';
+
+// Annotation Exporter processor
+export {
+  AnnotationExporterProcessor,
+  createAnnotationExporterProcessor,
+  exportAnnotations,
+  type AnnotationExportOptions,
+} from './annotation-exporter';
+
+// Batch Watermark Remover processor
+export {
+  BatchWatermarkRemoverProcessor,
+  createBatchWatermarkRemoverProcessor,
+  removeBatchWatermarks,
+  type BatchWatermarkOptions,
+} from './batch-watermark-remover';
+
+// Smart Data Redactor processor
+export {
+  SmartDataRedactorProcessor,
+  createSmartDataRedactorProcessor,
+  redactSmartData,
+  type SmartRedactOptions,
+} from './smart-data-redactor';
+
+// Bookmarks Auto Generator processor
+export {
+  BookmarksAutoGeneratorProcessor,
+  createBookmarksAutoGeneratorProcessor,
+  autoGenerateBookmarks,
+  type BookmarksAutoOptions,
+} from './bookmarks-auto-generator';
+
+// Batch Barcode Injector processor
+export {
+  BatchBarcodeInjectorProcessor,
+  createBatchBarcodeInjectorProcessor,
+  injectBatchBarcodes,
+  type BatchBarcodeOptions,
+} from './batch-barcode-injector';
+
+// Signature Ink Optimizer processor
+export {
+  SignatureInkOptimizerProcessor,
+  createSignatureInkOptimizerProcessor,
+  optimizeSignatureInk,
+  type SignatureInkOptions,
+} from './signature-ink-optimizer';
+
+// Dead Link Debugger processor
+export {
+  DeadLinkDebuggerProcessor,
+  createDeadLinkDebuggerProcessor,
+  debugDeadLinks,
+  type DeadLinkOptions,
+} from './dead-link-debugger';
+
+// Interactive TOC Generator processor
+export {
+  InteractiveTocGeneratorProcessor,
+  createInteractiveTocGeneratorProcessor,
+  generateInteractiveToc,
+  type InteractiveTocOptions,
+} from './interactive-toc-generator';
+
+// Global Invoice Parser processor
+export {
+  GlobalInvoiceParserProcessor,
+  createGlobalInvoiceParserProcessor,
+  parseGlobalInvoice,
+  type GlobalInvoiceOptions,
+} from './global-invoice-parser';
+
+// PDF Deskew Aligner processor
+export {
+  PdfDeskewAlignerProcessor,
+  createPdfDeskewAlignerProcessor,
+  deskewPDFAligner,
+  type PdfDeskewAlignerOptions,
+} from './pdf-deskew-aligner';
+
+// PDF Two Column Reflower processor
+export {
+  PdfTwoColumnReflowerProcessor,
+  createPdfTwoColumnReflowerProcessor,
+  reflowTwoColumnPDF,
+  type PdfTwoColumnReflowerOptions,
+} from './pdf-two-column-reflower';
+
+// PDF Page Resizer Uniform processor
+export {
+  PdfPageResizerUniformProcessor,
+  createPdfPageResizerUniformProcessor,
+  resizePDFPagesUniform,
+  type PdfPageResizerUniformOptions,
+} from './pdf-page-resizer-uniform';
+
+// Handwriting Ink Contrast Booster processor
+export {
+  HandwritingInkContrastBoosterProcessor,
+  createHandwritingInkContrastBoosterProcessor,
+  boostHandwritingInkContrast,
+  type HandwritingInkContrastBoosterOptions,
+} from './handwriting-ink-contrast-booster';
+
+// PDF Spine Bookbinder processor
+export {
+  PdfSpineBookbinderProcessor,
+  createPdfSpineBookbinderProcessor,
+  designPDFSpine,
+  type PdfSpineBookbinderOptions,
+} from './pdf-spine-bookbinder';
+
+// PDF Signature Anchor Helper processor
+export {
+  PdfSignatureAnchorHelperProcessor,
+  createPdfSignatureAnchorHelperProcessor,
+  injectSignatureAnchors,
+  type PdfSignatureAnchorHelperOptions,
+} from './pdf-signature-anchor-helper';
+
+// PDF Lossless Slicer processor
+export {
+  PdfLosslessSlicerProcessor,
+  createPdfLosslessSlicerProcessor,
+  slicePDFLossless,
+  type PdfLosslessSlicerOptions,
+} from './pdf-lossless-slicer';
+
+// PDF Scratchpad Canvas processor
+export {
+  PdfScratchpadCanvasProcessor,
+  createPdfScratchpadCanvasProcessor,
+  stitchScratchpadCanvas,
+  type PdfScratchpadCanvasOptions,
+} from './pdf-scratchpad-canvas';
+
+// Photo Tiling Prepress processor
+export {
+  PhotoTilingPrepressProcessor,
+  createPhotoTilingPrepressProcessor,
+  prepressPhotoTiling,
+  type PhotoTilingPrepressOptions,
+} from './photo-tiling-prepress';
+
+
+

@@ -22,11 +22,11 @@ interface AuditLog {
 }
 
 const TSA_SERVERS = [
-  { id: 'MeSign', name: 'MeSign TSA', desc: '中国信安可信时间戳权威机构', speed: '快速' },
-  { id: 'DigiCert', name: 'DigiCert TSA', desc: '全球领先的 PKI 安全时间戳提供商', speed: '极速' },
-  { id: 'Sectigo', name: 'Sectigo TSA', desc: 'Comodo 安全原子钟授时服务', speed: '极速' },
-  { id: 'SSL.com', name: 'SSL.com TSA', desc: '北美可信第三方权威授时节点', speed: '稳定' },
-  { id: 'FreeTSA', name: 'FreeTSA.org', desc: '开源高强密码学免费确权机构', speed: '中速' },
+  { id: 'MeSign', name: 'MeSign TSA', speedKey: 'fast' },
+  { id: 'DigiCert', name: 'DigiCert TSA', speedKey: 'blazing' },
+  { id: 'Sectigo', name: 'Sectigo TSA', speedKey: 'blazing' },
+  { id: 'SSL.com', name: 'SSL.com TSA', speedKey: 'stable' },
+  { id: 'FreeTSA', name: 'FreeTSA.org', speedKey: 'medium' },
 ];
 
 export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
@@ -161,8 +161,8 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
           onFilesSelected={handleFileSelected}
           onError={setError}
           disabled={isProcessing || isLoadingMetadata}
-          label="上传待签名确权 PDF"
-          description="将 PDF 文件拖放到此处。支持所有标准和加密 PDF 的自动解密载入。"
+          label={t('timestamp.uploadLabel')}
+          description={t('timestamp.uploadDescription')}
         />
       )}
 
@@ -187,7 +187,7 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                 {file.name}
               </p>
               <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                {totalPages > 0 ? `${totalPages} 页` : '载入元数据中...'} • {(file.size / (1024 * 1024)).toFixed(2)} MB
+                {totalPages > 0 ? t('comparePdfs.pageNumber', { page: totalPages }) : t('status.loading')} • {(file.size / (1024 * 1024)).toFixed(2)} MB
               </p>
             </div>
           </div>
@@ -197,7 +197,7 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
             onClick={handleClearFile}
             disabled={isProcessing}
           >
-            {t('buttons.remove') || 'Remove'}
+            {t('buttons.remove')}
           </Button>
         </Card>
       )}
@@ -215,10 +215,10 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                     <svg className="w-5 h-5 text-[hsl(var(--color-primary))]" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10" />
                     </svg>
-                    1. 选择受信任 TSA 服务器 (RFC 3161)
+                    {tTools('timestampPdf.selectTsaTitle')}
                   </h3>
                   <p className="text-[11px] text-[hsl(var(--color-muted-foreground))] mt-1">
-                    系统只发送无规律的 SHA-256 哈希值与服务器交互，绝对保障文档隐私。
+                    {tTools('timestampPdf.privacyGuaranteed')}
                   </p>
                 </div>
 
@@ -226,6 +226,7 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                 <div className="space-y-2.5 max-h-[300px] overflow-y-auto pr-1">
                   {TSA_SERVERS.map((tsa) => {
                     const isSelected = selectedTSA === tsa.id;
+                    const isFast = tsa.speedKey === 'fast' || tsa.speedKey === 'blazing';
                     return (
                       <div
                         key={tsa.id}
@@ -246,17 +247,17 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                             </span>
                           </div>
                           <p className="text-[11px] text-[hsl(var(--color-muted-foreground))] leading-normal max-w-sm">
-                            {tsa.desc}
+                            {tTools(`timestampPdf.tsa.desc.${tsa.id}`)}
                           </p>
                         </div>
                         
                         <div className="flex items-center gap-2">
                           <span className={`text-[9px] font-bold px-2 py-0.5 rounded-full ${
-                            tsa.speed === '极速' || tsa.speed === '快速' 
+                            isFast
                               ? 'bg-green-100 text-green-700 dark:bg-green-950/20 dark:text-green-400'
                               : 'bg-amber-100 text-amber-700 dark:bg-amber-950/20 dark:text-amber-400'
                           }`}>
-                            {tsa.speed}
+                            {tTools(`timestampPdf.tsa.speed.${tsa.speedKey}`)}
                           </span>
                           
                           {/* Inner selected circle indicator */}
@@ -290,7 +291,7 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                   <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
                     <path strokeLinecap="round" strokeLinejoin="round" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
                   </svg>
-                  签署可信时间戳
+                  {tTools('timestampPdf.processButton')}
                 </Button>
               </div>
             </Card>
@@ -308,9 +309,9 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
                   </div>
-                  <h4 className="text-sm font-bold text-[hsl(var(--color-foreground))]">等待时间戳确权签署</h4>
+                  <h4 className="text-sm font-bold text-[hsl(var(--color-foreground))]">{tTools('timestampPdf.waitingTitle')}</h4>
                   <p className="text-xs leading-relaxed max-w-[260px] mx-auto">
-                    上传文件并选择 TSA，点击“签署可信时间戳”生成由权威授时中心盖章的加密证书凭证。
+                    {tTools('timestampPdf.waitingDescription')}
                   </p>
                 </div>
               ) : (
@@ -324,7 +325,7 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                         TSA Verified & Secured
                       </span>
                       <h4 className="text-base font-black tracking-tight text-[hsl(var(--color-foreground))]">
-                        电子存证可信时间戳凭据
+                        {tTools('timestampPdf.certificateTitle')}
                       </h4>
                     </div>
                     {/* Golden luxury seal */}
@@ -347,7 +348,7 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                         </svg>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">TSA 原子钟授时时间 (UTC)</p>
+                        <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">{tTools('timestampPdf.tsaTime')}</p>
                         <p className="text-sm font-extrabold text-[hsl(var(--color-foreground))] mt-0.5">
                           {new Date(auditLog.timestamp).toLocaleString()}
                         </p>
@@ -356,7 +357,7 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
 
                     {/* Cryptographic Hash */}
                     <div className="space-y-1">
-                      <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">安全文件哈希校验和 (SHA-256)</p>
+                      <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">{tTools('timestampPdf.fileHash')}</p>
                       <code className="text-[10px] bg-[hsl(var(--color-muted)/0.35)] border border-[hsl(var(--color-border))] px-3 py-2 rounded-xl block font-mono text-[hsl(var(--color-foreground))] break-all leading-normal">
                         {auditLog.hash}
                       </code>
@@ -365,13 +366,13 @@ export function TimestampPDFTool({ className = '' }: TimestampPDFToolProps) {
                     {/* Metadata fields */}
                     <div className="grid grid-cols-2 gap-4">
                       <div>
-                        <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">授时权威商 (TSA)</p>
+                        <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">{tTools('timestampPdf.authority')}</p>
                         <p className="text-xs font-bold text-[hsl(var(--color-foreground))] mt-1">
                           {auditLog.tsaAuthority}
                         </p>
                       </div>
                       <div>
-                        <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">证书序列号 (Serial)</p>
+                        <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] uppercase font-bold tracking-wider">{tTools('timestampPdf.serialNumber')}</p>
                         <p className="text-xs font-bold text-[hsl(var(--color-foreground))] mt-1 font-mono">
                           {auditLog.serial}
                         </p>

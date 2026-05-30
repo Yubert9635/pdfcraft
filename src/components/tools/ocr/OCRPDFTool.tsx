@@ -361,14 +361,14 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
                 <div className="border-b border-[hsl(var(--color-border))] pb-3">
                   <h3 className="text-base font-bold text-[hsl(var(--color-foreground))] flex items-center gap-2">
                     <Settings2 className="w-5 h-5 text-[hsl(var(--color-primary))]" />
-                    OCR 文字识别参数配置
+                    {t('ocr.optionsTitle')}
                   </h3>
                 </div>
 
                 {/* Multi language choice */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider flex items-center gap-1.5">
-                    <Languages className="w-4 h-4" /> 选择识别语言 (支持多选)
+                    <Languages className="w-4 h-4" /> {t('ocr.selectLang')}
                   </label>
                   <div className="flex flex-wrap gap-1.5">
                     {availableLanguages.map(lang => (
@@ -395,44 +395,44 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
                   {/* Format Output */}
                   <div>
                     <label className="block text-[11px] font-bold text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider mb-2">
-                      输出文件格式
+                      {t('ocr.outputFormat')}
                     </label>
                     <Select
                       value={outputFormat}
                       onChange={(e) => setOutputFormat(e.target.value as OCROptions['outputFormat'])}
                       disabled={isProcessing}
                     >
-                      <option value="searchable-pdf">双层可搜索 PDF</option>
-                      <option value="text">提取纯文本文件 (.txt)</option>
+                      <option value="searchable-pdf">{t('ocr.formatSearchablePdf')}</option>
+                      <option value="text">{t('ocr.formatText')}</option>
                     </Select>
                   </div>
 
                   {/* Resolution scale */}
                   <div>
                     <label className="block text-[11px] font-bold text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider mb-2">
-                      渲染识别精度
+                      {t('ocr.accuracyTitle')}
                     </label>
                     <Select
                       value={scale}
                       onChange={(e) => setScale(parseFloat(e.target.value))}
                       disabled={isProcessing}
                     >
-                      <option value="1">标清 (适合清晰原件)</option>
-                      <option value="2">高清 (推荐，识别更稳)</option>
-                      <option value="3">超清 (慢，适合模糊件)</option>
+                      <option value="1">{t('ocr.accuracySd')}</option>
+                      <option value="2">{t('ocr.accuracyHd')}</option>
+                      <option value="3">{t('ocr.accuracyUd')}</option>
                     </Select>
                   </div>
 
                   {/* Range */}
                   <div>
                     <label className="block text-[11px] font-bold text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider mb-2">
-                      指定识别页码
+                      {t('ocr.specifyPages')}
                     </label>
                     <input
                       type="text"
                       value={pageRange}
                       onChange={(e) => setPageRange(e.target.value)}
-                      placeholder="如: 1-3, 5"
+                      placeholder={t('ocr.pagesPlaceholder')}
                       disabled={isProcessing}
                       className="w-full px-3 py-2 rounded-xl border border-[hsl(var(--color-border))] bg-white dark:bg-zinc-800 text-xs focus:ring-1 focus:ring-[hsl(var(--color-primary))]"
                     />
@@ -450,7 +450,7 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
                   disabled={!canProcess}
                 >
                   <Scan className="w-5 h-5" />
-                  开始文字识别
+                  {t('ocr.startOcr')}
                 </Button>
               </div>
 
@@ -478,10 +478,12 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
               <div className="w-full mt-4 bg-zinc-900/50 border border-zinc-800 rounded-2xl p-4 z-20 space-y-1.5">
                 <h4 className="text-[10px] font-black tracking-widest text-purple-400 uppercase flex items-center gap-1.5">
                   <Sparkles className="w-4 h-4 text-purple-400" />
-                  双层 PDF 核心优势:
+                  {t('ocr.advantageTitle')}
                 </h4>
                 <p className="text-[10px] text-zinc-400 leading-relaxed pl-1">
-                  重构后的可搜索 PDF 功能，会在后台计算 OCR 文字排版物理 Bounding Box，在原始 PDF 图层上层精确注入<b>完全透明的文字图层 (Invisible Text Layer)</b>。这不仅保持了原始扫描文件的图纸外观，还让文本完美支持<b>划词复制、检索和选定</b>。
+                  {t.rich('ocr.advantageDesc', {
+                    b: (chunks) => <b>{chunks}</b>
+                  })}
                 </p>
               </div>
 
@@ -510,11 +512,11 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
           </div>
 
           <div className="space-y-2 max-w-sm mx-auto">
-            <h3 className="text-base font-extrabold text-[hsl(var(--color-foreground))]">文字识别提取完成！</h3>
+            <h3 className="text-base font-extrabold text-[hsl(var(--color-foreground))]">{t('ocr.successTitle')}</h3>
             <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
               {outputFormat === 'searchable-pdf' 
-                ? '双层可搜索 PDF 编译完成。原始扫描图片已被文字遮罩覆盖，您可以使用任意 PDF 查看器打开文件并进行划词搜索与复制。' 
-                : '纯文本文件结构提取成功，已在下方显示文本流预览。'
+                ? t('ocr.successSearchable') 
+                : t('ocr.successText')
               }
             </p>
           </div>
@@ -536,7 +538,7 @@ export function OCRPDFTool({ className = '' }: OCRPDFToolProps) {
       {textPreview && (
         <Card variant="outlined" size="lg" className="rounded-3xl shadow-sm">
           <h3 className="text-sm font-bold text-[hsl(var(--color-foreground))] mb-4">
-            提取出来的文本流预览
+            {t('ocr.previewTitle')}
           </h3>
           <pre className="p-4 bg-[hsl(var(--color-muted)/0.35)] border border-[hsl(var(--color-border))] rounded-2xl overflow-auto max-h-64 text-xs font-mono text-[hsl(var(--color-foreground))] whitespace-pre-wrap leading-normal">
             {textPreview}

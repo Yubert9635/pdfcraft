@@ -240,8 +240,8 @@ export function AIPDFReflowerTool({ className = '' }: AIPDFReflowerToolProps) {
           onFilesSelected={handleFileSelected}
           onError={setError}
           disabled={isProcessing || isLoadingMetadata}
-          label="上传需要自适应重排的 PDF 文档"
-          description="拖放学术论文、双栏文档或文字类 PDF 到此处。系统将自动执行行重组和双栏解析。"
+          label={t('aiPdfReflower.uploadLabel')}
+          description={t('aiPdfReflower.uploadDescription')}
         />
       )}
 
@@ -266,7 +266,7 @@ export function AIPDFReflowerTool({ className = '' }: AIPDFReflowerToolProps) {
                 {file.name}
               </p>
               <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                {totalPages > 0 ? `${totalPages} 页` : '解析文档结构中...'} • {(file.size / (1024 * 1024)).toFixed(2)} MB
+                {totalPages > 0 ? `${totalPages} ${t('pdfToCbz.pagesLabel') || 'pages'}` : t('aiPdfReflower.scanningMetadata')} • {(file.size / (1024 * 1024)).toFixed(2)} MB
               </p>
             </div>
           </div>
@@ -291,10 +291,10 @@ export function AIPDFReflowerTool({ className = '' }: AIPDFReflowerToolProps) {
               <div className="border-b border-[hsl(var(--color-border))] pb-3">
                 <h3 className="text-base font-bold text-[hsl(var(--color-foreground))] flex items-center gap-2">
                   <Settings2 className="w-5 h-5 text-[hsl(var(--color-primary))]" />
-                  自适应阅读设置
+                  {t('aiPdfReflower.optionsTitle')}
                 </h3>
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">
-                  实时修改右侧 3D 手机模拟器内的文字排版风格。
+                  {t('aiPdfReflower.optionsHelp')}
                 </p>
               </div>
 
@@ -302,14 +302,14 @@ export function AIPDFReflowerTool({ className = '' }: AIPDFReflowerToolProps) {
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-[hsl(var(--color-muted-foreground))] flex items-center gap-1.5">
                   <Compass className="w-4 h-4" />
-                  阅读底色方案
+                  {t('aiPdfReflower.themeLabel')}
                 </label>
                 <div className="grid grid-cols-4 gap-2">
                   {[
-                    { id: 'sepia', name: '护眼纸张', bg: 'bg-[#f4ebd0] text-[#5b4636]' },
-                    { id: 'light', name: '亮白清爽', bg: 'bg-white text-zinc-800 border' },
-                    { id: 'green', name: '清新柔绿', bg: 'bg-[#e2edd9] text-[#1c3016]' },
-                    { id: 'dark', name: '夜间极客', bg: 'bg-zinc-900 text-zinc-100' },
+                    { id: 'sepia', name: t('aiPdfReflower.themeSepia'), bg: 'bg-[#f4ebd0] text-[#5b4636]' },
+                    { id: 'light', name: t('aiPdfReflower.themeLight'), bg: 'bg-white text-zinc-800 border' },
+                    { id: 'green', name: t('aiPdfReflower.themeGreen'), bg: 'bg-[#e2edd9] text-[#1c3016]' },
+                    { id: 'dark', name: t('aiPdfReflower.themeDark'), bg: 'bg-zinc-900 text-zinc-100' },
                   ].map((thm) => (
                     <button
                       key={thm.id}
@@ -327,7 +327,7 @@ export function AIPDFReflowerTool({ className = '' }: AIPDFReflowerToolProps) {
               {/* Font Size adjustments */}
               <div className="space-y-2">
                 <label className="text-xs font-bold uppercase tracking-wider text-[hsl(var(--color-muted-foreground))] flex items-center justify-between">
-                  <span className="flex items-center gap-1.5"><Type className="w-4 h-4" /> 阅读字号大小</span>
+                  <span className="flex items-center gap-1.5"><Type className="w-4 h-4" /> {t('aiPdfReflower.fontSizeLabel')}</span>
                   <span className="font-mono font-bold text-xs">{fontSize}px</span>
                 </label>
                 <div className="flex items-center gap-4">
@@ -362,7 +362,7 @@ export function AIPDFReflowerTool({ className = '' }: AIPDFReflowerToolProps) {
               <div className="border-t border-[hsl(var(--color-border))] pt-6 space-y-4 relative">
                 <label className="text-xs font-bold uppercase tracking-wider text-[hsl(var(--color-muted-foreground))] flex items-center gap-1.5">
                   <Download className="w-4 h-4" />
-                  拉动拉绳一键导出
+                  {t('aiPdfReflower.pullToExport')}
                 </label>
                 
                 <div className="grid grid-cols-3 gap-2">
@@ -397,7 +397,7 @@ export function AIPDFReflowerTool({ className = '' }: AIPDFReflowerToolProps) {
                       <div className="w-2.5 h-2.5 rounded-full bg-amber-500" />
                     </div>
                   </div>
-                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2 tracking-wider">下拉环快速保存 (Markdown)</span>
+                  <span className="text-[10px] text-zinc-400 dark:text-zinc-500 mt-2 tracking-wider">{t('aiPdfReflower.pullToExportHint')}</span>
                 </div>
               </div>
             </Card>

@@ -341,7 +341,7 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
                   {file.name}
                 </p>
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                  {pages.length} 页 • {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  {t('removeBlankPages.pagesCount', { count: pages.length, size: (file.size / (1024 * 1024)).toFixed(2) })}
                 </p>
               </div>
             </div>
@@ -387,17 +387,17 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
               <div className="md:col-span-5 flex flex-col justify-between border-t md:border-t-0 md:border-l border-zinc-200 dark:border-zinc-800 pt-6 md:pt-0 md:pl-6 space-y-4">
                 <div className="space-y-1">
                   <h4 className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider">
-                    过滤状态汇总
+                    {t('removeBlankPages.summaryTitle')}
                   </h4>
                   <div className="flex flex-wrap items-center gap-2.5 pt-1">
                     <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400">
-                      共 {pages.length} 页
+                      {t('removeBlankPages.totalLabel', { count: pages.length })}
                     </span>
                     <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-red-100 dark:bg-red-950/30 text-red-600 dark:text-red-400">
-                      待删除: {blankPagesCount} 页
+                      {t('removeBlankPages.blankLabel', { count: blankPagesCount })}
                     </span>
                     <span className="px-2.5 py-1 text-xs font-bold rounded-lg bg-emerald-100 dark:bg-emerald-950/30 text-emerald-600 dark:text-emerald-400">
-                      保留: {keepPagesCount} 页
+                      {t('removeBlankPages.keepLabel', { count: keepPagesCount })}
                     </span>
                   </div>
                 </div>
@@ -405,13 +405,13 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
                 {/* Batch Actions */}
                 <div className="flex flex-wrap gap-2">
                   <Button variant="ghost" size="sm" onClick={handleResetOverrides} disabled={Object.keys(userOverrides).length === 0} className="text-xs flex items-center gap-1">
-                    <Undo2 className="w-3 h-3" /> 重置手动修改
+                    <Undo2 className="w-3 h-3" /> {t('removeBlankPages.resetBtn')}
                   </Button>
                   <Button variant="ghost" size="sm" onClick={handleKeepAll} className="text-xs">
-                    保留全部页
+                    {t('removeBlankPages.keepAllBtn')}
                   </Button>
                   <Button variant="ghost" size="sm" onClick={handleSelectAllAsBlank} className="text-xs text-red-500 hover:text-red-600">
-                    删除全部页
+                    {t('removeBlankPages.deleteAllBtn')}
                   </Button>
                 </div>
               </div>
@@ -429,7 +429,7 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
                       : 'text-[hsl(var(--color-muted-foreground))] hover:text-[hsl(var(--color-foreground))]'
                   }`}
                 >
-                  全部页面 ({pages.length})
+                  {t('removeBlankPages.tabAll', { count: pages.length })}
                 </button>
                 <button
                   onClick={() => setFilterMode('blanks')}
@@ -439,7 +439,7 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
                       : 'text-red-500/80 hover:text-red-500'
                   }`}
                 >
-                  推荐删除 ({blankPagesCount})
+                  {t('removeBlankPages.tabBlanks', { count: blankPagesCount })}
                 </button>
                 <button
                   onClick={() => setFilterMode('keeps')}
@@ -449,7 +449,7 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
                       : 'text-emerald-500/80 hover:text-emerald-500'
                   }`}
                 >
-                  保留页面 ({keepPagesCount})
+                  {t('removeBlankPages.tabKeeps', { count: keepPagesCount })}
                 </button>
               </div>
 
@@ -476,7 +476,7 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
             <Card variant="outlined" className="p-12 text-center rounded-[2rem] border-dashed border-zinc-200 dark:border-zinc-800">
               <Eye className="w-10 h-10 text-zinc-300 dark:text-zinc-700 mx-auto mb-3" />
               <p className="text-sm text-[hsl(var(--color-muted-foreground))] font-bold">
-                当前视图下没有页面可供显示
+                {t('removeBlankPages.noPagesToDisplay') || 'No pages to display'}
               </p>
             </Card>
           ) : (
@@ -520,8 +520,9 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
             </h3>
             <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
               {removedCount > 0 
-                ? `系统已清理 ${removedCount} 页空白页，保留并重新编译了剩余页面。` 
-                : '文档中未检测到被删除的页面，已直接导出。'}
+                ? t('removeBlankPages.successPurged', { count: removedCount }) 
+                : t('removeBlankPages.successNoChange')
+              }
             </p>
           </div>
 
@@ -535,7 +536,7 @@ export function RemoveBlankPagesTool({ className = '' }: RemoveBlankPagesToolPro
               showFileSize 
             />
             <Button variant="ghost" size="lg" onClick={handleClear} className="border border-zinc-200 dark:border-zinc-800">
-              处理新文件
+              {t('removeBlankPages.processNewFile') || 'Process New File'}
             </Button>
           </div>
         </Card>
@@ -569,6 +570,7 @@ interface PageCardProps {
 }
 
 function PageCard({ page, isRemoved, isAutoBlank, isManualKeep, isManualRemove, onToggle }: PageCardProps) {
+  const t = useTranslations('common');
   const cardRef = useRef<HTMLDivElement>(null);
   
   const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
@@ -636,7 +638,7 @@ function PageCard({ page, isRemoved, isAutoBlank, isManualKeep, isManualRemove, 
         {/* Hover action overlay indicator */}
         <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 flex items-center justify-center transition-opacity duration-200 z-20 pointer-events-none">
           <span className="text-[10px] font-bold text-white bg-black/60 px-2.5 py-1 rounded-full backdrop-blur-md shadow-md border border-white/10 uppercase tracking-wider">
-            {isRemoved ? '点击保留该页' : '点击删除该页'}
+            {isRemoved ? t('removeBlankPages.clickToKeep') : t('removeBlankPages.clickToDelete')}
           </span>
         </div>
       </div>
@@ -648,12 +650,12 @@ function PageCard({ page, isRemoved, isAutoBlank, isManualKeep, isManualRemove, 
           : 'bg-zinc-50 dark:bg-zinc-900/60 border-zinc-100 dark:border-zinc-800'
       }`}>
         <span className={isRemoved ? 'text-red-500' : 'text-zinc-500'}>
-          第 {page.pageNumber} 页
+          {t('removeBlankPages.pageNumberLabel', { num: page.pageNumber })}
         </span>
         
         {/* Entropy Tag */}
         <span className="text-[9px] font-medium text-zinc-400 font-mono tracking-tighter" title={`Shannon Entropy: ${page.entropy.toFixed(4)}`}>
-          熵: {page.entropy.toFixed(3)}
+          {t('removeBlankPages.entropyLabel', { val: page.entropy.toFixed(3) })}
         </span>
       </div>
 
@@ -661,17 +663,17 @@ function PageCard({ page, isRemoved, isAutoBlank, isManualKeep, isManualRemove, 
       <div className="absolute top-2.5 right-2.5 z-20 pointer-events-none">
         {isManualRemove && (
           <span className="px-2 py-0.5 text-[8px] font-extrabold rounded-md shadow-md bg-red-500 text-white border border-red-600 tracking-wider">
-            强删
+            {t('removeBlankPages.badgeForceDelete')}
           </span>
         )}
         {isManualKeep && (
           <span className="px-2 py-0.5 text-[8px] font-extrabold rounded-md shadow-md bg-emerald-500 text-white border border-emerald-600 tracking-wider animate-pulse">
-            强留
+            {t('removeBlankPages.badgeForceKeep')}
           </span>
         )}
         {!isManualKeep && !isManualRemove && isAutoBlank && (
           <span className="px-2 py-0.5 text-[8px] font-extrabold rounded-md shadow-md bg-red-600/90 text-white border border-red-700 tracking-wider">
-            空页
+            {t('removeBlankPages.badgeEmptyPage')}
           </span>
         )}
       </div>

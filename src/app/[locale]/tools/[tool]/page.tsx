@@ -100,6 +100,30 @@ import { AIPDFReflowerTool } from '@/components/tools/ai-pdf-reflower/AIPDFReflo
 import { CitationLinkerTool } from '@/components/tools/citation-linker/CitationLinkerTool';
 import { PDFVectorExtractorTool } from '@/components/tools/vector-extractor/PDFVectorExtractorTool';
 import { DeepSanitizeTool } from '@/components/tools/deep-sanitize/DeepSanitizeTool';
+import { BookletFoldingSimulatorTool } from '@/components/tools/booklet-folding-simulator/BookletFoldingSimulatorTool';
+import { PDFToSlideTool } from '@/components/tools/pdf-to-slide/PDFToSlideTool';
+import { FormLogicDesignerTool } from '@/components/tools/form-logic-designer/FormLogicDesignerTool';
+import { EinkOptimizerTool } from '@/components/tools/eink-optimizer/EinkOptimizerTool';
+import { CertCryptorTool } from '@/components/tools/cert-cryptor/CertCryptorTool';
+import { PassportIdComposerTool } from '@/components/tools/passport-id-composer/PassportIdComposerTool';
+import { AnnotationExporterTool } from '@/components/tools/annotation-exporter/AnnotationExporterTool';
+import { BatchWatermarkRemoverTool } from '@/components/tools/batch-watermark-remover/BatchWatermarkRemoverTool';
+import { SmartDataRedactorTool } from '@/components/tools/smart-data-redactor/SmartDataRedactorTool';
+import { BookmarksAutoGeneratorTool } from '@/components/tools/bookmarks-auto-generator/BookmarksAutoGeneratorTool';
+import { BatchBarcodeInjectorTool } from '@/components/tools/batch-barcode-injector/BatchBarcodeInjectorTool';
+import { SignatureInkOptimizerTool } from '@/components/tools/signature-ink-optimizer/SignatureInkOptimizerTool';
+import { DeadLinkDebuggerTool } from '@/components/tools/dead-link-debugger/DeadLinkDebuggerTool';
+import { InteractiveTocGeneratorTool } from '@/components/tools/interactive-toc-generator/InteractiveTocGeneratorTool';
+import { GlobalInvoiceParserTool } from '@/components/tools/global-invoice-parser/GlobalInvoiceParserTool';
+import { PdfDeskewAlignerTool } from '@/components/tools/pdf-deskew-aligner/PdfDeskewAlignerTool';
+import { PdfTwoColumnReflowerTool } from '@/components/tools/pdf-two-column-reflower/PdfTwoColumnReflowerTool';
+import { PdfPageResizerUniformTool } from '@/components/tools/pdf-page-resizer-uniform/PdfPageResizerUniformTool';
+import { HandwritingInkContrastBoosterTool } from '@/components/tools/handwriting-ink-contrast-booster/HandwritingInkContrastBoosterTool';
+import { PdfSpineBookbinderTool } from '@/components/tools/pdf-spine-bookbinder/PdfSpineBookbinderTool';
+import { PdfSignatureAnchorHelperTool } from '@/components/tools/pdf-signature-anchor-helper/PdfSignatureAnchorHelperTool';
+import { PdfLosslessSlicerTool } from '@/components/tools/pdf-lossless-slicer/PdfLosslessSlicerTool';
+import { PdfScratchpadCanvasTool } from '@/components/tools/pdf-scratchpad-canvas/PdfScratchpadCanvasTool';
+import { PhotoTilingPrepressTool } from '@/components/tools/photo-tiling-prepress/PhotoTilingPrepressTool';
 import { generateToolMetadata } from '@/lib/seo/metadata';
 import { JsonLd } from '@/components/seo/JsonLd';
 import {
@@ -441,6 +465,54 @@ export default async function ToolPageRoute({ params }: ToolPageParams) {
         return <PDFVectorExtractorTool />;
       case 'deep-sanitize':
         return <DeepSanitizeTool />;
+      case 'booklet-folding-simulator':
+        return <BookletFoldingSimulatorTool />;
+      case 'pdf-to-slide':
+        return <PDFToSlideTool />;
+      case 'form-logic-designer':
+        return <FormLogicDesignerTool />;
+      case 'eink-optimizer':
+        return <EinkOptimizerTool />;
+      case 'cert-cryptor':
+        return <CertCryptorTool />;
+      case 'passport-id-composer':
+        return <PassportIdComposerTool />;
+      case 'annotation-exporter':
+        return <AnnotationExporterTool />;
+      case 'batch-watermark-remover':
+        return <BatchWatermarkRemoverTool />;
+      case 'smart-data-redactor':
+        return <SmartDataRedactorTool />;
+      case 'bookmarks-auto-generator':
+        return <BookmarksAutoGeneratorTool />;
+      case 'batch-barcode-injector':
+        return <BatchBarcodeInjectorTool />;
+      case 'signature-ink-optimizer':
+        return <SignatureInkOptimizerTool />;
+      case 'dead-link-debugger':
+        return <DeadLinkDebuggerTool />;
+      case 'interactive-toc-generator':
+        return <InteractiveTocGeneratorTool />;
+      case 'global-invoice-parser':
+        return <GlobalInvoiceParserTool />;
+      case 'pdf-deskew-aligner':
+        return <PdfDeskewAlignerTool />;
+      case 'pdf-two-column-reflower':
+        return <PdfTwoColumnReflowerTool />;
+      case 'pdf-page-resizer-uniform':
+        return <PdfPageResizerUniformTool />;
+      case 'handwriting-ink-contrast-booster':
+        return <HandwritingInkContrastBoosterTool />;
+      case 'pdf-spine-bookbinder':
+        return <PdfSpineBookbinderTool />;
+      case 'pdf-signature-anchor-helper':
+        return <PdfSignatureAnchorHelperTool />;
+      case 'pdf-lossless-slicer':
+        return <PdfLosslessSlicerTool />;
+      case 'pdf-scratchpad-canvas':
+        return <PdfScratchpadCanvasTool />;
+      case 'photo-tiling-prepress':
+        return <PhotoTilingPrepressTool />;
       // Add more tool cases here as they are implemented
       default:
         return (

@@ -250,8 +250,8 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
           onFilesSelected={handleFileSelected}
           onError={setError}
           disabled={isProcessing || isLoadingMetadata}
-          label="上传带有参考文献列表的学术 PDF"
-          description="拖放学术文献、期刊论文或会议报告。系统将自动找出引用标记（如 [1]）并关联参考文献。"
+          label={t('citationLinker.uploadLabel')}
+          description={t('citationLinker.uploadDescription')}
         />
       )}
 
@@ -276,7 +276,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                 {file.name}
               </p>
               <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                {totalPages > 0 ? `${totalPages} 页` : '扫描文本结构中...'} • {(file.size / (1024 * 1024)).toFixed(2)} MB
+                {totalPages > 0 ? `${totalPages} ${t('pdfToCbz.pagesLabel') || 'pages'}` : t('citationLinker.scanningMetadata')} • {(file.size / (1024 * 1024)).toFixed(2)} MB
               </p>
             </div>
           </div>
@@ -298,7 +298,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                 <div className="border-b border-[hsl(var(--color-border))] pb-3">
                   <h3 className="text-base font-bold text-[hsl(var(--color-foreground))] flex items-center gap-2">
                     <Settings2 className="w-5 h-5 text-[hsl(var(--color-primary))]" />
-                    引文链接激活选项
+                    {t('citationLinker.optionsTitle')}
                   </h3>
                 </div>
 
@@ -310,7 +310,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                       onChange={(e) => setDetectDoi(e.target.checked)}
                       className="w-4.5 h-4.5 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
-                    <span className="text-xs font-semibold text-[hsl(var(--color-foreground))]">自动检测参考文献 DOI 超链接</span>
+                    <span className="text-xs font-semibold text-[hsl(var(--color-foreground))]">{t('citationLinker.detectDoi')}</span>
                   </label>
                   <label className="flex items-center gap-3 cursor-pointer">
                     <input
@@ -319,7 +319,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                       onChange={(e) => setFallbackToPageJump(e.target.checked)}
                       className="w-4.5 h-4.5 rounded border-zinc-300 text-[hsl(var(--color-primary))] focus:ring-[hsl(var(--color-primary))]"
                     />
-                    <span className="text-xs font-semibold text-[hsl(var(--color-foreground))]">无 DOI 时自动启用“页内跳转” (GoTo Page)</span>
+                    <span className="text-xs font-semibold text-[hsl(var(--color-foreground))]">{t('citationLinker.enableGoto')}</span>
                   </label>
                 </div>
 
@@ -327,12 +327,12 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                 {selectedCitation && (
                   <div className="p-4 bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-border))] rounded-2xl space-y-3 animate-in fade-in zoom-in-95 duration-200">
                     <div className="flex items-center justify-between">
-                      <span className="text-xs font-bold text-amber-500">正在修改引文: {selectedCitation.marker}</span>
-                      <span className="text-[10px] opacity-60">所在页面: 第 {selectedCitation.pageNum} 页</span>
+                      <span className="text-xs font-bold text-amber-500">{t('citationLinker.editingCitation', { marker: selectedCitation.marker })}</span>
+                      <span className="text-[10px] opacity-60">{t('citationLinker.citationPage', { page: selectedCitation.pageNum })}</span>
                     </div>
                     
                     <p className="text-[11px] leading-relaxed line-clamp-2 text-zinc-500 dark:text-zinc-400">
-                      文献: {selectedCitation.refText}
+                      {t('citationLinker.citationRef', { ref: selectedCitation.refText })}
                     </p>
 
                     <div className="flex gap-2">
@@ -340,7 +340,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                         type="text"
                         value={editUrl}
                         onChange={(e) => setEditUrl(e.target.value)}
-                        placeholder="请输入此文献的 DOI / URL 链接"
+                        placeholder={t('citationLinker.doiPlaceholder')}
                         className="flex-1 px-3 py-2 text-xs rounded-xl bg-white dark:bg-zinc-800 border border-[hsl(var(--color-border))] focus:ring-1 focus:ring-[hsl(var(--color-primary))]"
                       />
                       <Button size="sm" variant="primary" onClick={handleSaveUrl}>
@@ -353,7 +353,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                 {/* Citations checklist */}
                 <div className="space-y-2">
                   <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] uppercase tracking-wider">
-                    扫描出的引文列表 ({citations.length})
+                    {t('citationLinker.citationListTitle', { count: citations.length })}
                   </label>
                   <div className="space-y-1.5 max-h-[160px] overflow-y-auto pr-1">
                     {citations.map((c) => (
@@ -379,7 +379,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                               <Link2 className="w-3 h-3" /> DOI
                             </span>
                           ) : (
-                            <span className="text-[10px] text-zinc-400 font-medium">页内跳转</span>
+                            <span className="text-[10px] text-zinc-400 font-medium">{t('citationLinker.gotoPage')}</span>
                           )}
                         </div>
                       </div>
@@ -397,7 +397,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
                   onClick={handleApplyLinks}
                 >
                   <GitBranch className="w-5 h-5" />
-                  激活超链接注入
+                  {t('citationLinker.injectLink')}
                 </Button>
               </div>
             </Card>
@@ -515,8 +515,8 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
 
               {/* Topology Instructions Overlay */}
               <div className="absolute bottom-4 left-4 right-4 flex items-center justify-between text-[10px] text-zinc-400 dark:text-zinc-500 z-30">
-                <span>绿实线: DOI 外部链接</span>
-                <span>灰虚线: 参考文献页内跳转</span>
+                <span>{t('citationLinker.doiExternalLink')}</span>
+                <span>{t('citationLinker.gotoPageLink')}</span>
               </div>
 
             </Card>
@@ -553,7 +553,7 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
           </div>
 
           <div className="text-center space-y-2">
-            <h4 className="text-sm font-bold text-[hsl(var(--color-foreground))]">正在注入高强可点击引文注释...</h4>
+            <h4 className="text-sm font-bold text-[hsl(var(--color-foreground))]">{t('citationLinker.injectingMessage')}</h4>
             <p className="text-xs text-[hsl(var(--color-muted-foreground))]">{progressMessage}</p>
           </div>
         </Card>
@@ -567,9 +567,9 @@ export function CitationLinkerTool({ className = '' }: CitationLinkerToolProps) 
           </div>
           
           <div className="space-y-2 max-w-sm mx-auto">
-            <h3 className="text-base font-extrabold text-[hsl(var(--color-foreground))]">引文超链接激活成功！</h3>
+            <h3 className="text-base font-extrabold text-[hsl(var(--color-foreground))]">{t('citationLinker.injectLink')}</h3>
             <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-              共为 {citations.length} 处引文符号注入了关联链接和页内跳转跳转点，文档可在任意符合标准的 PDF 阅读器中完美交互。
+              {t('citationLinker.successDesc', { count: citations.length })}
             </p>
           </div>
 

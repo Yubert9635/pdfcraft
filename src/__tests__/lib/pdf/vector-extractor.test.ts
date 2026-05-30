@@ -6,8 +6,8 @@ import {
 } from '@/lib/pdf/processors/vector-extractor';
 import { PDFErrorCode } from '@/types/pdf';
 
-// Mock loader
-vi.mock('@/lib/pdf/loader', () => {
+// Mock loader-legacy
+vi.mock('@/lib/pdf/loader-legacy', () => {
   const mockSVGElement = {
     removeAttribute: vi.fn(),
     setAttribute: vi.fn(),
@@ -38,7 +38,8 @@ vi.mock('@/lib/pdf/loader', () => {
   };
 
   return {
-    loadPdfjs: vi.fn().mockResolvedValue(mockPdfjs),
+    loadPdfjsLegacy: vi.fn().mockResolvedValue(mockPdfjs),
+    loadSVGGraphics: vi.fn().mockResolvedValue(mockPdfjs.SVGGraphics),
   };
 });
 

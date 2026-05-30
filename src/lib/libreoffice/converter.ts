@@ -31,11 +31,11 @@ import { fetchAssembledBlob } from '../utils/asset-loader';
 import { withBasePath } from '../utils/path';
 
 const LIBREOFFICE_PATH = withBasePath('/libreoffice-wasm/');
-const ASSET_VERSION = '20240212-3';
+const ASSET_VERSION = '20240212-4';
 // Request uncompressed names. In production, nginx gzip_static serves the .gz variant
 // with correct Content-Encoding and MIME headers (required for WebAssembly streaming).
-const SOFFICE_WASM_FILE = 'soffice.wasm';
-const SOFFICE_DATA_FILE = 'soffice.data';
+const SOFFICE_WASM_FILE = 'soffice.wasm.bin';
+const SOFFICE_DATA_FILE = 'soffice.data.bin';
 
 function normalizeBasePath(path: string): string {
     return path.endsWith('/') ? path : `${path}/`;
@@ -117,30 +117,35 @@ export class LibreOfficeConverter {
                 : '';
             this.progressCallback?.({ phase: 'loading', percent: 5, message: `Loading conversion engine${totalInfo}...` });
 
-            // Fetch and reassemble assets (handles chunking on Cloudflare Pages)
-            const [sofficeJsBlob, sofficeWasmBlob, sofficeDataBlob, sofficeWorkerJsBlob, browserWorkerJsBlob] = await Promise.all([
-                fetchAssembledBlob(`${this.basePath}soffice.js?v=${ASSET_VERSION}`),
-                fetchAssembledBlob(`${this.basePath}${SOFFICE_WASM_FILE}?v=${ASSET_VERSION}`),
-                fetchAssembledBlob(`${this.basePath}${SOFFICE_DATA_FILE}?v=${ASSET_VERSION}`),
-                fetchAssembledBlob(`${this.basePath}soffice.worker.js?v=${ASSET_VERSION}`),
-                fetchAssembledBlob(`${this.basePath}browser.worker.global.js?v=${ASSET_VERSION}`),
-            ]);
+            const filesToFetch = [
+                { name: 'soffice.wasm.bin', url: `${this.basePath}${SOFFICE_WASM_FILE}?v=${ASSET_VERSION}`, estSize: 147 * 1024 * 1024 },
+                { name: 'soffice.data.bin', url: `${this.basePath}${SOFFICE_DATA_FILE}?v=${ASSET_VERSION}`, estSize: 99 * 1024 * 1024 },
+                { name: 'NotoSansSC-Regular.ttf', url: withBasePath(`/fonts/NotoSansSC-Regular.ttf?v=${ASSET_VERSION}`), estSize: 16.4 * 1024 * 1024 }
+            ];
 
-            const sofficeJsUrl = URL.createObjectURL(sofficeJsBlob);
+            // Fetch and reassemble assets (handles chunking on Cloudflare Pages)
+            const [sofficeWasmBlob, sofficeDataBlob, fontBlob] = await Promise.all(
+                filesToFetch.map(f => fetchAssembledBlob(f.url))
+            );
+
             const sofficeWasmUrl = URL.createObjectURL(sofficeWasmBlob);
             const sofficeDataUrl = URL.createObjectURL(sofficeDataBlob);
-            const sofficeWorkerJsUrl = URL.createObjectURL(sofficeWorkerJsBlob);
-            const browserWorkerJsUrl = URL.createObjectURL(browserWorkerJsBlob);
 
-            this.blobUrls = [sofficeJsUrl, sofficeWasmUrl, sofficeDataUrl, sofficeWorkerJsUrl, browserWorkerJsUrl];
+            this.blobUrls = [sofficeWasmUrl, sofficeDataUrl];
+
+            // Load CJK font into ArrayBuffer for the converter
+            const fontArrayBuffer = await fontBlob.arrayBuffer();
 
             this.converter = new WorkerBrowserConverter({
-                sofficeJs: sofficeJsUrl,
+                sofficeJs: `${this.basePath}soffice.js?v=${ASSET_VERSION}`,
                 sofficeWasm: sofficeWasmUrl,
                 sofficeData: sofficeDataUrl,
-                sofficeWorkerJs: sofficeWorkerJsUrl,
-                browserWorkerJs: browserWorkerJsUrl,
+                sofficeWorkerJs: `${this.basePath}soffice.worker.js?v=${ASSET_VERSION}`,
+                browserWorkerJs: `${this.basePath}browser.worker.global.js?v=${ASSET_VERSION}`,
                 verbose: false,
+                fonts: [
+                    { filename: 'NotoSansSC-Regular.ttf', data: fontArrayBuffer }
+                ],
                 onProgress: (info: { phase: string; percent: number; message: string }) => {
                     // Use this.progressCallback so a late-arriving callback from the UI gets picked up
                     if (this.progressCallback && !this.initialized) {
@@ -185,6 +190,20 @@ export class LibreOfficeConverter {
      */
     private async checkEnvironment(): Promise<void> {
         console.warn('[LibreOffice] === Environment Check ===');
+
+        // Unregister any active service workers to prevent them from intercepting 
+        // LibreOffice WASM assets and causing ERR_FAILED / 500 OOM crashes.
+        if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+            try {
+                const registrations = await navigator.serviceWorker.getRegistrations();
+                for (const reg of registrations) {
+                    await reg.unregister();
+                    console.warn(`[LibreOffice] Unregistered active Service Worker to prevent interference: ${reg.scope}`);
+                }
+            } catch (e) {
+                console.warn('[LibreOffice] Failed to unregister Service Worker:', e);
+            }
+        }
 
         // 1. Check COOP/COEP — this is the #1 cause of WASM timeout
         const isIsolated = window.crossOriginIsolated;

@@ -1,3 +1,4 @@
+import { toolContentEn } from './en';
 /**
  * Traditional Chinese Tool Content
  * Requirements: 3.1 - Multi-language support
@@ -2673,5 +2674,427 @@ export const toolContentZhTW: Record<string, ToolContent> = {
       { question: '可以從特定頁面提取嗎？', answer: '是的，指定頁面範圍以將提取限制在某些頁面。' },
     ],
   },
+  'form-logic-designer': {
+    "title": "表單邏輯設計",
+    "metaDescription": "使用毛玻璃節點圖連線設計交互邏輯，向PDF表單注入可編程聯動 JavaScript 腳本。",
+    "keywords": [
+        "PDF表單邏輯",
+        "AcroJS注入",
+        "節點連線",
+        "交互式PDF",
+        "表單連動"
+    ],
+    "description": "\n        <p>可編程PDF表單邏輯設計艙是填補PDF高級交互空白的革新性工具。傳統的PDF表單都是死板的靜態欄位，而本工具能讓您的PDF表單像現代Web應用一樣具備動態交互邏輯。</p>\n        <p>通過基於 React Flow 構建的“毛玻璃發光節點”視覺化畫布，您的PDF表單欄位會變成可交互的邏輯節點。您可以通過拖拽連線，為它們定義各種觸發條件與行為動作（如：當複選框被勾選 ➜ 啟用原本禁用的輸入框 ➜ 自動計算總價並填充）。</p>\n        <p>設計完畢後，底層的 AcroJS 腳本注入引擎會將邏輯完全編譯為標準的 Acrobat JavaScript 並埋入 PDF 的交互表單字典 '/AA' 中，使該文檔在任意標準 PDF 閱讀器中均能生效。</p>\n      ",
+    "howToUse": [
+        {
+            "step": 1,
+            "title": "上傳交互式PDF表單",
+            "description": "上傳已包含交互表單欄位（AcroForm）的PDF文件。"
+        },
+        {
+            "step": 2,
+            "title": "在畫布設計邏輯連線",
+            "description": "各個欄位自動呈現為節點，從源欄位事件（如改變、失去焦點）拉出連線，指向目標欄位的動作（如隱藏、禁用、設值）。"
+        },
+        {
+            "step": 3,
+            "title": "編譯注入並下載",
+            "description": "點擊編譯，系統生成 JavaScript 腳本並注入 PDF 字典，輸出具備高交互性的智能PDF。"
+        }
+    ],
+    "useCases": [
+        {
+            "title": "智能商業合約樣本",
+            "description": "根據用戶勾選的條款，動態顯示或隱藏附加補充協議輸入框，保持介面清爽。",
+            "icon": "file-signature"
+        },
+        {
+            "title": "動態財務報銷單",
+            "description": "多行報銷金額自動求和，並根據填寫的稅率自動計算最終扣稅，完全零手動輸入。",
+            "icon": "calculator"
+        },
+        {
+            "title": "交互式問卷調研表",
+            "description": "利用條件跳轉邏輯，跳過不適用的問題，提升用戶在移動端填寫表單的體驗。",
+            "icon": "form-input"
+        }
+    ],
+    "faq": [
+        {
+            "question": "這需要我的 PDF 預先有表單欄位嗎？",
+            "answer": "是的。該工具用於為已有的 PDF 表單欄位添加高級邏輯。如果您沒有表單欄位，可以先使用我們的表單創建工具添加輸入框和複選框。"
+        },
+        {
+            "question": "生成的交互邏輯在所有 PDF 閱讀器上都能運行嗎？",
+            "answer": "只要閱讀器遵循 Adobe PDF 標準並支持 Acrobat JavaScript（如 Adobe Reader, Foxit Reader, Chrome/Edge 瀏覽器內置閱讀器等），聯動邏輯均能完美執行。部分精簡版移動端閱讀器可能支持有限。"
+        },
+        {
+            "question": "會影響 PDF 的正常打印嗎？",
+            "answer": "完全不會。注入的腳本只在屏幕交互時運行，打印時會根據當前的表單內容靜態度量打印，不包含任何連線痕迹。"
+        }
+    ]
+},
+
+  'global-invoice-parser': {
+    "title": "發票翻譯與折算",
+    "metaDescription": "智能識別多國發票，原地翻譯表格條目，按實時國際匯率覆蓋高端三維立體折算帳本。",
+    "keywords": [
+        "發票翻譯",
+        "發票匯率折算",
+        "外幣帳單換算",
+        "發票原地替換",
+        "多幣種發票"
+    ],
+    "description": "\n        <p>全球發票版式智能翻譯與多幣種匯率折算艙是跨國財務人員與海淘用戶的“掌控感福音”。</p>\n        <p>拿到美元、歐元、日圓等外幣發票時，繁雜的匯率計算和語種障礙令人頭疼。本工具不僅實現了 <strong>發票表格條目的原地翻譯</strong>，更接入了實時國際匯率機制。</p>\n        <p>自動在發票右下角或頁腳留白位置，物理覆蓋印蓋一個 HSL 毛玻璃效果、印有三維貨幣符號發光的“Exchange Rate ledger”匯率折算帳本，並伴隨老虎機滾輪數字翻轉的震撼特效。不破壞原有發票排版格式，清晰呈現本幣合計及匯率，財務掌控感滿分。</p>\n      ",
+    "howToUse": [
+        {
+            "step": 1,
+            "title": "上傳外幣發票PDF",
+            "description": "拖入一張包含美元 ($), 歐元 (€) 或日圓 (¥) 的 PDF 發票或帳單。"
+        },
+        {
+            "step": 2,
+            "title": "設定本幣與匯率",
+            "description": "選擇您希望折算的目标本幣（如 CNY），可手動填入自定義匯率或使用實時匯率。"
+        },
+        {
+            "step": 3,
+            "title": "生成折算帳本",
+            "description": "點擊折算，發票總額旁邊被優雅 stamped 本地匯率帳本並開放下載。"
+        }
+    ],
+    "useCases": [
+        {
+            "title": "跨國差旅費報銷",
+            "description": "員工海外出差的發票（如美元計價），一鍵折算為人民幣總額，並物理印蓋匯率快照，方便財務極速報銷。",
+            "icon": "plane"
+        },
+        {
+            "title": "跨境海淘對帳結算",
+            "description": "將海淘帳單上的歐元/日圓原地折算，一眼看清真實的本地貨幣支出。",
+            "icon": "credit-card"
+        },
+        {
+            "title": "外貿企業發票建檔",
+            "description": "為日常繁雜的外幣結算單加蓋本幣標記及核算快照，統一財務歸檔度量衡。",
+            "icon": "folder-open"
+        }
+    ],
+    "faq": [
+        {
+            "question": "它是如何自動獲取發票金額的？",
+            "answer": "系統後台利用 PDFJS 文本字元流分析，通過金錢正則匹配帶有 `$`、`€`、`£` 等符號的數字。同時分析 `Total` 等關鍵詞以鎖定真實的發票最終金額。"
+        },
+        {
+            "question": "匯率是實時的嗎？",
+            "answer": "是的。默認情況下，系統會基於國際匯率接口自動拉取當天的基準匯率。當然，您也可以完全自由地手動填入公司財務統一要求的內部結算匯率。"
+        },
+        {
+            "question": "蓋印的“轉換帳本”會遮擋原發票的關鍵信息嗎？",
+            "answer": "系統會智能探測發票底部的空白位置進行蓋印。同時，該帳本背景具有高品質半透明毛玻璃特效，能夠以優雅、不破壞原文檔格式的形態貼在頁面上。"
+        }
+    ]
+},
+
+  'pdf-to-cbz': {
+    title: 'PDF 轉 CBZ',
+    metaDescription: '將 PDF 文件轉換為 CBZ 漫畫書歸檔。保留圖像順序和質量。',
+    keywords: ["pdf 轉 cbz","漫畫轉換","cbz 轉換器"],
+    description: toolContentEn['pdf-to-cbz'].description,
+    howToUse: toolContentEn['pdf-to-cbz'].howToUse,
+    useCases: toolContentEn['pdf-to-cbz'].useCases,
+    faq: toolContentEn['pdf-to-cbz'].faq,
+  },
+
+  'overlay-pdf': {
+    title: '疊加 PDF',
+    metaDescription: '將兩個 PDF 頁面疊加合併為一頁。適用於印章、背景與水印疊加。',
+    keywords: ["pdf 疊加","合併 pdf","浮水印疊加","頁面覆蓋"],
+    description: toolContentEn['overlay-pdf'].description,
+    howToUse: toolContentEn['overlay-pdf'].howToUse,
+    useCases: toolContentEn['overlay-pdf'].useCases,
+    faq: toolContentEn['overlay-pdf'].faq,
+  },
+
+  'timestamp-pdf': {
+    title: 'PDF 時間戳記',
+    metaDescription: '為 PDF 文檔注入 RFC 3161 安全時間戳記。驗證文件創建時間防篡改。',
+    keywords: ["pdf 時間戳記","rfc 3161","時間戳服務","數字簽名"],
+    description: toolContentEn['timestamp-pdf'].description,
+    howToUse: toolContentEn['timestamp-pdf'].howToUse,
+    useCases: toolContentEn['timestamp-pdf'].useCases,
+    faq: toolContentEn['timestamp-pdf'].faq,
+  },
+
+  'add-page-labels': {
+    title: '添加頁面標籤',
+    metaDescription: '為 PDF 設定自定義頁面標籤（如前言用 I, II，正文用 1, 2）。改善閱讀器導航。',
+    keywords: ["頁面標籤","pdf 頁面編號","pdf 邏輯頁碼","閱讀器導航"],
+    description: toolContentEn['add-page-labels'].description,
+    howToUse: toolContentEn['add-page-labels'].howToUse,
+    useCases: toolContentEn['add-page-labels'].useCases,
+    faq: toolContentEn['add-page-labels'].faq,
+  },
+
+  'ai-pdf-reflower': {
+    title: 'AI 智能自適應重排',
+    metaDescription: '將 PDF 文檔重新排版為響應式行動端版面，支援導出 Markdown 和 EPUB。',
+    keywords: ["pdf 重排","自適應 pdf","pdf 轉 markdown","epub 導出"],
+    description: toolContentEn['ai-pdf-reflower'].description,
+    howToUse: toolContentEn['ai-pdf-reflower'].howToUse,
+    useCases: toolContentEn['ai-pdf-reflower'].useCases,
+    faq: toolContentEn['ai-pdf-reflower'].faq,
+  },
+
+  'citation-linker': {
+    title: '引文連結啟動器',
+    metaDescription: '掃描並啟動 PDF 中的引文標記，將其轉化為可點擊的 DOI 或頁內跳轉連結。',
+    keywords: ["引文激活","pdf 超連結","doi 匹配","學術 pdf 助手"],
+    description: toolContentEn['citation-linker'].description,
+    howToUse: toolContentEn['citation-linker'].howToUse,
+    useCases: toolContentEn['citation-linker'].useCases,
+    faq: toolContentEn['citation-linker'].faq,
+  },
+
+  'vector-extractor': {
+    title: 'PDF 矢量提取器',
+    metaDescription: '將 PDF 轉換為高保真 SVG，允許滑鼠拖動、框選並無損提取任意矢量圖形。',
+    keywords: ["pdf 提取矢量","svg 導出","矢量圖表提取","提取 logo"],
+    description: toolContentEn['vector-extractor'].description,
+    howToUse: toolContentEn['vector-extractor'].howToUse,
+    useCases: toolContentEn['vector-extractor'].useCases,
+    faq: toolContentEn['vector-extractor'].faq,
+  },
+
+  'deep-sanitize': {
+    title: '深度元數據清洗',
+    metaDescription: '徹底擦除 PDF 文檔中的作者信息、修改歷史、隱藏圖層以及未引用的冗餘數據。',
+    keywords: ["pdf 脫敏","清除元數據","防溯源","安全 pdf"],
+    description: toolContentEn['deep-sanitize'].description,
+    howToUse: toolContentEn['deep-sanitize'].howToUse,
+    useCases: toolContentEn['deep-sanitize'].useCases,
+    faq: toolContentEn['deep-sanitize'].faq,
+  },
+
+  'booklet-folding-simulator': {
+    title: '3D 裝訂拼版與折頁模擬器',
+    metaDescription: '將 PDF 多頁拼版為可折疊的大版，提供 3D 物理折頁和騎馬釘裝訂仿真動效預覽。',
+    keywords: ["3D 拼版","折頁模擬","騎馬釘裝訂","書籍排版"],
+    description: toolContentEn['booklet-folding-simulator'].description,
+    howToUse: toolContentEn['booklet-folding-simulator'].howToUse,
+    useCases: toolContentEn['booklet-folding-simulator'].useCases,
+    faq: toolContentEn['booklet-folding-simulator'].faq,
+  },
+
+  'pdf-to-slide': {
+    title: 'PDF 轉 Slide',
+    metaDescription: '智能分析 PDF 大綱，提取矢量圖表與重點內容並無損重建為可編輯的 PPTX 演示文稿。',
+    keywords: ["PDF 轉 PPT","投影片重建","圖表提取","PPTX 生成"],
+    description: toolContentEn['pdf-to-slide'].description,
+    howToUse: toolContentEn['pdf-to-slide'].howToUse,
+    useCases: toolContentEn['pdf-to-slide'].useCases,
+    faq: toolContentEn['pdf-to-slide'].faq,
+  },
+
+  'eink-optimizer': {
+    title: '電子墨水屏護眼調色艙',
+    metaDescription: '針對電子墨水屏設備優化 PDF：去噪、直方圖二值化、字跡膨脹加粗，帶來極致的紙感閱讀。',
+    keywords: ["墨水屏優化","二值化去噪","字跡加粗","護眼閱讀"],
+    description: toolContentEn['eink-optimizer'].description,
+    howToUse: toolContentEn['eink-optimizer'].howToUse,
+    useCases: toolContentEn['eink-optimizer'].useCases,
+    faq: toolContentEn['eink-optimizer'].faq,
+  },
+
+  'cert-cryptor': {
+    title: '證書加密與簽名',
+    metaDescription: '使用非對稱公鑰證書加密 PDF，配合 3D 實體黃金火漆按壓蓋印及 PKCS#7 數字證書簽名。',
+    keywords: ["證書加密","火漆簽名","數字簽名","非對稱加密"],
+    description: toolContentEn['cert-cryptor'].description,
+    howToUse: toolContentEn['cert-cryptor'].howToUse,
+    useCases: toolContentEn['cert-cryptor'].useCases,
+    faq: toolContentEn['cert-cryptor'].faq,
+  },
+
+  'passport-id-composer': {
+    title: '證件雙面拼版',
+    metaDescription: '一鍵將身份證或護照正反兩面快速拼版渲染到單張 A4 紙張的上下區域，支援加防偽透明水印。',
+    keywords: ["身份證拼版","護照拼大版","證件複印合成","身份證水印"],
+    description: toolContentEn['passport-id-composer'].description,
+    howToUse: toolContentEn['passport-id-composer'].howToUse,
+    useCases: toolContentEn['passport-id-composer'].useCases,
+    faq: toolContentEn['passport-id-composer'].faq,
+  },
+
+  'annotation-exporter': {
+    title: '批註與高亮導出',
+    metaDescription: '深入讀取 PDF 批註字典，一鍵捕獲高亮、手寫備忘與文字批註並導出為結構化 Markdown。',
+    keywords: ["pdf 導出批註","文獻閱讀筆記","提取高亮","markdown 導出"],
+    description: toolContentEn['annotation-exporter'].description,
+    howToUse: toolContentEn['annotation-exporter'].howToUse,
+    useCases: toolContentEn['annotation-exporter'].useCases,
+    faq: toolContentEn['annotation-exporter'].faq,
+  },
+
+  'batch-watermark-remover': {
+    title: '批量去水印',
+    metaDescription: '深入 PDF 內容描述符，精確刪除特定 Tj/TJ 文本流與 XObject 圖像水印而不損害文案。',
+    keywords: ["pdf 去水印","批量刪除浮水印","內容流優化","pdf 清潔"],
+    description: toolContentEn['batch-watermark-remover'].description,
+    howToUse: toolContentEn['batch-watermark-remover'].howToUse,
+    useCases: toolContentEn['batch-watermark-remover'].useCases,
+    faq: toolContentEn['batch-watermark-remover'].faq,
+  },
+
+  'smart-data-redactor': {
+    title: '敏感訊息脫敏',
+    metaDescription: '智能檢索文檔中的郵箱、身份證、手機等隱私數據，強制物理填色遮罩並重置底層文本。',
+    keywords: ["pdf 隱私遮罩","安全脫敏","物理擦除","數據合規"],
+    description: toolContentEn['smart-data-redactor'].description,
+    howToUse: toolContentEn['smart-data-redactor'].howToUse,
+    useCases: toolContentEn['smart-data-redactor'].useCases,
+    faq: toolContentEn['smart-data-redactor'].faq,
+  },
+
+  'bookmarks-auto-generator': {
+    title: '自動生成書籤',
+    metaDescription: '智能分析文檔中的字體大小與層級，在底層對象中自動注入嵌套大綱 Outlines 書簽樹。',
+    keywords: ["pdf 自動書籤","大綱目錄樹","pdf 導航結構","自動大綱"],
+    description: toolContentEn['bookmarks-auto-generator'].description,
+    howToUse: toolContentEn['bookmarks-auto-generator'].howToUse,
+    useCases: toolContentEn['bookmarks-auto-generator'].useCases,
+    faq: toolContentEn['bookmarks-auto-generator'].faq,
+  },
+
+  'batch-barcode-injector': {
+    title: '批量注入條碼',
+    metaDescription: '批量且高精度地向 PDF 各頁面指定坐標注入二維碼與 Code128 條形碼圖層。',
+    keywords: ["pdf 注入條碼","二維碼合埋","批次二維碼","條形碼嵌入"],
+    description: toolContentEn['batch-barcode-injector'].description,
+    howToUse: toolContentEn['batch-barcode-injector'].howToUse,
+    useCases: toolContentEn['batch-barcode-injector'].useCases,
+    faq: toolContentEn['batch-barcode-injector'].faq,
+  },
+
+  'signature-ink-optimizer': {
+    title: '簽名印章提取',
+    metaDescription: '提取簽名印章並純化 HSL 色彩空間，漂白雜色與紙張反光，還原高品質透明底透明簽名。',
+    keywords: ["簽名提取","印章透明化","筆跡純化","印章漂白"],
+    description: toolContentEn['signature-ink-optimizer'].description,
+    howToUse: toolContentEn['signature-ink-optimizer'].howToUse,
+    useCases: toolContentEn['signature-ink-optimizer'].useCases,
+    faq: toolContentEn['signature-ink-optimizer'].faq,
+  },
+
+  'dead-link-debugger': {
+    title: '失效鏈接修復',
+    metaDescription: '診斷 PDF 文檔中的 /URI 鏈接動作，提供無效鏈接標識與原地重定向修復。',
+    keywords: ["pdf 死鏈診斷","修改鏈接","pdf 鏈接修復","網頁鏈接調試"],
+    description: toolContentEn['dead-link-debugger'].description,
+    howToUse: toolContentEn['dead-link-debugger'].howToUse,
+    useCases: toolContentEn['dead-link-debugger'].useCases,
+    faq: toolContentEn['dead-link-debugger'].faq,
+  },
+
+  'interactive-toc-generator': {
+    title: '生成互動目錄',
+    metaDescription: '在頁首添加雙向 GoTo 動作 TOC 頁面，頁邊加蓋 TOC ↩ 回跳按鈕。',
+    keywords: ["pdf 互動目錄","自動目錄頁","頁面錨定","雙向導航"],
+    description: toolContentEn['interactive-toc-generator'].description,
+    howToUse: toolContentEn['interactive-toc-generator'].howToUse,
+    useCases: toolContentEn['interactive-toc-generator'].useCases,
+    faq: toolContentEn['interactive-toc-generator'].faq,
+  },
+
+  'pdf-deskew-aligner': {
+    title: '掃描件自動糾偏',
+    metaDescription: '智能檢測手機拍攝或掃描版 PDF 的傾斜角度，物理糾偏並重新水平對齊，恢復完美排版。',
+    keywords: ["pdf 傾斜校正","掃描糾偏","水平對齊","自動糾偏"],
+    description: toolContentEn['pdf-deskew-aligner'].description,
+    howToUse: toolContentEn['pdf-deskew-aligner'].howToUse,
+    useCases: toolContentEn['pdf-deskew-aligner'].useCases,
+    faq: toolContentEn['pdf-deskew-aligner'].faq,
+  },
+
+  'pdf-two-column-reflower': {
+    title: '雙欄論文重排',
+    metaDescription: '無損複製頁面並重新限制 CropBox 左/右視口，無損、100% 矢量級實現雙欄變單欄。',
+    keywords: ["雙欄重排","學術論文單欄","CropBox 裁剪","pdf 視口分裂"],
+    description: toolContentEn['pdf-two-column-reflower'].description,
+    howToUse: toolContentEn['pdf-two-column-reflower'].howToUse,
+    useCases: toolContentEn['pdf-two-column-reflower'].useCases,
+    faq: toolContentEn['pdf-two-column-reflower'].faq,
+  },
+
+  'pdf-page-resizer-uniform': {
+    title: 'PDF 尺寸統一',
+    metaDescription: '智能讀取多規格 PDF 頁面尺寸，將其等比縮放並完美居中平鋪至統一的目标規格。',
+    keywords: ["pdf 頁面縮放","頁面尺寸統一","a4 歸一","pdf 重塑尺寸"],
+    description: toolContentEn['pdf-page-resizer-uniform'].description,
+    howToUse: toolContentEn['pdf-page-resizer-uniform'].howToUse,
+    useCases: toolContentEn['pdf-page-resizer-uniform'].useCases,
+    faq: toolContentEn['pdf-page-resizer-uniform'].faq,
+  },
+
+  'handwriting-ink-contrast-booster': {
+    title: '手寫筆跡增強',
+    metaDescription: '漂白黃斑暗光影背景，對藍/黑手寫筆跡和紅印章進行高斯局部對比度拉伸。',
+    keywords: ["筆跡增強","去除背景雜色","手寫優化","合同筆跡增強"],
+    description: toolContentEn['handwriting-ink-contrast-booster'].description,
+    howToUse: toolContentEn['handwriting-ink-contrast-booster'].howToUse,
+    useCases: toolContentEn['handwriting-ink-contrast-booster'].useCases,
+    faq: toolContentEn['handwriting-ink-contrast-booster'].faq,
+  },
+
+  'pdf-spine-bookbinder': {
+    title: '書脊厚度計算',
+    metaDescription: '輸入頁數與 GSM 紙重，毫米級精准建模計算書脊寬度，並動態繪製帶有折壓印線的高清封套 PDF。',
+    keywords: ["書脊厚度計算","書籍裝訂","封面排版","膠裝書脊"],
+    description: toolContentEn['pdf-spine-bookbinder'].description,
+    howToUse: toolContentEn['pdf-spine-bookbinder'].howToUse,
+    useCases: toolContentEn['pdf-spine-bookbinder'].useCases,
+    faq: toolContentEn['pdf-spine-bookbinder'].faq,
+  },
+
+  'pdf-signature-anchor-helper': {
+    title: '簽名位置引導',
+    metaDescription: '在 PDF 頁面中精確定位並物理合併手寫筆引導戳記和交互跳轉 Link 標記。',
+    keywords: ["簽名引導","簽字錨定","跳轉連結","合同引導圖層"],
+    description: toolContentEn['pdf-signature-anchor-helper'].description,
+    howToUse: toolContentEn['pdf-signature-anchor-helper'].howToUse,
+    useCases: toolContentEn['pdf-signature-anchor-helper'].useCases,
+    faq: toolContentEn['pdf-signature-anchor-helper'].faq,
+  },
+
+  'pdf-lossless-slicer': {
+    title: '大圖紙無損裁剪',
+    metaDescription: '徹底重塑 MediaBox 與 CropBox 矩形空間，無損、100% 矢量級裁剪大圖紙。',
+    keywords: ["pdf 無損裁剪","圖紙切片","CropBox 重塑","pdf 矢量裁剪"],
+    description: toolContentEn['pdf-lossless-slicer'].description,
+    howToUse: toolContentEn['pdf-lossless-slicer'].howToUse,
+    useCases: toolContentEn['pdf-lossless-slicer'].useCases,
+    faq: toolContentEn['pdf-lossless-slicer'].faq,
+  },
+
+  'pdf-scratchpad-canvas': {
+    title: '草稿拼接畫布',
+    metaDescription: '物理拓寬頁面尺寸，在右側或底部縫合出 200 pt 的草稿紙空間，並蓋印淺灰網格。',
+    keywords: ["pdf 草稿紙","頁面拼接","網格背景","pdf 筆記畫布"],
+    description: toolContentEn['pdf-scratchpad-canvas'].description,
+    howToUse: toolContentEn['pdf-scratchpad-canvas'].howToUse,
+    useCases: toolContentEn['pdf-scratchpad-canvas'].useCases,
+    faq: toolContentEn['pdf-scratchpad-canvas'].faq,
+  },
+
+  'photo-tiling-prepress': {
+    title: '證件照自助拼版',
+    metaDescription: '智能將單張證件照以高精度矩陣排滿 5寸/6寸標準相紙，並貼心加蓋裁剪線。',
+    keywords: ["證件照排版","相紙貼版","印前拼版","證件照拼版"],
+    description: toolContentEn['photo-tiling-prepress'].description,
+    howToUse: toolContentEn['photo-tiling-prepress'].howToUse,
+    useCases: toolContentEn['photo-tiling-prepress'].useCases,
+    faq: toolContentEn['photo-tiling-prepress'].faq,
+  },
+
 };
 

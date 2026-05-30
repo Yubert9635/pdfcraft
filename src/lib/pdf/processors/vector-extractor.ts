@@ -11,7 +11,7 @@ import type {
 } from '@/types/pdf';
 import { PDFErrorCode } from '@/types/pdf';
 import { BasePDFProcessor } from '../processor';
-import { loadPdfjs } from '../loader';
+import { loadPdfjsLegacy, loadSVGGraphics } from '../loader-legacy';
 
 export interface VectorExtractorOptions {
   pageNum?: number;
@@ -43,12 +43,13 @@ export class VectorExtractorProcessor extends BasePDFProcessor {
     const file = files[0];
 
     try {
-      this.updateProgress(10, 'Initializing PDF.js engine...');
-      const pdfjs = await loadPdfjs();
+      this.updateProgress(10, 'Initializing PDF.js Legacy engine...');
+      const pdfjsLegacy = await loadPdfjsLegacy();
+      const SVGGraphics = await loadSVGGraphics();
 
       this.updateProgress(20, 'Loading PDF document...');
       const arrayBuffer = await file.arrayBuffer();
-      const pdfDoc = await pdfjs.getDocument({ data: arrayBuffer }).promise;
+      const pdfDoc = await pdfjsLegacy.getDocument({ data: arrayBuffer }).promise;
       const totalPages = pdfDoc.numPages;
 
       const targetPageNum = Math.min(Math.max(1, extractOptions.pageNum || 1), totalPages);
@@ -73,7 +74,7 @@ export class VectorExtractorProcessor extends BasePDFProcessor {
       let svgString = '';
       
       if (typeof window !== 'undefined') {
-        const svgGfx = new (pdfjs as any).SVGGraphics(commonObjs, objs);
+        const svgGfx = new SVGGraphics(commonObjs, objs);
         const svgElement = await svgGfx.getSVG(opList, viewport);
         
         // Post-processing SVG elements (cleaning, formatting classes)

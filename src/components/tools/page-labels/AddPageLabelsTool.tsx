@@ -77,7 +77,7 @@ export function AddPageLabelsTool() {
       setTotalPages(pdf.getPageCount());
     } catch (err) {
       console.error(err);
-      setError('无法解析主 PDF 的元数据，该文件可能已损坏。');
+      setError(t('pageLabels.errorMetadata'));
     } finally {
       setIsLoadingFile(false);
     }
@@ -178,7 +178,7 @@ export function AddPageLabelsTool() {
    */
   const handleProcess = async () => {
     if (!file) {
-      setError('请上传待添加页面标签的 PDF。');
+      setError(t('pageLabels.errorUpload'));
       return;
     }
 
@@ -202,7 +202,7 @@ export function AddPageLabelsTool() {
         (prog, message) => {
           if (!cancelledRef.current) {
             setProgress(prog);
-            setProgressMessage(message || '正在批量注入页面标签...');
+            setProgressMessage(message || t('pageLabels.progressInjecting'));
           }
         }
       );
@@ -216,12 +216,12 @@ export function AddPageLabelsTool() {
         setResult(output.result as Blob);
         setStatus('complete');
       } else {
-        setError(output.error?.message || '注入页面标签失败。');
+        setError(output.error?.message || t('pageLabels.errorInjecting'));
         setStatus('error');
       }
     } catch (err) {
       if (!cancelledRef.current) {
-        setError(err instanceof Error ? err.message : '发生未知错误。');
+        setError(err instanceof Error ? err.message : t('pageLabels.errorUnknown'));
         setStatus('error');
       }
     }
@@ -246,7 +246,7 @@ export function AddPageLabelsTool() {
       {/* File Upload Zone */}
       <div className="space-y-3">
         <label className="text-sm font-bold text-[hsl(var(--color-foreground))] block">
-          1. 上传文档 (PDF)
+          {t('pageLabels.uploadLabel')}
         </label>
         {file ? (
           <Card 
@@ -267,7 +267,7 @@ export function AddPageLabelsTool() {
                   {file.name}
                 </p>
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))]">
-                  {totalPages > 0 ? `${totalPages} 页` : '正在载入...'} • {(file.size / (1024 * 1024)).toFixed(2)} MB
+                  {totalPages > 0 ? t('pageLabels.uploadSuccess', { count: totalPages, size: (file.size / (1024 * 1024)).toFixed(2) }) : (t('aiPdfReflower.scanningMetadata') || 'Loading...')}
                 </p>
               </div>
             </div>
@@ -288,8 +288,8 @@ export function AddPageLabelsTool() {
             onFilesSelected={handleFileSelected}
             onError={setError}
             disabled={isProcessing || isLoadingFile}
-            label="点击或拖拽上传 PDF"
-            description="本工具将直接在 PDF Catalog 中注入标准的 PageLabels 字典，与 Adobe Acrobat 完全兼容。"
+            label={t('pageLabels.uploadButton')}
+            description={t('pageLabels.uploadDesc')}
             className="min-h-[160px] p-6 rounded-2xl"
           />
         )}
@@ -313,7 +313,7 @@ export function AddPageLabelsTool() {
             <div className="flex justify-between items-center pb-2">
               <label className="text-sm font-bold text-[hsl(var(--color-foreground))] flex items-center gap-1.5">
                 <Layers className="w-4 h-4 text-[hsl(var(--color-primary))]" />
-                2. 配置标签映射规则 (Page Label Rules)
+                {t('pageLabels.optionsTitle')}
               </label>
               <Button
                 variant="outline"
@@ -323,7 +323,7 @@ export function AddPageLabelsTool() {
                 className="flex items-center gap-1 text-xs border border-[hsl(var(--color-primary)/0.35)] hover:bg-[hsl(var(--color-primary)/0.08)] py-1.5"
               >
                 <Plus className="w-3.5 h-3.5" />
-                添加新规则
+                {t('pageLabels.addRuleButton')}
               </Button>
             </div>
 
@@ -336,14 +336,14 @@ export function AddPageLabelsTool() {
                 >
                   <div className="flex justify-between items-center border-b border-[hsl(var(--color-border))] pb-3">
                     <span className="text-xs font-bold text-[hsl(var(--color-primary))] bg-[hsl(var(--color-primary)/0.1)] px-2.5 py-1 rounded-md">
-                      规则 #{idx + 1}
+                      {t('pageLabels.ruleTitle', { index: idx + 1 })}
                     </span>
                     {rules.length > 1 && (
                       <button
                         onClick={() => handleRemoveRule(idx)}
                         disabled={isProcessing}
                         className="text-zinc-400 hover:text-red-500 p-1.5 rounded-lg hover:bg-[hsl(var(--color-muted))] transition-colors"
-                        title="删除此规则"
+                        title={t('pageLabels.deleteRuleTitle')}
                       >
                         <Trash2 className="w-4 h-4" />
                       </button>
@@ -355,15 +355,15 @@ export function AddPageLabelsTool() {
                     <div className="space-y-1.5">
                       <div className="flex justify-between items-center">
                         <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))]">
-                          页码作用范围
+                          {t('pageLabels.pageRangeLabel')}
                         </label>
                         <span className="text-[10px] text-[hsl(var(--color-muted-foreground))] font-medium">
-                          留空应用到所有页
+                          {t('pageLabels.pageRangeHelp')}
                         </span>
                       </div>
                       <input
                         type="text"
-                        placeholder="例如: 1-9, odd, even"
+                        placeholder={t('pageLabels.pageRangePlaceholder')}
                         value={rule.pageRange}
                         onChange={(e) => handleRuleChange(idx, { pageRange: e.target.value })}
                         className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] focus:border-transparent transition-all"
@@ -373,30 +373,30 @@ export function AddPageLabelsTool() {
                     {/* Style selector */}
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] block">
-                        标签编码样式
+                        {t('pageLabels.styleLabel')}
                       </label>
                       <select
                         value={rule.style}
                         onChange={(e) => handleRuleChange(idx, { style: e.target.value as any })}
                         className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.35)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
                       >
-                        <option value="D">1, 2, 3... (阿拉伯数字)</option>
-                        <option value="R">I, II, III... (大写罗马)</option>
-                        <option value="r">i, ii, iii... (小写罗马)</option>
-                        <option value="A">A, B, C... (大写字母)</option>
-                        <option value="a">a, b, c... (小写字母)</option>
-                        <option value="none">无数字样式 (仅前缀)</option>
+                        <option value="D">{t('pageLabels.styleArabic')}</option>
+                        <option value="R">{t('pageLabels.styleRomanUpper')}</option>
+                        <option value="r">{t('pageLabels.styleRomanLower')}</option>
+                        <option value="A">{t('pageLabels.styleAlphaUpper')}</option>
+                        <option value="a">{t('pageLabels.styleAlphaLower')}</option>
+                        <option value="none">{t('pageLabels.styleNone')}</option>
                       </select>
                     </div>
 
                     {/* Prefix input */}
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] block">
-                        自定义前缀 (Prefix)
+                        {t('pageLabels.prefixLabel')}
                       </label>
                       <input
                         type="text"
-                        placeholder="例如: Appendix-, A-"
+                        placeholder={t('pageLabels.prefixPlaceholder')}
                         value={rule.prefix}
                         onChange={(e) => handleRuleChange(idx, { prefix: e.target.value })}
                         className="w-full px-3 py-2 text-xs rounded-xl bg-[hsl(var(--color-muted)/0.3)] border border-[hsl(var(--color-input))] text-[hsl(var(--color-foreground))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] transition-all"
@@ -406,7 +406,7 @@ export function AddPageLabelsTool() {
                     {/* Start value input */}
                     <div className="space-y-1.5">
                       <label className="text-xs font-bold text-[hsl(var(--color-muted-foreground))] block">
-                        起始数值 (Start Value)
+                        {t('pageLabels.startValueLabel')}
                       </label>
                       <input
                         type="number"
@@ -431,7 +431,7 @@ export function AddPageLabelsTool() {
                 className="w-full py-4 font-bold shadow-lg shadow-[hsl(var(--color-primary)/0.15)] flex items-center justify-center gap-2"
               >
                 <Tag className="w-5 h-5" />
-                {isProcessing ? '正在注入标签并编译...' : '开始注入 PageLabels'}
+                {isProcessing ? t('pageLabels.processing') : t('pageLabels.processButton')}
               </Button>
 
               {result && (
@@ -450,7 +450,7 @@ export function AddPageLabelsTool() {
               <div className="p-4 rounded-xl bg-green-50 dark:bg-green-950/20 border border-green-200 dark:border-green-900/50 text-green-700 dark:text-green-400 text-center animate-in fade-in">
                 <p className="text-sm font-semibold flex items-center justify-center gap-1.5">
                   <Check className="w-5 h-5" />
-                  🎉 页面标签注入成功！请下载已签名的 PDF 并在专业阅读器中查看侧栏导航。
+                  {t('pageLabels.successMessage')}
                 </p>
               </div>
             )}
@@ -460,7 +460,7 @@ export function AddPageLabelsTool() {
           <div className="lg:col-span-5 space-y-4">
             <label className="text-sm font-bold text-[hsl(var(--color-foreground))] flex items-center gap-1.5">
               <Tag className="w-4 h-4 text-emerald-500" />
-              页面标签序列实时流预览
+              {t('pageLabels.previewTitle')}
             </label>
 
             <Card 
@@ -471,8 +471,8 @@ export function AddPageLabelsTool() {
               <div className="mb-4 p-3 rounded-xl bg-emerald-50/50 dark:bg-emerald-950/10 border border-emerald-100/35 text-[11px] text-[hsl(var(--color-muted-foreground))] leading-normal flex gap-2">
                 <Info className="w-4 h-4 text-emerald-500 shrink-0 mt-0.5" />
                 <div>
-                  <span className="font-bold text-[hsl(var(--color-foreground))]">规则优先覆盖与不相交算法：</span>
-                  下方徽章代表 PDF 内部每一页最终算出的标签序列。物理页码旁的渐变色小徽章，即为其展现给用户的结构标签。
+                  <span className="font-bold text-[hsl(var(--color-foreground))]">{t('pageLabels.previewAlgorithmTitle')}</span>
+                  {t('pageLabels.previewAlgorithmDesc')}
                 </div>
               </div>
 
@@ -495,7 +495,7 @@ export function AddPageLabelsTool() {
                 {totalPages > maxPreviewCount && !showAllPreview && (
                   <div className="col-span-full pt-4 pb-2 text-center">
                     <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] mb-2">
-                      还有 {totalPages - maxPreviewCount} 页未显示，已自动折叠以提升交互性能。
+                      {t('pageLabels.previewFolded', { count: totalPages - maxPreviewCount })}
                     </p>
                     <Button
                       variant="outline"
@@ -503,7 +503,7 @@ export function AddPageLabelsTool() {
                       onClick={() => setShowAllPreview(true)}
                       className="text-[10px] py-1 px-3 rounded-xl"
                     >
-                      加载完整 {totalPages} 页预览
+                      {t('pageLabels.previewLoadAll', { total: totalPages })}
                     </Button>
                   </div>
                 )}
