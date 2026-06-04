@@ -82,3 +82,4 @@ public/libreoffice-wasm/soffice.data.bin
 # Tauri / Cargo (local build output)
 src-tauri/target/
 
+yarn.lock
