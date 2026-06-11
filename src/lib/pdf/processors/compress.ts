@@ -55,7 +55,7 @@ export interface CompressPDFOptions {
  * Default compress options
  */
 const DEFAULT_COMPRESS_OPTIONS: CompressPDFOptions = {
-  algorithm: 'standard',
+  algorithm: 'condense', // Use condense by default to preserve image quality
   quality: 'medium',
   removeMetadata: false,
   optimizeImages: true,
@@ -174,7 +174,12 @@ export class CompressPDFProcessor extends BasePDFProcessor {
           result = await this.compressWithWorker(arrayBuffer, compressOptions);
 
           // If optimizeImages is enabled, additionally compress images with PyMuPDF
-          if (compressOptions.optimizeImages) {
+          // Skip image optimization for small files (<500KB) or low-quality settings to prevent icon/vector corruption
+          const shouldOptimizeImages = compressOptions.optimizeImages && 
+                                       originalSize > 500 * 1024 && 
+                                       compressOptions.quality !== 'low';
+          
+          if (shouldOptimizeImages) {
             this.updateProgress(70, 'Optimizing images...');
             try {
               result = await this.optimizeImagesWithPyMuPDF(result.pdfBytes, compressOptions);
@@ -186,6 +191,8 @@ export class CompressPDFProcessor extends BasePDFProcessor {
               );
               this.updateProgress(95, 'Image optimization unavailable, finalizing...');
             }
+          } else if (compressOptions.optimizeImages && originalSize <= 500 * 1024) {
+            logger.log('[CompressPDF] Skipping image optimization for small file to preserve icon quality');
           }
           break;
       }

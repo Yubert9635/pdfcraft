@@ -44,7 +44,6 @@ export const navConfig = {
   ],
   footerNav: [
     { title: 'Privacy', href: '/privacy' },
-    { title: 'Terms', href: '/terms' },
     { title: 'Contact', href: '/contact' },
   ],
 };

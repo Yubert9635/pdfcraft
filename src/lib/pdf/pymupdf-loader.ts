@@ -1051,6 +1051,10 @@ for page_num in range(len(doc)):
             # Create pixmap from image data
             pix = pymupdf.Pixmap(image_bytes)
             
+            # Skip images with alpha channel (transparency) to prevent icon/vector markup corruption
+            if pix.alpha:
+                continue
+            
             # Check if we need to reduce quality
             if pix.width > 100 and pix.height > 100:
                 # Calculate scale factor if image is too large
@@ -1075,20 +1079,7 @@ for page_num in range(len(doc)):
                 
                 # Only replace if we actually reduced size
                 if len(new_image_bytes) < len(image_bytes) * 0.9:
-                    # Update the image stream and its dictionary to match JPEG format
-                    doc.update_stream(xref, new_image_bytes)
-                    # Update the image XObject dictionary to reflect JPEG encoding
-                    doc.xref_set_key(xref, "Filter", "/DCTDecode")
-                    doc.xref_set_key(xref, "ColorSpace", "/DeviceRGB")
-                    doc.xref_set_key(xref, "BitsPerComponent", "8")
-                    # Update dimensions if image was resized
-                    doc.xref_set_key(xref, "Width", str(pix.width))
-                    doc.xref_set_key(xref, "Height", str(pix.height))
-                    # Remove DecodeParms that may be left from PNG/Flate encoding
-                    try:
-                        doc.xref_set_key(xref, "DecodeParms", "null")
-                    except:
-                        pass
+                    page.replace_image(xref, stream=new_image_bytes)
         except Exception as e:
             # Skip images that can't be processed
             pass
@@ -1102,7 +1093,6 @@ if remove_metadata:
 pdf_bytes = doc.tobytes(
     garbage=4,  # Remove unused objects, merge duplicate objects
     deflate=True,  # Compress streams
-    clean=True,  # Clean content streams
 )
 doc.close()
 
