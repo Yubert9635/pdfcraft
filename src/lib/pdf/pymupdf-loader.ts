@@ -1051,8 +1051,9 @@ for page_num in range(len(doc)):
             # Create pixmap from image data
             pix = pymupdf.Pixmap(image_bytes)
             
-            # Skip images with alpha channel (transparency) to prevent icon/vector markup corruption
-            if pix.alpha:
+            # Skip images with alpha channel (transparency) or masks to prevent icon/vector markup corruption and black background issue
+            obj_str = doc.xref_object(xref)
+            if pix.alpha or base_image.get("smask", 0) > 0 or "/SMask" in obj_str or "/Mask" in obj_str:
                 continue
             
             # Check if we need to reduce quality
