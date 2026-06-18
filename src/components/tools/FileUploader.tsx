@@ -452,17 +452,28 @@ export const FileUploader: React.FC<FileUploaderProps> = ({
   }, [disabled, handleFiles]);
 
   /**
-   * Prevent default browser drag/drop behavior to avoid file navigation
+   * Prevent default browser drag/drop behavior to avoid file navigation (only for file drags)
    */
   useEffect(() => {
-    const preventDefault = (e: DragEvent) => {
-      e.preventDefault();
+    const handleGlobalDragOver = (e: DragEvent) => {
+      const hasFiles = e.dataTransfer && e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files');
+      if (hasFiles) {
+        e.preventDefault();
+      }
     };
-    window.addEventListener('dragover', preventDefault);
-    window.addEventListener('drop', preventDefault);
+    
+    const handleGlobalDrop = (e: DragEvent) => {
+      const hasFiles = e.dataTransfer && e.dataTransfer.types && Array.from(e.dataTransfer.types).includes('Files');
+      if (hasFiles) {
+        e.preventDefault();
+      }
+    };
+
+    window.addEventListener('dragover', handleGlobalDragOver);
+    window.addEventListener('drop', handleGlobalDrop);
     return () => {
-      window.removeEventListener('dragover', preventDefault);
-      window.removeEventListener('drop', preventDefault);
+      window.removeEventListener('dragover', handleGlobalDragOver);
+      window.removeEventListener('drop', handleGlobalDrop);
     };
   }, []);
 

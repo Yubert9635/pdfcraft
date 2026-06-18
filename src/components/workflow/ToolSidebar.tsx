@@ -11,6 +11,7 @@ import { Locale } from '@/lib/i18n/config';
 
 interface ToolSidebarProps {
     onDragStart: (event: React.DragEvent, nodeData: ToolNodeData) => void;
+    onDragEnd?: () => void;
     isCollapsed?: boolean;
     onToggleCollapse?: () => void;
 }
@@ -26,7 +27,12 @@ interface CategoryGroup {
  * Tool Sidebar for the workflow editor
  * Displays available tools grouped by category
  */
-export function ToolSidebar({ onDragStart, isCollapsed = false, onToggleCollapse }: ToolSidebarProps) {
+export function ToolSidebar({
+    onDragStart,
+    onDragEnd,
+    isCollapsed = false,
+    onToggleCollapse,
+}: ToolSidebarProps) {
     const tWorkflow = useTranslations('workflow');
     const locale = useLocale() as Locale;
 
@@ -282,6 +288,7 @@ export function ToolSidebar({ onDragStart, isCollapsed = false, onToggleCollapse
                                                 key={tool.id}
                                                 draggable
                                                 onDragStart={(e) => handleDragStart(e, tool)}
+                                                onDragEnd={onDragEnd}
                                                 className="flex items-center gap-2 px-4 py-2 mx-2 rounded-md cursor-grab hover:bg-[hsl(var(--color-muted))] active:cursor-grabbing transition-colors group"
                                             >
                                                 <GripVertical className="w-3 h-3 text-[hsl(var(--color-muted-foreground))] opacity-0 group-hover:opacity-100 transition-opacity" />

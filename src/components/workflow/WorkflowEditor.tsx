@@ -43,6 +43,9 @@ import { NodeSettingsPanel } from './NodeSettingsPanel';
 import { WorkflowPreview } from './WorkflowPreview';
 import { Undo2, Redo2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
 
+// Global drag data cache for WebView2/Tauri compatibility
+let globalDragData: ToolNodeData | null = null;
+
 // Node types for ReactFlow
 const nodeTypes = {
     toolNode: ToolNode,
@@ -272,8 +275,18 @@ function WorkflowEditorContent() {
      * Handle drag over for dropping new nodes
      */
     const onDragOver = useCallback((event: React.DragEvent) => {
-        event.preventDefault();
-        event.dataTransfer.dropEffect = 'move';
+        const isToolDrag = globalDragData !== null || 
+            (event.dataTransfer && (
+                event.dataTransfer.types.includes('application/reactflow') || 
+                event.dataTransfer.types.includes('text/plain')
+            ));
+        
+        if (isToolDrag) {
+            event.preventDefault();
+            if (event.dataTransfer) {
+                event.dataTransfer.dropEffect = 'move';
+            }
+        }
     }, []);
 
     /**
@@ -285,12 +298,23 @@ function WorkflowEditorContent() {
 
             if (!reactFlowWrapper.current || !reactFlowInstance) return;
 
-            const reactFlowBounds = reactFlowWrapper.current.getBoundingClientRect();
-            const nodeDataStr = event.dataTransfer.getData('application/reactflow');
+            // Try to resolve nodeData from global variable first, fallback to dataTransfer for WebView2 compatibility
+            let nodeData: ToolNodeData | null = globalDragData;
+            if (!nodeData) {
+                const nodeDataStr = event.dataTransfer.getData('application/reactflow');
+                if (nodeDataStr) {
+                    try {
+                        nodeData = JSON.parse(nodeDataStr);
+                    } catch (e) {
+                        logger.error('Failed to parse reactflow drag data:', e);
+                    }
+                }
+            }
 
-            if (!nodeDataStr) return;
+            // Always reset the global drag data cache
+            globalDragData = null;
 
-            const nodeData: ToolNodeData = JSON.parse(nodeDataStr);
+            if (!nodeData) return;
 
             const position = reactFlowInstance.screenToFlowPosition({
                 x: event.clientX,
@@ -313,8 +337,18 @@ function WorkflowEditorContent() {
      * Handle drag start from sidebar
      */
     const onDragStart = useCallback((event: React.DragEvent, nodeData: ToolNodeData) => {
+        globalDragData = nodeData;
         event.dataTransfer.setData('application/reactflow', JSON.stringify(nodeData));
+        // Add standard plain text format fallback to ensure drop action gets activated under WebView2/Tauri
+        event.dataTransfer.setData('text/plain', nodeData.toolId);
         event.dataTransfer.effectAllowed = 'move';
+    }, []);
+
+    /**
+     * Handle drag end to clean up global drag data
+     */
+    const onDragEnd = useCallback(() => {
+        globalDragData = null;
     }, []);
 
     /**
@@ -942,6 +976,7 @@ function WorkflowEditorContent() {
             {/* Left Sidebar - Tool Library */}
             <ToolSidebar
                 onDragStart={onDragStart}
+                onDragEnd={onDragEnd}
                 isCollapsed={isLeftSidebarCollapsed}
                 onToggleCollapse={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
             />
@@ -969,7 +1004,12 @@ function WorkflowEditorContent() {
                 </div>
 
                 {/* Canvas */}
-                <div className="flex-1 relative" ref={reactFlowWrapper}>
+                <div 
+                    className="flex-1 relative" 
+                    ref={reactFlowWrapper}
+                    onDragOver={onDragOver}
+                    onDrop={onDrop}
+                >
                     {/* Undo/Redo buttons */}
                     <div className="absolute top-2 left-2 z-10 flex gap-1">
                         <button
