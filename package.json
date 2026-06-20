@@ -6,8 +6,8 @@
   "scripts": {
     "dev": "next dev --turbopack",
     "tauri": "tauri",
-    "dev:tauri": "TAURI_ENV=true tauri dev",
-    "build:tauri": "TAURI_ENV=true tauri build",
+    "dev:tauri": "set TAURI_ENV=true&& tauri dev",
+    "build:tauri": "set TAURI_ENV=true&& tauri build",
     "build": "next build",
     "start": "next start",
     "lint": "eslint . --ext .ts,.tsx",

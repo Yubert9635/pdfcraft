@@ -41,6 +41,7 @@ import { WorkflowLibrary } from './WorkflowLibrary';
 import { WorkflowControls } from './WorkflowControls';
 import { NodeSettingsPanel } from './NodeSettingsPanel';
 import { WorkflowPreview } from './WorkflowPreview';
+import { WORKFLOW_TOOL_DROP_EVENT, type WorkflowToolDropEventDetail } from './dragEvents';
 import { Undo2, Redo2, PanelLeftClose, PanelLeftOpen, PanelRightClose, PanelRightOpen } from 'lucide-react';
 
 // Global drag data cache for WebView2/Tauri compatibility
@@ -109,6 +110,7 @@ function WorkflowEditorContent() {
 
     // AbortController for cancelling workflow execution
     const executionAbortController = useRef<AbortController | null>(null);
+    const lastToolDropRef = useRef<{ toolId: string; clientX: number; clientY: number; time: number } | null>(null);
 
     /**
      * Register a Blob URL for cleanup
@@ -275,23 +277,40 @@ function WorkflowEditorContent() {
      * Handle drag over for dropping new nodes
      */
     const onDragOver = useCallback((event: React.DragEvent) => {
-        const isToolDrag = globalDragData !== null || 
-            (event.dataTransfer && (
-                event.dataTransfer.types.includes('application/reactflow') || 
-                event.dataTransfer.types.includes('text/plain')
-            ));
-        
-        if (isToolDrag) {
-            event.preventDefault();
-            if (event.dataTransfer) {
-                event.dataTransfer.dropEffect = 'move';
-            }
+        // Always allow drop in Tauri/WebView2 environment where dataTransfer may be restricted
+        event.preventDefault();
+        if (event.dataTransfer) {
+            event.dataTransfer.dropEffect = 'move';
         }
     }, []);
 
     /**
      * Handle dropping a tool node onto the canvas
      */
+    const addToolNodeAtClientPosition = useCallback((nodeData: ToolNodeData, clientX: number, clientY: number) => {
+        if (!reactFlowWrapper.current || !reactFlowInstance) return;
+
+        const position = reactFlowInstance.screenToFlowPosition({
+            x: clientX,
+            y: clientY,
+        });
+
+        const newNode: Node<ToolNodeData> = {
+            id: getNodeId(),
+            type: 'toolNode',
+            position,
+            data: { ...nodeData, settings: {} },
+        };
+
+        setNodes((nds) => nds.concat(newNode));
+        lastToolDropRef.current = {
+            toolId: nodeData.toolId,
+            clientX,
+            clientY,
+            time: Date.now(),
+        };
+    }, [reactFlowInstance, setNodes]);
+
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
@@ -316,22 +335,31 @@ function WorkflowEditorContent() {
 
             if (!nodeData) return;
 
-            const position = reactFlowInstance.screenToFlowPosition({
-                x: event.clientX,
-                y: event.clientY,
-            });
-
-            const newNode: Node<ToolNodeData> = {
-                id: getNodeId(),
-                type: 'toolNode',
-                position,
-                data: { ...nodeData, settings: {} },
-            };
-
-            setNodes((nds) => nds.concat(newNode));
+            addToolNodeAtClientPosition(nodeData, event.clientX, event.clientY);
         },
-        [reactFlowInstance, setNodes]
+        [reactFlowInstance, addToolNodeAtClientPosition]
     );
+
+    useEffect(() => {
+        const handleFallbackToolDrop = (event: Event) => {
+            const { nodeData, clientX, clientY } = (event as CustomEvent<WorkflowToolDropEventDetail>).detail;
+            if (!nodeData) return;
+
+            const lastDrop = lastToolDropRef.current;
+            const isDuplicateNativeDrop = lastDrop &&
+                lastDrop.toolId === nodeData.toolId &&
+                Math.abs(lastDrop.clientX - clientX) < 8 &&
+                Math.abs(lastDrop.clientY - clientY) < 8 &&
+                Date.now() - lastDrop.time < 500;
+
+            if (isDuplicateNativeDrop) return;
+
+            addToolNodeAtClientPosition(nodeData, clientX, clientY);
+        };
+
+        window.addEventListener(WORKFLOW_TOOL_DROP_EVENT, handleFallbackToolDrop);
+        return () => window.removeEventListener(WORKFLOW_TOOL_DROP_EVENT, handleFallbackToolDrop);
+    }, [addToolNodeAtClientPosition]);
 
     /**
      * Handle drag start from sidebar

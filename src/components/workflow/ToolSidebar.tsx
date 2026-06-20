@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef, useEffect } from 'react';
 import { useTranslations, useLocale } from 'next-intl';
 import { tools } from '@/config/tools';
 import { getToolContent } from '@/config/tool-content';
@@ -8,6 +8,7 @@ import { ToolNodeData } from '@/types/workflow';
 import * as LucideIcons from 'lucide-react';
 import { Search, ChevronDown, ChevronRight, GripVertical, PanelLeftClose, PanelLeftOpen } from 'lucide-react';
 import { Locale } from '@/lib/i18n/config';
+import { WORKFLOW_TOOL_DROP_EVENT } from './dragEvents';
 
 interface ToolSidebarProps {
     onDragStart: (event: React.DragEvent, nodeData: ToolNodeData) => void;
@@ -21,6 +22,16 @@ interface CategoryGroup {
     name: string;
     icon: string;
     tools: typeof tools;
+}
+
+interface PointerDragState {
+    pointerId: number;
+    nodeData: ToolNodeData;
+    startX: number;
+    startY: number;
+    lastX: number;
+    lastY: number;
+    hasMoved: boolean;
 }
 
 /**
@@ -40,6 +51,7 @@ export function ToolSidebar({
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
         new Set(['organize-manage', 'convert-to-pdf'])
     );
+    const pointerDragRef = useRef<PointerDragState | null>(null);
 
     // Format tool ID to human readable name
     const formatToolId = (id: string): string => {
@@ -162,18 +174,82 @@ export function ToolSidebar({
     };
 
     const handleDragStart = (e: React.DragEvent, tool: typeof tools[0]) => {
-        const nodeData: ToolNodeData = {
-            toolId: tool.id,
-            label: getToolName(tool.id),
-            icon: tool.icon,
-            category: tool.category,
-            acceptedFormats: tool.acceptedFormats,
-            outputFormat: tool.outputFormat,
-            status: 'idle',
-            progress: 0,
-        };
-        onDragStart(e, nodeData);
+        onDragStart(e, createNodeData(tool));
     };
+
+    const createNodeData = (tool: typeof tools[0]): ToolNodeData => ({
+        toolId: tool.id,
+        label: getToolName(tool.id),
+        icon: tool.icon,
+        category: tool.category,
+        acceptedFormats: tool.acceptedFormats,
+        outputFormat: tool.outputFormat,
+        status: 'idle',
+        progress: 0,
+    });
+
+    const handlePointerDown = (e: React.PointerEvent, tool: typeof tools[0]) => {
+        if (e.button !== 0) return;
+
+        pointerDragRef.current = {
+            pointerId: e.pointerId,
+            nodeData: createNodeData(tool),
+            startX: e.clientX,
+            startY: e.clientY,
+            lastX: e.clientX,
+            lastY: e.clientY,
+            hasMoved: false,
+        };
+    };
+
+    useEffect(() => {
+        const handlePointerMove = (event: PointerEvent) => {
+            const dragState = pointerDragRef.current;
+            if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+            dragState.lastX = event.clientX;
+            dragState.lastY = event.clientY;
+            if (
+                Math.abs(event.clientX - dragState.startX) > 6 ||
+                Math.abs(event.clientY - dragState.startY) > 6
+            ) {
+                dragState.hasMoved = true;
+            }
+        };
+
+        const handlePointerUp = (event: PointerEvent) => {
+            const dragState = pointerDragRef.current;
+            if (!dragState || dragState.pointerId !== event.pointerId) return;
+
+            pointerDragRef.current = null;
+            if (!dragState.hasMoved) return;
+
+            window.dispatchEvent(new CustomEvent(WORKFLOW_TOOL_DROP_EVENT, {
+                detail: {
+                    nodeData: dragState.nodeData,
+                    clientX: event.clientX || dragState.lastX,
+                    clientY: event.clientY || dragState.lastY,
+                },
+            }));
+        };
+
+        const handlePointerCancel = (event: PointerEvent) => {
+            const dragState = pointerDragRef.current;
+            if (dragState && dragState.pointerId === event.pointerId) {
+                pointerDragRef.current = null;
+            }
+        };
+
+        window.addEventListener('pointermove', handlePointerMove);
+        window.addEventListener('pointerup', handlePointerUp);
+        window.addEventListener('pointercancel', handlePointerCancel);
+
+        return () => {
+            window.removeEventListener('pointermove', handlePointerMove);
+            window.removeEventListener('pointerup', handlePointerUp);
+            window.removeEventListener('pointercancel', handlePointerCancel);
+        };
+    }, []);
 
     // Get icon component dynamically
     const getIcon = (iconName: string) => {
@@ -289,6 +365,7 @@ export function ToolSidebar({
                                                 draggable
                                                 onDragStart={(e) => handleDragStart(e, tool)}
                                                 onDragEnd={onDragEnd}
+                                                onPointerDown={(e) => handlePointerDown(e, tool)}
                                                 className="flex items-center gap-2 px-4 py-2 mx-2 rounded-md cursor-grab hover:bg-[hsl(var(--color-muted))] active:cursor-grabbing transition-colors group"
                                             >
                                                 <GripVertical className="w-3 h-3 text-[hsl(var(--color-muted-foreground))] opacity-0 group-hover:opacity-100 transition-opacity" />
