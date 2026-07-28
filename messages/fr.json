@@ -634,7 +634,8 @@
       "redoBtn": "Rétablir",
       "unnamedUser": "Utilisateur invité",
       "undo": "Annuler",
-      "redo": "Rétablir"
+      "redo": "Rétablir",
+      "annDefault": "Annotation"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Décalage d'Otsu)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Options invalides fournies.",
     "unknown": "Une erreur inattendue s'est produite. Veuillez réessayer.",
     "toolNotFound": "Outil introuvable",
-    "invalidPassword": "Le mot de passe saisi est incorrect. Veuillez vérifier et réessayer."
+    "invalidPassword": "Le mot de passe saisi est incorrect. Veuillez vérifier et réessayer.",
+    "incorrectPassword": "Mot de passe incorrect. Veuillez réessayer."
   },
   "home": {
     "hero": {

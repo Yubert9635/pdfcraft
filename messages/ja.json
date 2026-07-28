@@ -634,7 +634,8 @@
       "redoBtn": "やり直す",
       "unnamedUser": "ゲストユーザー",
       "undo": "元に戻す",
-      "redo": "やり直す"
+      "redo": "やり直す",
+      "annDefault": "注釈"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (大津しきい値オフセット)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "無効なオプションが指定されました。",
     "unknown": "予期しないエラーが発生しました。もう一度お試しください。",
     "toolNotFound": "ツールが見つかりません",
-    "invalidPassword": "入力されたパスワードが正しくありません。確認して再度お試しください。"
+    "invalidPassword": "入力されたパスワードが正しくありません。確認して再度お試しください。",
+    "incorrectPassword": "パスワードが正しくありません。もう一度お試しください。"
   },
   "home": {
     "hero": {

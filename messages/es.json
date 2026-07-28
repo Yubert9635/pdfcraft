@@ -634,7 +634,8 @@
       "redoBtn": "Rehacer",
       "unnamedUser": "Usuario invitado",
       "undo": "Deshacer",
-      "redo": "Rehacer"
+      "redo": "Rehacer",
+      "annDefault": "Anotación"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Desviación Otsu)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Opciones inválidas proporcionadas.",
     "unknown": "Ocurrió un error inesperado. Por favor intenta de nuevo.",
     "toolNotFound": "Herramienta no encontrada",
-    "invalidPassword": "La contraseña ingresada es incorrecta. Verifique e intente de nuevo."
+    "invalidPassword": "La contraseña ingresada es incorrecta. Verifique e intente de nuevo.",
+    "incorrectPassword": "Contraseña incorrecta. Inténtalo de nuevo."
   },
   "home": {
     "hero": {

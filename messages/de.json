@@ -634,7 +634,8 @@
       "redoBtn": "Wiederholen",
       "unnamedUser": "Gastbenutzer",
       "undo": "Rückgängig",
-      "redo": "Wiederholen"
+      "redo": "Wiederholen",
+      "annDefault": "Anmerkung"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Otsu-Offset)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Ungültige Optionen angegeben.",
     "unknown": "Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.",
     "toolNotFound": "Werkzeug nicht gefunden",
-    "invalidPassword": "Das eingegebene Passwort ist falsch. Bitte überprüfen und erneut versuchen."
+    "invalidPassword": "Das eingegebene Passwort ist falsch. Bitte überprüfen und erneut versuchen.",
+    "incorrectPassword": "Falsches Passwort. Bitte versuchen Sie es erneut."
   },
   "home": {
     "hero": {

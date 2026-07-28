@@ -634,7 +634,8 @@
       "redoBtn": "Ulangi",
       "unnamedUser": "Pengguna tamu",
       "undo": "Batal",
-      "redo": "Ulangi"
+      "redo": "Ulangi",
+      "annDefault": "Anotasi"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Offset Otsu)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Opsi yang diberikan tidak valid.",
     "unknown": "Terjadi kesalahan yang tidak terduga. Silakan coba lagi.",
     "toolNotFound": "Alat Tidak Ditemukan",
-    "invalidPassword": "Kata sandi yang Anda masukkan salah. Silakan periksa dan coba lagi."
+    "invalidPassword": "Kata sandi yang Anda masukkan salah. Silakan periksa dan coba lagi.",
+    "incorrectPassword": "Kata sandi salah. Silakan coba lagi."
   },
   "home": {
     "hero": {

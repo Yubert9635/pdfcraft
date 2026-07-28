@@ -634,7 +634,8 @@
       "redoBtn": "Refă",
       "unnamedUser": "Utilizator invitat",
       "undo": "Anulează",
-      "redo": "Refă"
+      "redo": "Refă",
+      "annDefault": "Adnotare"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Offset Otsu)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Opțiuni nevalide furnizate.",
     "unknown": "A apărut o eroare neașteptată. Te rugăm să încerci din nou.",
     "toolNotFound": "Instrumentul nu a fost găsit",
-    "invalidPassword": "Parola introdusă este incorectă. Verificați și încercați din nou."
+    "invalidPassword": "Parola introdusă este incorectă. Verificați și încercați din nou.",
+    "incorrectPassword": "Parolă incorectă. Vă rugăm să încercați din nou."
   },
   "home": {
     "hero": {

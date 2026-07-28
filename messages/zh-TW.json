@@ -634,7 +634,8 @@
       "redoBtn": "重做",
       "unnamedUser": "不具名使用者",
       "undo": "撤銷",
-      "redo": "重做"
+      "redo": "重做",
+      "annDefault": "註釋"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Otsu 閾值偏移)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "提供的選項無效。",
     "unknown": "發生意外錯誤。請重試。",
     "toolNotFound": "工具未找到",
-    "invalidPassword": "您輸入的密碼不正確。請檢查後重試。"
+    "invalidPassword": "您輸入的密碼不正確。請檢查後重試。",
+    "incorrectPassword": "密碼錯誤，請重試。"
   },
   "home": {
     "hero": {

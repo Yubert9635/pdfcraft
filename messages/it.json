@@ -634,7 +634,8 @@
       "redoBtn": "Ripristina",
       "unnamedUser": "Utente ospite",
       "undo": "Annulla",
-      "redo": "Ripristina"
+      "redo": "Ripristina",
+      "annDefault": "Annotazione"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Offset Otsu)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Opzioni non valide fornite.",
     "unknown": "Si è verificato un errore imprevisto. Riprova.",
     "toolNotFound": "Strumento non trovato",
-    "invalidPassword": "La password inserita non è corretta. Controlla e riprova."
+    "invalidPassword": "La password inserita non è corretta. Controlla e riprova.",
+    "incorrectPassword": "Password errata. Riprova."
   },
   "home": {
     "hero": {

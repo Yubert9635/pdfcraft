@@ -634,7 +634,8 @@
       "redoBtn": "Refazer",
       "unnamedUser": "Usuário convidado",
       "undo": "Desfazer",
-      "redo": "Refazer"
+      "redo": "Refazer",
+      "annDefault": "Anotação"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Desvio Otsu)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Opções inválidas fornecidas.",
     "unknown": "Ocorreu um erro inesperado. Por favor, tente novamente.",
     "toolNotFound": "Ferramenta não encontrada",
-    "invalidPassword": "A senha inserida está incorreta. Verifique e tente novamente."
+    "invalidPassword": "A senha inserida está incorreta. Verifique e tente novamente.",
+    "incorrectPassword": "Senha incorreta. Tente novamente."
   },
   "home": {
     "hero": {

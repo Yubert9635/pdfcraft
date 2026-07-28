@@ -634,7 +634,8 @@
       "redoBtn": "Làm lại",
       "unnamedUser": "Người dùng khách",
       "undo": "Hoàn tác",
-      "redo": "Làm lại"
+      "redo": "Làm lại",
+      "annDefault": "Chú thích"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Độ lệch Otsu)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Tùy chọn không hợp lệ.",
     "unknown": "Đã xảy ra lỗi không mong muốn. Vui lòng thử lại.",
     "toolNotFound": "Không tìm thấy công cụ",
-    "invalidPassword": "Mật khẩu bạn nhập không đúng. Vui lòng kiểm tra và thử lại."
+    "invalidPassword": "Mật khẩu bạn nhập không đúng. Vui lòng kiểm tra và thử lại.",
+    "incorrectPassword": "Mật khẩu không đúng. Vui lòng thử lại."
   },
   "home": {
     "hero": {

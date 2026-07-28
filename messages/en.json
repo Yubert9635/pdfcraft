@@ -634,7 +634,8 @@
       "redoBtn": "Redo",
       "unnamedUser": "Guest User",
       "undo": "Undo",
-      "redo": "Redo"
+      "redo": "Redo",
+      "annDefault": "Annotation"
     },
     "einkOptimizer": {
       "otsueThresholdSuffix": " (Otsu Offset)",
@@ -1173,7 +1174,8 @@
     "invalidOptions": "Invalid options provided.",
     "unknown": "An unexpected error occurred. Please try again.",
     "toolNotFound": "Tool Not Found",
-    "invalidPassword": "The password you entered is incorrect. Please check and try again."
+    "invalidPassword": "The password you entered is incorrect. Please check and try again.",
+    "incorrectPassword": "Incorrect password. Please try again."
   },
   "home": {
     "hero": {
