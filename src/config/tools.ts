@@ -79,7 +79,7 @@ export const tools: Tool[] = [
     outputFormat: 'pdf',
     maxFileSize: DEFAULT_MAX_FILE_SIZE,
     maxFiles: 1,
-    features: ['annotate', 'highlight', 'redact', 'comment', 'shapes', 'images', 'search'],
+    features: ['edit-existing-text', 'annotate', 'highlight', 'redact', 'comment', 'shapes', 'images', 'search'],
     relatedTools: ['sign-pdf', 'add-watermark', 'form-filler'],
   },
   {

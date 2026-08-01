@@ -193,7 +193,7 @@ export const toolContentEn: Record<string, ToolContent> = {
       { title: 'Content Redaction', description: 'Permanently remove sensitive information from documents before sharing.', icon: 'eye-off' },
     ],
     faq: [
-      { question: 'Can I edit the original text in the PDF?', answer: 'This tool focuses on adding annotations and new content. For editing existing text, you may need to use the original source document.' },
+      { question: 'Can I edit the original text in the PDF?', answer: 'Yes. Select Edit text in the PDF toolbar, click an existing text block, enter the replacement, and apply it. Text is permanently replaced in the exported PDF.' },
       { question: 'Are my edits permanent?', answer: 'Annotations can be flattened to make them permanent, or kept as editable layers depending on your preference.' },
       { question: 'Can I undo my changes?', answer: 'Yes, the editor supports undo/redo functionality. You can also reset to the original document at any time before saving.' },
     ],

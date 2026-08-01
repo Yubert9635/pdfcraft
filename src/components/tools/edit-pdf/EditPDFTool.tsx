@@ -5,6 +5,11 @@ import { useTranslations } from 'next-intl';
 import { FileUploader } from '../FileUploader';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import {
+  replaceExistingText,
+  type ReplaceExistingTextDiagnostics,
+  type TextFitMode,
+} from '@/lib/pdf/processors/replace-existing-text';
 
 export interface EditPDFToolProps {
   className?: string;
@@ -25,14 +30,28 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [isEditorReady, setIsEditorReady] = useState(false);
+  const [isTextReplacing, setIsTextReplacing] = useState(false);
+  const [replacementNotice, setReplacementNotice] = useState<string | null>(null);
+  const [replacementDiagnostics, setReplacementDiagnostics] =
+    useState<ReplaceExistingTextDiagnostics | null>(null);
+  const [textUndoCount, setTextUndoCount] = useState(0);
+  const [textRedoCount, setTextRedoCount] = useState(0);
   
   const iframeRef = useRef<HTMLIFrameElement>(null);
+  const textUndoStackRef = useRef<File[]>([]);
+  const textRedoStackRef = useRef<File[]>([]);
 
   const handleFilesSelected = useCallback((files: File[]) => {
     if (files.length > 0) {
       const selectedFile = files[0];
       setFile(selectedFile);
       setError(null);
+      setReplacementNotice(null);
+      setReplacementDiagnostics(null);
+      textUndoStackRef.current = [];
+      textRedoStackRef.current = [];
+      setTextUndoCount(0);
+      setTextRedoCount(0);
       setPdfUrl(URL.createObjectURL(selectedFile));
     }
   }, []);
@@ -106,8 +125,283 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
                   setupUndoRedoAndAuthorPatch();
                   setupSnapping();
                   setupChineseFontPatch();
+                  setupExistingTextEditing();
                 }
               }, 200);
+
+              function setupExistingTextEditing() {
+                if (document.getElementById('pdfcraft-edit-existing-text')) return;
+                const toolbar = document.querySelector('.CustomToolbar ul.buttons');
+                if (!toolbar) return;
+
+                const parentLang = window.parent?.document?.documentElement?.lang || 'en';
+                const parentLocale = window.parent?.location?.pathname?.split('/')[1] || parentLang;
+                const isSpanish = parentLocale.toLowerCase().startsWith('es');
+                const labels = isSpanish
+                  ? {
+                      tool: 'Editar texto',
+                      heading: 'Editar texto existente',
+                      original: 'Texto original',
+                      replacement: 'Texto nuevo',
+                      apply: 'Aplicar',
+                      confirm: 'Confirmar cambio',
+                      cancel: 'Cancelar',
+                      hint: 'Haz clic sobre un bloque de texto del PDF',
+                      overflow: 'El texto nuevo no cabe en el área original.',
+                      fit: 'Si no cabe',
+                      preserve: 'Mantener tamaño',
+                      shrink: 'Reducir para encajar',
+                      expand: 'Ampliar el área',
+                      signature: 'Editar el contenido invalida las firmas digitales existentes.'
+                    }
+                  : {
+                      tool: 'Edit text',
+                      heading: 'Edit existing text',
+                      original: 'Original text',
+                      replacement: 'New text',
+                      apply: 'Apply',
+                      confirm: 'Confirm change',
+                      cancel: 'Cancel',
+                      hint: 'Click a text block in the PDF',
+                      overflow: 'The new text does not fit in the original area.',
+                      fit: 'If it does not fit',
+                      preserve: 'Keep original size',
+                      shrink: 'Shrink to fit',
+                      expand: 'Expand the area',
+                      signature: 'Editing content invalidates existing digital signatures.'
+                    };
+
+                const item = document.createElement('li');
+                item.id = 'pdfcraft-edit-existing-text';
+                item.title = labels.tool;
+                item.innerHTML =
+                  '<div class="icon"><span role="img" aria-label="' + labels.tool + '"' +
+                  ' style="font-size:18px;font-weight:700;line-height:1">T✎</span></div>' +
+                  '<div class="name">' + labels.tool + '</div>';
+
+                const selectItem = toolbar.querySelector('li[title="Select"]');
+                if (selectItem?.nextSibling) {
+                  toolbar.insertBefore(item, selectItem.nextSibling);
+                } else {
+                  toolbar.insertBefore(item, toolbar.firstChild);
+                }
+
+                const style = document.createElement('style');
+                style.id = 'pdfcraft-existing-text-styles';
+                style.textContent = \`
+                  body.pdfcraft-text-edit-mode .textLayer { pointer-events: auto !important; }
+                  body.pdfcraft-text-edit-mode .textLayer span {
+                    cursor: text !important;
+                    pointer-events: auto !important;
+                    border-radius: 2px;
+                    transition: outline-color .12s, background .12s;
+                  }
+                  body.pdfcraft-text-edit-mode .textLayer span:hover {
+                    outline: 2px solid #2563eb !important;
+                    background: rgba(37, 99, 235, .14) !important;
+                  }
+                  #pdfcraft-edit-existing-text.pdfcraft-active {
+                    background: rgba(37, 99, 235, .18) !important;
+                    color: #2563eb !important;
+                  }
+                  #pdfcraft-text-edit-hint {
+                    position: fixed; left: 50%; top: 74px; transform: translateX(-50%);
+                    z-index: 100000; padding: 7px 12px; border-radius: 999px;
+                    color: white; background: #1d4ed8; box-shadow: 0 5px 18px rgba(0,0,0,.2);
+                    font: 500 12px/1.2 system-ui, sans-serif; pointer-events: none;
+                  }
+                  #pdfcraft-text-edit-popover {
+                    position: fixed; z-index: 100001; width: min(380px, calc(100vw - 24px));
+                    padding: 14px; border: 1px solid #cbd5e1; border-radius: 10px;
+                    background: white; color: #0f172a; box-shadow: 0 16px 40px rgba(15,23,42,.28);
+                    font: 13px/1.4 system-ui, sans-serif;
+                  }
+                  #pdfcraft-text-edit-popover textarea {
+                    box-sizing: border-box; width: 100%; min-height: 62px; resize: vertical;
+                    margin-top: 4px; padding: 8px; border: 1px solid #94a3b8; border-radius: 6px;
+                    color: #0f172a; background: white; font: inherit;
+                  }
+                  #pdfcraft-text-edit-popover .pdfcraft-actions {
+                    display: flex; justify-content: flex-end; gap: 8px; margin-top: 10px;
+                  }
+                  #pdfcraft-text-edit-popover button {
+                    padding: 6px 11px; border: 1px solid #94a3b8; border-radius: 6px;
+                    cursor: pointer; background: white; color: #0f172a; font: inherit;
+                  }
+                  #pdfcraft-text-edit-popover button[data-action="apply"] {
+                    border-color: #2563eb; background: #2563eb; color: white;
+                  }
+                  #pdfcraft-text-edit-popover .pdfcraft-overflow {
+                    display: none; margin-top: 8px; padding: 7px 8px; border-radius: 6px;
+                    color: #92400e; background: #fffbeb; border: 1px solid #fde68a;
+                  }
+                  #pdfcraft-text-edit-popover select {
+                    box-sizing: border-box; width: 100%; margin-top: 4px; padding: 7px;
+                    border: 1px solid #94a3b8; border-radius: 6px; background: white;
+                  }
+                  .pdfcraft-live-text-preview {
+                    outline: 2px dashed #16a34a !important;
+                    background: rgba(22, 163, 74, .10) !important;
+                  }
+                \`;
+                document.head.appendChild(style);
+
+                let active = false;
+                let popover = null;
+                let previewSpan = null;
+                let previewOriginalText = '';
+
+                function restorePreview() {
+                  if (previewSpan) {
+                    previewSpan.textContent = previewOriginalText;
+                    previewSpan.classList.remove('pdfcraft-live-text-preview');
+                  }
+                  previewSpan = null;
+                  previewOriginalText = '';
+                }
+
+                function closePopover(restore = true) {
+                  if (restore) restorePreview();
+                  if (popover) popover.remove();
+                  popover = null;
+                }
+
+                function setActive(nextActive) {
+                  active = nextActive;
+                  document.body.classList.toggle('pdfcraft-text-edit-mode', active);
+                  item.classList.toggle('pdfcraft-active', active);
+                  closePopover();
+
+                  document.getElementById('pdfcraft-text-edit-hint')?.remove();
+                  if (active) {
+                    const hint = document.createElement('div');
+                    hint.id = 'pdfcraft-text-edit-hint';
+                    hint.textContent = labels.hint;
+                    document.body.appendChild(hint);
+                  }
+                }
+
+                item.addEventListener('click', function(event) {
+                  event.preventDefault();
+                  event.stopPropagation();
+                  setActive(!active);
+                });
+
+                document.addEventListener('keydown', function(event) {
+                  if (event.key === 'Escape' && (active || popover)) {
+                    if (popover) closePopover();
+                    else setActive(false);
+                  }
+                });
+
+                document.addEventListener('click', async function(event) {
+                  if (!active) return;
+                  const target = event.target;
+                  if (!(target instanceof HTMLElement)) return;
+                  const span = target.closest('.textLayer span');
+                  if (!span || !span.textContent?.trim()) return;
+
+                  event.preventDefault();
+                  event.stopPropagation();
+
+                  const pageElement = span.closest('.page');
+                  const pageNumber = Number(pageElement?.getAttribute('data-page-number'));
+                  const app = window.PDFViewerApplication;
+                  const pageView = app?.pdfViewer?.getPageView(pageNumber - 1);
+                  const pdfPage = pageView?.pdfPage;
+                  if (!pageElement || !pageNumber || !pdfPage) return;
+
+                  const viewport = pdfPage.getViewport({ scale: 1 });
+                  const pageRect = pageElement.getBoundingClientRect();
+                  const textRect = span.getBoundingClientRect();
+                  const originalWidth = textRect.width;
+                  const originalHeight = textRect.height;
+                  const x = (textRect.left - pageRect.left) / pageRect.width * viewport.width;
+                  const top = (textRect.top - pageRect.top) / pageRect.height * viewport.height;
+                  const width = textRect.width / pageRect.width * viewport.width;
+                  const height = textRect.height / pageRect.height * viewport.height;
+                  const y = viewport.height - top - height;
+
+                  closePopover();
+                  previewSpan = span;
+                  previewOriginalText = span.textContent;
+                  popover = document.createElement('div');
+                  popover.id = 'pdfcraft-text-edit-popover';
+                  popover.innerHTML =
+                    '<strong>' + labels.heading + '</strong>' +
+                    '<div style="margin-top:8px;color:#64748b">' + labels.original + '</div>' +
+                    '<div style="max-height:48px;overflow:auto">' +
+                      span.textContent.replace(/&/g, '&amp;').replace(/</g, '&lt;') +
+                    '</div>' +
+                    '<label style="display:block;margin-top:8px">' + labels.replacement +
+                      '<textarea></textarea>' +
+                    '</label>' +
+                    '<div class="pdfcraft-overflow" role="status">' + labels.overflow + '</div>' +
+                    '<label style="display:block;margin-top:8px">' + labels.fit +
+                      '<select data-fit-mode>' +
+                        '<option value="preserve">' + labels.preserve + '</option>' +
+                        '<option value="shrink">' + labels.shrink + '</option>' +
+                        '<option value="expand">' + labels.expand + '</option>' +
+                      '</select>' +
+                    '</label>' +
+                    '<div style="margin-top:8px;color:#92400e;font-size:11px">' + labels.signature + '</div>' +
+                    '<div class="pdfcraft-actions">' +
+                      '<button type="button" data-action="cancel">' + labels.cancel + '</button>' +
+                      '<button type="button" data-action="apply">' + labels.apply + '</button>' +
+                    '</div>';
+
+                  const left = Math.min(Math.max(12, textRect.left), window.innerWidth - 392);
+                  const topPosition = Math.min(
+                    window.innerHeight - 245,
+                    Math.max(90, textRect.bottom + 8)
+                  );
+                  popover.style.left = left + 'px';
+                  popover.style.top = topPosition + 'px';
+                  document.body.appendChild(popover);
+
+                  const textarea = popover.querySelector('textarea');
+                  textarea.value = span.textContent;
+                  textarea.focus();
+                  textarea.select();
+                  const overflowNotice = popover.querySelector('.pdfcraft-overflow');
+
+                  function updatePreview() {
+                    span.textContent = textarea.value;
+                    span.classList.add('pdfcraft-live-text-preview');
+                    const previewRect = span.getBoundingClientRect();
+                    const lineCount = Math.max(1, textarea.value.split(/\\r?\\n/).length);
+                    const overflow = previewRect.width > originalWidth + 1 ||
+                      lineCount * originalHeight > originalHeight + 1;
+                    overflowNotice.style.display = overflow ? 'block' : 'none';
+                  }
+                  textarea.addEventListener('input', updatePreview);
+                  updatePreview();
+
+                  popover.querySelector('[data-action="cancel"]').addEventListener('click', closePopover);
+                  popover.querySelector('[data-action="apply"]').addEventListener('click', function() {
+                    const newText = textarea.value;
+                    if (newText === previewOriginalText) {
+                      closePopover();
+                      return;
+                    }
+
+                    const applyButton = popover.querySelector('[data-action="apply"]');
+                    applyButton.disabled = true;
+                    applyButton.textContent = '…';
+                    window.parent.postMessage({
+                      type: 'pdfcraft:replace-existing-text',
+                      payload: {
+                        page: pageNumber,
+                        text: previewOriginalText,
+                        replacementText: newText,
+                        fitMode: popover.querySelector('[data-fit-mode]').value,
+                        x, y, width, height
+                      }
+                    }, window.location.origin);
+                    closePopover(false);
+                  });
+                }, true);
+              }
 
               function setupSnapping() {
                 const ext = window.pdfjsAnnotationExtensionInstance;
@@ -204,7 +498,10 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
                   let hasChinese = false;
                   
                   // Inspect the annotation store inside PDFJS Annotation Extension
-                  const store = window.pdfjsAnnotationExtensionInstance?.getAnnotationStore();
+                  const annotationExtension = window.pdfjsAnnotationExtensionInstance;
+                  const store = typeof annotationExtension?.getAnnotationStore === 'function'
+                    ? annotationExtension.getAnnotationStore()
+                    : null;
                   if (store && store.annotations) {
                     store.annotations.forEach(ann => {
                       if (ann.name === 'freeText' && /[\u4e00-\u9fa5]/.test(ann.text || '')) {
@@ -423,6 +720,7 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
               function getAnnotationsSnapshot() {
                 const ext = window.pdfjsAnnotationExtensionInstance;
                 if (!ext) return null;
+                if (typeof ext.getAnnotationStore !== 'function') return null;
                 const store = ext.getAnnotationStore();
                 if (!store) return null;
                 return JSON.stringify(store);
@@ -442,11 +740,13 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
                   if (!ext) return;
 
                   // Dynamic author override for tool name labels in comments list
-                  const store = ext.getAnnotationStore();
+                  const store = typeof ext.getAnnotationStore === 'function'
+                    ? ext.getAnnotationStore()
+                    : null;
                   let authorUpdated = false;
                   if (store && store.annotations) {
                     store.annotations.forEach(ann => {
-                      const transName = toolNameTranslations[ann.name] || '${t('editPdf.annDefault')}';
+                      const transName = toolNameTranslations[ann.name] || 'Annotation';
                       const targetAuthor = transName + ' (${t('editPdf.unnamedUser')})';
                       if (ann.author !== targetAuthor && ann.author === '${t('editPdf.unnamedUser')}') {
                         ann.author = targetAuthor;
@@ -587,7 +887,131 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
     setPdfUrl(null);
     setError(null);
     setIsEditorReady(false);
+    setReplacementNotice(null);
+    setReplacementDiagnostics(null);
+    textUndoStackRef.current = [];
+    textRedoStackRef.current = [];
+    setTextUndoCount(0);
+    setTextRedoCount(0);
   }, [pdfUrl]);
+
+  const showFileVersion = useCallback((nextFile: File) => {
+    setFile(nextFile);
+    setIsEditorReady(false);
+    setPdfUrl(URL.createObjectURL(nextFile));
+  }, []);
+
+  const handleExistingTextReplaced = useCallback((
+    result: Blob,
+    count: number,
+    diagnostics?: ReplaceExistingTextDiagnostics
+  ) => {
+    if (!file) return;
+    const editedFile = new File([result], file.name, { type: 'application/pdf' });
+    textUndoStackRef.current.push(file);
+    textRedoStackRef.current = [];
+    setTextUndoCount(textUndoStackRef.current.length);
+    setTextRedoCount(0);
+    setReplacementNotice(`${count} text occurrence${count === 1 ? '' : 's'} replaced.`);
+    setReplacementDiagnostics(diagnostics ?? null);
+    showFileVersion(editedFile);
+  }, [file, showFileVersion]);
+
+  const handleTextUndo = useCallback(() => {
+    if (!file || textUndoStackRef.current.length === 0 || isTextReplacing) return;
+    const previousFile = textUndoStackRef.current.pop();
+    if (!previousFile) return;
+    textRedoStackRef.current.push(file);
+    setTextUndoCount(textUndoStackRef.current.length);
+    setTextRedoCount(textRedoStackRef.current.length);
+    setReplacementNotice(tTools('textUndoApplied'));
+    setReplacementDiagnostics(null);
+    showFileVersion(previousFile);
+  }, [file, isTextReplacing, showFileVersion, tTools]);
+
+  const handleTextRedo = useCallback(() => {
+    if (!file || textRedoStackRef.current.length === 0 || isTextReplacing) return;
+    const nextFile = textRedoStackRef.current.pop();
+    if (!nextFile) return;
+    textUndoStackRef.current.push(file);
+    setTextUndoCount(textUndoStackRef.current.length);
+    setTextRedoCount(textRedoStackRef.current.length);
+    setReplacementNotice(tTools('textRedoApplied'));
+    setReplacementDiagnostics(null);
+    showFileVersion(nextFile);
+  }, [file, isTextReplacing, showFileVersion, tTools]);
+
+  useEffect(() => {
+    const handleMessage = async (event: MessageEvent) => {
+      if (
+        event.origin !== window.location.origin ||
+        event.source !== iframeRef.current?.contentWindow ||
+        event.data?.type !== 'pdfcraft:replace-existing-text' ||
+        !file ||
+        isTextReplacing
+      ) {
+        return;
+      }
+
+      const payload = event.data.payload as {
+        page: number;
+        text: string;
+        replacementText: string;
+        x: number;
+        y: number;
+        width: number;
+        height: number;
+        fitMode?: TextFitMode;
+      };
+
+      if (
+        !payload ||
+        !Number.isFinite(payload.page) ||
+        !Number.isFinite(payload.x) ||
+        !Number.isFinite(payload.y) ||
+        !Number.isFinite(payload.width) ||
+        !Number.isFinite(payload.height)
+      ) {
+        return;
+      }
+
+      setIsTextReplacing(true);
+      setError(null);
+      const match = {
+        page: payload.page,
+        text: payload.text,
+        x: payload.x,
+        y: payload.y,
+        width: payload.width,
+        height: payload.height,
+        id: `inline-${payload.page}-${payload.x}-${payload.y}`,
+        selected: true,
+      };
+
+      const result = await replaceExistingText(
+        file,
+        [match],
+        {
+          replacementText: payload.replacementText,
+          fitMode: payload.fitMode ?? 'preserve',
+        }
+      );
+
+      if (result.success && result.result) {
+        handleExistingTextReplaced(
+          result.result,
+          result.replacedCount,
+          result.diagnostics
+        );
+      } else {
+        setError(result.error || 'Unable to edit the selected text.');
+      }
+      setIsTextReplacing(false);
+    };
+
+    window.addEventListener('message', handleMessage);
+    return () => window.removeEventListener('message', handleMessage);
+  }, [file, handleExistingTextReplaced, isTextReplacing]);
 
   return (
     <div className={`space-y-6 ${className}`.trim()}>
@@ -631,6 +1055,55 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
             </div>
           </Card>
 
+          {replacementNotice && (
+            <div className="rounded-md border border-green-200 bg-green-50 p-3">
+              <p className="text-sm text-green-800">{replacementNotice}</p>
+            </div>
+          )}
+
+          <div
+            className="flex flex-wrap items-center gap-2 rounded-md border border-[hsl(var(--color-border))] bg-white p-2"
+            aria-label={tTools('textHistory')}
+          >
+            <span className="mr-1 text-xs font-medium text-[hsl(var(--color-muted-foreground))]">
+              {tTools('textHistory')}:
+            </span>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleTextUndo}
+              disabled={textUndoCount === 0 || isTextReplacing}
+            >
+              ↩ {tTools('textUndo')}
+            </Button>
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={handleTextRedo}
+              disabled={textRedoCount === 0 || isTextReplacing}
+            >
+              ↪ {tTools('textRedo')}
+            </Button>
+          </div>
+
+          {replacementDiagnostics?.overflowDetected && (
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-3" role="status">
+              <p className="text-sm text-amber-900">{tTools('overflowAppliedWarning')}</p>
+            </div>
+          )}
+
+          {replacementDiagnostics?.usedFallbackFont && (
+            <div className="rounded-md border border-amber-200 bg-amber-50 p-3" role="status">
+              <p className="text-sm text-amber-900">{tTools('fallbackFontWarning')}</p>
+            </div>
+          )}
+
+          {replacementDiagnostics?.hasDigitalSignatures && (
+            <div className="rounded-md border border-red-200 bg-red-50 p-3" role="alert">
+              <p className="text-sm font-medium text-red-800">{tTools('signatureInvalidatedWarning')}</p>
+            </div>
+          )}
+
           {/* PDF Viewer iframe */}
           <div className="relative border border-[hsl(var(--color-border))] rounded-[var(--radius-md)] overflow-hidden bg-gray-100">
             <iframe
@@ -646,6 +1119,14 @@ export function EditPDFTool({ className = '' }: EditPDFToolProps) {
                 <div className="text-center">
                   <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-[hsl(var(--color-primary))] mx-auto mb-2"></div>
                   <p className="text-sm text-[hsl(var(--color-muted-foreground))]">{t('status.loading') || 'Loading...'}</p>
+                </div>
+              </div>
+            )}
+            {isTextReplacing && (
+              <div className="absolute inset-0 z-20 flex items-center justify-center bg-white/70">
+                <div className="rounded-lg bg-white px-5 py-4 text-center shadow-lg">
+                  <div className="mx-auto mb-2 h-8 w-8 animate-spin rounded-full border-b-2 border-[hsl(var(--color-primary))]" />
+                  <p className="text-sm font-medium">Updating PDF text…</p>
                 </div>
               </div>
             )}
