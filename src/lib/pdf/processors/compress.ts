@@ -174,10 +174,11 @@ export class CompressPDFProcessor extends BasePDFProcessor {
           result = await this.compressWithWorker(arrayBuffer, compressOptions);
 
           // If optimizeImages is enabled, additionally compress images with PyMuPDF
-          // Skip image optimization for small files (<500KB) or low-quality settings to prevent icon/vector corruption
+          // Skip image optimization for small files (<500KB) to prevent icon/vector corruption,
+          // or when quality is 'maximum' where preserving original image quality is desired.
           const shouldOptimizeImages = compressOptions.optimizeImages && 
                                        originalSize > 500 * 1024 && 
-                                       compressOptions.quality !== 'low';
+                                       compressOptions.quality !== 'maximum';
           
           if (shouldOptimizeImages) {
             this.updateProgress(70, 'Optimizing images...');

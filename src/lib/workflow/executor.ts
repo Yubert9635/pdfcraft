@@ -676,7 +676,7 @@ export async function executeNode(
                 const processor = new CompressPDFProcessor();
                 const quality = String(settings.quality || 'medium') as 'low' | 'medium' | 'high' | 'maximum';
                 const algorithm = String(settings.algorithm || 'standard') as 'standard' | 'condense' | 'photon';
-                const optimizeImages = settings.optimizeImages !== undefined ? Boolean(settings.optimizeImages) : false;
+                const optimizeImages = settings.optimizeImages !== undefined ? Boolean(settings.optimizeImages) : true;
                 const removeMetadata = settings.removeMetadata !== undefined ? Boolean(settings.removeMetadata) : false;
                 const photonDpi = Number(settings.photonDpi) || 150;
                 return await processor.process(createProcessInput(files, { 
