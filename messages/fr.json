@@ -918,6 +918,29 @@
       "codeCopied": "Code SVG copié dans le presse-papiers",
       "copyCode": "Copier le code SVG",
       "downloadSvg": "Télécharger l'actif SVG"
+    },
+    "updater": {
+      "title": "Mise à jour du logiciel",
+      "checkBtn": "Vérifier les mises à jour",
+      "checking": "Vérification des mises à jour...",
+      "errorTitle": "Impossible de vérifier les mises à jour",
+      "retry": "Réessayer",
+      "latest": "Vous êtes à jour !",
+      "latestDesc": "PDFCraft est actuellement à la dernière version ({version}).",
+      "available": "Nouvelle version disponible",
+      "currentVersion": "Version actuelle",
+      "released": "Publié le",
+      "releaseNotes": "Notes de version",
+      "downloadPortable": "Télécharger la version portable Windows (ZIP)",
+      "downloadInstaller": "Télécharger l'installateur Windows (.exe / .msi)",
+      "downloadMac": "Télécharger pour macOS (.dmg)",
+      "downloadAppImage": "Télécharger Linux AppImage (Portable)",
+      "downloadDeb": "Télécharger Linux Debian (.deb)",
+      "allDownloads": "Voir tous les téléchargements par plateforme",
+      "viewOnGithub": "Voir sur GitHub",
+      "skipVersion": "Ignorer cette version",
+      "remindLater": "Me le rappeler plus tard",
+      "close": "Fermer"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "Rogner et redimensionner les pages",
         "description": "Rogner les pages PDF et ajuster les dimensions des pages"
       }
-    }
+    },
+    "autoLayout": "Mise en page automatique",
+    "duplicateNode": "Dupliquer le nœud",
+    "downloadZip": "Télécharger au format ZIP",
+    "downloadIndividually": "Télécharger les fichiers individuellement",
+    "flowControl": "Contrôle de flux",
+    "conditionGateway": "Passerelle de condition"
   },
   "tools": {
     "search": {

@@ -33,19 +33,21 @@ const ToolNode = memo(({ id, data, selected = false, isConnectable = true }: Too
     };
 
     // Status colors
-    const statusColors = {
+    const statusColors: Record<ToolNodeData['status'], string> = {
         idle: 'bg-[hsl(var(--color-muted))]',
         processing: 'bg-blue-100 border-blue-400',
         complete: 'bg-green-100 border-green-400',
         error: 'bg-red-100 border-red-400',
+        skipped: 'bg-gray-100/70 dark:bg-gray-800/40 border-dashed border-gray-300 dark:border-gray-600 opacity-60',
     };
 
     // Status indicator colors
-    const statusIndicatorColors = {
+    const statusIndicatorColors: Record<ToolNodeData['status'], string> = {
         idle: 'bg-gray-300',
         processing: 'bg-blue-500 animate-pulse',
         complete: 'bg-green-500',
         error: 'bg-red-500',
+        skipped: 'bg-gray-400',
     };
 
     // Category colors

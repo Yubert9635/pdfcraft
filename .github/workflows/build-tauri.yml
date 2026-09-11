@@ -7,6 +7,9 @@ on:
     branches: [main]
   workflow_dispatch:
 
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
 jobs:
   build-tauri:
     name: Build ${{ matrix.platform }}
@@ -35,8 +38,7 @@ jobs:
       - name: Cache Rust dependencies
         uses: Swatinem/rust-cache@v2
         with:
-          workspaces: src-tauri -> target
-          cache-on-failure: true
+          workspaces: "src-tauri -> src-tauri/target"
 
       - name: Install Node 22
         uses: actions/setup-node@v4
@@ -48,10 +50,24 @@ jobs:
         if: matrix.platform == 'ubuntu-latest'
         run: |
           sudo apt-get update
-          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev
+          sudo apt-get install -y libwebkit2gtk-4.1-dev build-essential curl wget file libxdo-dev libssl-dev libayatana-appindicator3-dev librsvg2-dev patchelf
+          sudo apt-get install -y libfuse2t64 || sudo apt-get install -y libfuse2 || true
 
       - name: Install npm dependencies
         run: npm ci
+
+      - name: Generate version info
+        id: version
+        shell: bash
+        run: |
+          VERSION="v$(date +'%Y.%m.%d')-$(git rev-parse --short HEAD)"
+          echo "version=$VERSION" >> $GITHUB_OUTPUT
+
+      - name: Build frontend
+        run: npm run build
+        env:
+          TAURI_ENV: "true"
+          APP_VERSION: ${{ steps.version.outputs.version }}
 
       - name: Build Tauri app
         uses: nick-fields/retry@v3
@@ -60,15 +76,34 @@ jobs:
           max_attempts: 3
           retry_on: error
           shell: bash
-          command: npx tauri build
+          command: npx tauri build -v --ci --config src-tauri/tauri.ci.conf.json
         env:
           TAURI_ENV: "true"
+          RUST_BACKTRACE: "1"
+          APPIMAGE_EXTRACT_AND_RUN: "1"
 
-      - name: Validate Tauri action wiring
-        uses: tauri-apps/tauri-action@v0
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          TAURI_ENV: "true"
+      - name: Package Portable Windows Build
+        if: matrix.platform == 'windows-latest'
+        shell: bash
+        run: |
+          echo "Packaging Windows portable version..."
+          mkdir -p src-tauri/target/release/bundle/portable
+          if [ -f "src-tauri/target/release/pdfcraft.exe" ]; then
+            cp "src-tauri/target/release/pdfcraft.exe" "src-tauri/target/release/bundle/portable/PDFCraft-Portable.exe"
+          elif [ -f "src-tauri/target/release/PDFCraft.exe" ]; then
+            cp "src-tauri/target/release/PDFCraft.exe" "src-tauri/target/release/bundle/portable/PDFCraft-Portable.exe"
+          fi
+          echo "PDFCraft Portable Mode" > "src-tauri/target/release/bundle/portable/portable.txt"
+          echo "All application data and cache will be stored in the 'data' folder alongside this file." >> "src-tauri/target/release/bundle/portable/portable.txt"
+          cd src-tauri/target/release/bundle/portable
+          if command -v 7z >/dev/null 2>&1; then
+            7z a ../PDFCraft-Windows-x64-Portable.zip PDFCraft-Portable.exe portable.txt
+          elif command -v zip >/dev/null 2>&1; then
+            zip -r ../PDFCraft-Windows-x64-Portable.zip PDFCraft-Portable.exe portable.txt
+          else
+            tar -a -c -f ../PDFCraft-Windows-x64-Portable.zip PDFCraft-Portable.exe portable.txt
+          fi
+          echo "Portable zip created at src-tauri/target/release/bundle/PDFCraft-Windows-x64-Portable.zip"
 
       - name: Upload Tauri bundles
         uses: actions/upload-artifact@v4
@@ -80,4 +115,5 @@ jobs:
             src-tauri/target/release/bundle/**/*.exe
             src-tauri/target/release/bundle/**/*.deb
             src-tauri/target/release/bundle/**/*.AppImage
+            src-tauri/target/release/bundle/**/*.zip
           if-no-files-found: warn

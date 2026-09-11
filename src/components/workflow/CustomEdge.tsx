@@ -11,8 +11,8 @@ import {
 import { X } from 'lucide-react';
 
 /**
- * Custom Edge with Delete Button
- * Displays a delete button when the edge is selected
+ * Custom Edge with Conditional Branch Badges & Delete Button
+ * Displays True/False labels for condition gateways, and a delete button when selected
  */
 export function CustomEdge({
     id,
@@ -25,6 +25,7 @@ export function CustomEdge({
     style = {},
     markerEnd,
     selected,
+    sourceHandleId,
 }: EdgeProps) {
     const { setEdges } = useReactFlow();
     const [edgePath, labelX, labelY] = getBezierPath({
@@ -40,6 +41,16 @@ export function CustomEdge({
         setEdges((edges) => edges.filter((edge) => edge.id !== id));
     };
 
+    const isTrueBranch = sourceHandleId === 'true';
+    const isFalseBranch = sourceHandleId === 'false';
+
+    let strokeColor = (style?.stroke as string) || (selected ? '#3b82f6' : '#94a3b8');
+    if (isTrueBranch) {
+        strokeColor = selected ? '#059669' : '#10b981';
+    } else if (isFalseBranch) {
+        strokeColor = selected ? '#d97706' : '#f59e0b';
+    }
+
     return (
         <>
             <BaseEdge 
@@ -48,29 +59,41 @@ export function CustomEdge({
                 style={{
                     ...style,
                     strokeWidth: selected ? 3 : 2,
-                    stroke: selected ? '#3b82f6' : '#94a3b8',
+                    stroke: strokeColor,
                 }}
             />
             <EdgeLabelRenderer>
-                {selected && (
-                    <div
-                        style={{
-                            position: 'absolute',
-                            transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-                            fontSize: 12,
-                            pointerEvents: 'all',
-                        }}
-                        className="nodrag nopan"
-                    >
+                <div
+                    style={{
+                        position: 'absolute',
+                        transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
+                        fontSize: 12,
+                        pointerEvents: 'all',
+                    }}
+                    className="nodrag nopan flex items-center gap-1.5"
+                >
+                    {isTrueBranch && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-emerald-100 text-emerald-800 dark:bg-emerald-950 dark:text-emerald-200 border border-emerald-400 shadow-sm select-none">
+                            ✓ True
+                        </span>
+                    )}
+
+                    {isFalseBranch && (
+                        <span className="px-2 py-0.5 rounded-full text-[10px] font-bold bg-amber-100 text-amber-800 dark:bg-amber-950 dark:text-amber-200 border border-amber-400 shadow-sm select-none">
+                            ✗ False
+                        </span>
+                    )}
+
+                    {selected && (
                         <button
                             onClick={onEdgeDelete}
-                            className="w-6 h-6 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
+                            className="w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg transition-all hover:scale-110"
                             title="删除连接 (Delete)"
                         >
-                            <X className="w-4 h-4" />
+                            <X className="w-3 h-3" />
                         </button>
-                    </div>
-                )}
+                    )}
+                </div>
             </EdgeLabelRenderer>
         </>
     );

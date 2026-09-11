@@ -191,22 +191,27 @@ export class LibreOfficeConverter {
     private async checkEnvironment(): Promise<void> {
         console.warn('[LibreOffice] === Environment Check ===');
 
-        // Unregister any active service workers to prevent them from intercepting 
-        // LibreOffice WASM assets and causing ERR_FAILED / 500 OOM crashes.
+        // Unregister conflicting service workers, but preserve coi-serviceworker
+        // which provides Cross-Origin Isolation headers for SharedArrayBuffer.
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
             try {
                 const registrations = await navigator.serviceWorker.getRegistrations();
                 for (const reg of registrations) {
+                    const scriptUrl = reg.active?.scriptURL || reg.waiting?.scriptURL || reg.installing?.scriptURL || '';
+                    if (scriptUrl.includes('coi-serviceworker')) {
+                        console.log(`[LibreOffice] Preserving coi-serviceworker for cross-origin isolation: ${scriptUrl}`);
+                        continue;
+                    }
                     await reg.unregister();
-                    console.warn(`[LibreOffice] Unregistered active Service Worker to prevent interference: ${reg.scope}`);
+                    console.warn(`[LibreOffice] Unregistered conflicting Service Worker: ${reg.scope}`);
                 }
             } catch (e) {
-                console.warn('[LibreOffice] Failed to unregister Service Worker:', e);
+                console.warn('[LibreOffice] Failed to check Service Worker:', e);
             }
         }
 
         // 1. Check COOP/COEP — this is the #1 cause of WASM timeout
-        const isIsolated = window.crossOriginIsolated;
+        const isIsolated = typeof window !== 'undefined' ? window.crossOriginIsolated : false;
         console.warn(`[LibreOffice] Cross-Origin Isolated: ${isIsolated ? 'YES ✅' : 'NO ❌'}`);
 
         // 2. Check SharedArrayBuffer directly
@@ -214,22 +219,34 @@ export class LibreOfficeConverter {
         console.warn(`[LibreOffice] SharedArrayBuffer: ${hasSAB ? 'Available ✅' : 'NOT available ❌'}`);
 
         if (!isIsolated || !hasSAB) {
+            if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+                try {
+                    const basePath = window.location.pathname.startsWith('/pdfcraft') ? '/pdfcraft/' : '/';
+                    navigator.serviceWorker.register(`${basePath}coi-serviceworker.js`).then((reg) => {
+                        if (reg.active && !navigator.serviceWorker.controller) {
+                            window.location.reload();
+                        }
+                    }).catch(() => {});
+                } catch (_) {}
+            }
+
             const errorMsg = [
                 'LibreOffice WASM requires SharedArrayBuffer for multi-threading.',
                 '',
                 'SharedArrayBuffer is only available in Cross-Origin Isolated contexts.',
-                'Your server MUST return these headers on ALL responses:',
+                'If self-hosting (Nginx/Docker), ensure your server returns:',
                 '  Cross-Origin-Opener-Policy: same-origin',
                 '  Cross-Origin-Embedder-Policy: require-corp',
                 '  Cross-Origin-Resource-Policy: cross-origin',
                 '',
                 `Current state: crossOriginIsolated=${isIsolated}, SharedArrayBuffer=${hasSAB}`,
+                'A cross-origin isolation service worker has been initialized. Please reload the page if this error persists.',
             ].join('\n');
             console.error(`[LibreOffice] ${errorMsg}`);
             throw new Error(
                 `SharedArrayBuffer is not available (crossOriginIsolated=${isIsolated}). ` +
                 'Your server must set Cross-Origin-Opener-Policy and Cross-Origin-Embedder-Policy headers. ' +
-                'See browser console for details.'
+                'If using static hosting, reload the page to allow the isolation worker to take effect.'
             );
         }
 

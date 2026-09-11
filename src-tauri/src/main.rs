@@ -77,6 +77,30 @@ fn get_temp_dir() -> String {
 }
 
 fn main() {
+    #[cfg(target_os = "windows")]
+    {
+        if let Ok(exe_path) = env::current_exe() {
+            if let Some(exe_dir) = exe_path.parent() {
+                let data_dir = exe_dir.join("data");
+                let portable_marker = exe_dir.join("portable.txt");
+                let is_portable = exe_path
+                    .file_name()
+                    .map(|n| n.to_string_lossy().to_lowercase().contains("portable"))
+                    .unwrap_or(false)
+                    || data_dir.exists()
+                    || portable_marker.exists();
+
+                if is_portable {
+                    let _ = fs::create_dir_all(&data_dir);
+                    #[allow(unused_unsafe)]
+                    unsafe {
+                        env::set_var("WEBVIEW2_USER_DATA_FOLDER", &data_dir);
+                    }
+                }
+            }
+        }
+    }
+
     tauri::Builder::default()
         .plugin(tauri_plugin_dialog::init())
         .plugin(tauri_plugin_fs::init())

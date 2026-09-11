@@ -214,11 +214,12 @@ export function SignPDFTool({ className = '' }: SignPDFToolProps) {
       }
 
       const rawPdfBytes = await pdfDocument.saveDocument();
-      const pdfBytes = Uint8Array.from(
-        rawPdfBytes instanceof Uint8Array ? rawPdfBytes : new Uint8Array(rawPdfBytes)
-      );
+      const pdfBytes =
+        rawPdfBytes instanceof Uint8Array
+          ? rawPdfBytes
+          : new Uint8Array(rawPdfBytes);
 
-      const blob = new Blob([pdfBytes.buffer], { type: 'application/pdf' });
+      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
 
       const url = URL.createObjectURL(blob);
       const a = document.createElement('a');
@@ -232,7 +233,8 @@ export function SignPDFTool({ className = '' }: SignPDFToolProps) {
       setIsProcessing(false);
     } catch (err) {
       console.error('Failed to save signed PDF:', err);
-      setError('Failed to save signed PDF. Please try again.');
+      const msg = err instanceof Error ? err.message : 'Please try again.';
+      setError(`Failed to save signed PDF: ${msg}`);
       setIsProcessing(false);
     }
   }, [signState.viewerReady, signState.file]);

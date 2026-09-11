@@ -918,6 +918,29 @@
       "codeCopied": "클립보드에 복사된 SVG 코드",
       "copyCode": "SVG 코드 복사",
       "downloadSvg": "SVG 자산 다운로드"
+    },
+    "updater": {
+      "title": "소프트웨어 업데이트",
+      "checkBtn": "업데이트 확인",
+      "checking": "업데이트 확인 중...",
+      "errorTitle": "업데이트를 확인할 수 없습니다",
+      "retry": "다시 시도",
+      "latest": "최신 버전입니다!",
+      "latestDesc": "PDFCraft가 현재 최신 버전({version})입니다.",
+      "available": "새 버전 출시",
+      "currentVersion": "현재 버전",
+      "released": "출시일",
+      "releaseNotes": "릴리스 노트",
+      "downloadPortable": "Windows 무설치 포터블 버전 다운로드 (ZIP)",
+      "downloadInstaller": "Windows 설치 프로그램 다운로드 (.exe / .msi)",
+      "downloadMac": "macOS 다운로드 (.dmg)",
+      "downloadAppImage": "Linux AppImage 다운로드 (포터블)",
+      "downloadDeb": "Linux Debian 패키지 다운로드 (.deb)",
+      "allDownloads": "모든 플랫폼 다운로드 보기",
+      "viewOnGithub": "GitHub에서 보기",
+      "skipVersion": "이 버전 건너뛰기",
+      "remindLater": "나중에 알림",
+      "close": "닫기"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "페이지 자르기 및 크기 조정",
         "description": "PDF 페이지 자르기 및 페이지 크기 조정"
       }
-    }
+    },
+    "autoLayout": "자동 레이아웃",
+    "duplicateNode": "노드 복제",
+    "downloadZip": "ZIP으로 다운로드",
+    "downloadIndividually": "파일 개별 다운로드",
+    "flowControl": "흐름 제어",
+    "conditionGateway": "조건부 분기"
   },
   "tools": {
     "search": {

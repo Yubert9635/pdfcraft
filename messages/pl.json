@@ -673,6 +673,20 @@
       "outputFormat": "Format pliku wyjściowego",
       "formatSearchablePdf": "Dwuwarstwowe z możliwością wyszukiwania PDF",
       "formatText": "Wyodrębnij zwykły plik tekstowy (.txt)",
+      "formatMarkdown": "Strukturyzowany Markdown (.md)",
+      "formatJson": "Strukturyzowany JSON (.json)",
+      "enhanceContrast": "Inteligentna poprawa jakości obrazu",
+      "enhanceContrastDesc": "Automatycznie poprawia kontrast i wyostrza krawędzie dla wyblakłego druku i ciemnych skanów",
+      "copyText": "Kopiuj rozpoznany tekst",
+      "copied": "Skopiowano do schowka!",
+      "openInEditor": "Edytuj w edytorze PDF",
+      "openInEditorDesc": "Bezpośrednio edytuj tekst i układ w edytorze PDFCraft bez pobierania",
+      "statsPages": "Strony",
+      "statsWords": "Słowa",
+      "statsChars": "Znaki",
+      "statsConfidence": "Śr. pewność",
+      "tabText": "Podgląd tekstu",
+      "tabJson": "Struktura JSON",
       "accuracyTitle": "Jakość rozpoznawania OCR",
       "accuracySd": "Standard (szybkie, przejrzyste dokumenty)",
       "accuracyHd": "Wysoka jakość (zalecane, standardowe skany)",
@@ -918,6 +932,29 @@
       "codeCopied": "Kod SVG został skopiowany do schowka",
       "copyCode": "Skopiuj kod SVG",
       "downloadSvg": "Pobierz zasób SVG"
+    },
+    "updater": {
+      "title": "Aktualizacja oprogramowania",
+      "checkBtn": "Sprawdź aktualizacje",
+      "checking": "Sprawdzanie aktualizacji...",
+      "errorTitle": "Nie można sprawdzić aktualizacji",
+      "retry": "Ponów próbę",
+      "latest": "Wszystko jest aktualne!",
+      "latestDesc": "PDFCraft jest obecnie w najnowszej wersji ({version}).",
+      "available": "Dostępna nowa wersja",
+      "currentVersion": "Bieżąca wersja",
+      "released": "Wydano",
+      "releaseNotes": "Informacje o wydaniu",
+      "downloadPortable": "Pobierz wersję przenośną dla Windows (ZIP)",
+      "downloadInstaller": "Pobierz instalator dla Windows (.exe / .msi)",
+      "downloadMac": "Pobierz dla macOS (.dmg)",
+      "downloadAppImage": "Pobierz Linux AppImage (przenośny)",
+      "downloadDeb": "Pobierz pakiet Linux Debian (.deb)",
+      "allDownloads": "Pokaż pliki do pobrania dla wszystkich platform",
+      "viewOnGithub": "Zobacz na GitHubie",
+      "skipVersion": "Pomiń tę wersję",
+      "remindLater": "Przypomnij mi później",
+      "close": "Zamknij"
     }
   },
   "toolsPage": {
@@ -1416,7 +1453,13 @@
         "name": "Przytnij i zmień rozmiar stron",
         "description": "Przytnij strony PDF i dostosuj ich wymiary"
       }
-    }
+    },
+    "autoLayout": "Automatyczny układ",
+    "duplicateNode": "Duplikuj węzeł",
+    "downloadZip": "Pobierz jako ZIP",
+    "downloadIndividually": "Pobierz pliki pojedynczo",
+    "flowControl": "Sterowanie przepływem",
+    "conditionGateway": "Bramka warunkowa"
   },
   "tools": {
     "search": {

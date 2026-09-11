@@ -5,6 +5,8 @@ import { useTranslations } from 'next-intl';
 import { WorkflowExecutionState, WorkflowNode, WorkflowEdge, WorkflowValidation, WorkflowOutputFile } from '@/types/workflow';
 import { Button } from '@/components/ui/Button';
 import { FileListPanel } from './FileListPanel';
+import { createZip } from '@/lib/zip';
+import { logger } from '@/lib/utils/logger';
 import {
     Play,
     Pause,
@@ -20,6 +22,7 @@ import {
     Edit2,
     RefreshCcw,
     RotateCcw,
+    Archive,
 } from 'lucide-react';
 
 interface WorkflowControlsProps {
@@ -63,6 +66,7 @@ export function WorkflowControls({
     const [workflowName, setWorkflowName] = useState('');
     const [workflowDescription, setWorkflowDescription] = useState('');
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [isZipping, setIsZipping] = useState(false);
 
     const fileInputRef = useRef<HTMLInputElement>(null);
     const importInputRef = useRef<HTMLInputElement>(null);
@@ -273,43 +277,117 @@ export function WorkflowControls({
             {/* Download output button */}
             {executionState.status === 'complete' && executionState.outputFiles && executionState.outputFiles.length > 0 && (
                 <div className="px-4 py-2 bg-green-50 border-b border-green-200">
-                    <div className="flex items-center justify-between">
+                    <div className="flex items-center justify-between gap-3">
                         <span className="text-sm text-green-700">
                             {tWorkflow('workflowComplete') || 'Workflow completed successfully!'}
+                            <span className="ml-1 text-xs text-green-600 font-medium">
+                                ({executionState.outputFiles.length} {executionState.outputFiles.length === 1 ? 'file' : 'files'})
+                            </span>
                         </span>
-                        <Button
-                            variant="primary"
-                            size="sm"
-                            onClick={() => {
-                                executionState.outputFiles?.forEach((item, index) => {
-                                    let blob: Blob;
-                                    let filename: string;
+                        <div className="flex items-center gap-2">
+                            {executionState.outputFiles.length > 1 ? (
+                                <>
+                                    <Button
+                                        variant="primary"
+                                        size="sm"
+                                        disabled={isZipping}
+                                        onClick={async () => {
+                                            if (!executionState.outputFiles || executionState.outputFiles.length === 0) return;
+                                            setIsZipping(true);
+                                            try {
+                                                const filesForZip = executionState.outputFiles.map((item, index) => {
+                                                    if (item instanceof Blob) {
+                                                        return { blob: item, filename: `output_${index + 1}.pdf` };
+                                                    }
+                                                    return { blob: item.blob, filename: item.filename || `output_${index + 1}.pdf` };
+                                                });
+                                                const zipBlob = await createZip(filesForZip);
+                                                const url = URL.createObjectURL(zipBlob);
+                                                const a = document.createElement('a');
+                                                a.href = url;
+                                                a.download = `workflow_results_${new Date().toISOString().slice(0, 10)}.zip`;
+                                                document.body.appendChild(a);
+                                                a.click();
+                                                document.body.removeChild(a);
+                                                setTimeout(() => URL.revokeObjectURL(url), 100);
+                                            } catch (error) {
+                                                logger.error('Failed to create ZIP package:', error);
+                                            } finally {
+                                                setIsZipping(false);
+                                            }
+                                        }}
+                                    >
+                                        {isZipping ? (
+                                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                                        ) : (
+                                            <Archive className="w-4 h-4 mr-2" />
+                                        )}
+                                        {tWorkflow('downloadZip') || 'Download as ZIP'}
+                                    </Button>
+                                    <Button
+                                        variant="outline"
+                                        size="sm"
+                                        onClick={() => {
+                                            executionState.outputFiles?.forEach((item, index) => {
+                                                let blob: Blob;
+                                                let filename: string;
 
-                                    if (item instanceof Blob) {
-                                        blob = item;
-                                        filename = `output_${index + 1}.pdf`;
-                                    } else {
-                                        blob = item.blob;
-                                        filename = item.filename || `output_${index + 1}.pdf`;
-                                    }
+                                                if (item instanceof Blob) {
+                                                    blob = item;
+                                                    filename = `output_${index + 1}.pdf`;
+                                                } else {
+                                                    blob = item.blob;
+                                                    filename = item.filename || `output_${index + 1}.pdf`;
+                                                }
 
-                                    // Create URL for download
-                                    const url = URL.createObjectURL(blob);
-                                    const a = document.createElement('a');
-                                    a.href = url;
-                                    a.download = filename;
-                                    document.body.appendChild(a);
-                                    a.click();
-                                    document.body.removeChild(a);
-                                    
-                                    // Cleanup URL immediately after download
-                                    setTimeout(() => URL.revokeObjectURL(url), 100);
-                                });
-                            }}
-                        >
-                            <Download className="w-4 h-4 mr-2" />
-                            {tWorkflow('downloadResults') || 'Download Results'}
-                        </Button>
+                                                const url = URL.createObjectURL(blob);
+                                                const a = document.createElement('a');
+                                                a.href = url;
+                                                a.download = filename;
+                                                document.body.appendChild(a);
+                                                a.click();
+                                                document.body.removeChild(a);
+                                                setTimeout(() => URL.revokeObjectURL(url), 100);
+                                            });
+                                        }}
+                                        title={tWorkflow('downloadIndividually') || 'Download files individually'}
+                                    >
+                                        <Download className="w-4 h-4 mr-2" />
+                                        {tWorkflow('downloadIndividually') || 'Download All (Separate)'}
+                                    </Button>
+                                </>
+                            ) : (
+                                <Button
+                                    variant="primary"
+                                    size="sm"
+                                    onClick={() => {
+                                        const item = executionState.outputFiles![0];
+                                        let blob: Blob;
+                                        let filename: string;
+
+                                        if (item instanceof Blob) {
+                                            blob = item;
+                                            filename = `output_1.pdf`;
+                                        } else {
+                                            blob = item.blob;
+                                            filename = item.filename || `output_1.pdf`;
+                                        }
+
+                                        const url = URL.createObjectURL(blob);
+                                        const a = document.createElement('a');
+                                        a.href = url;
+                                        a.download = filename;
+                                        document.body.appendChild(a);
+                                        a.click();
+                                        document.body.removeChild(a);
+                                        setTimeout(() => URL.revokeObjectURL(url), 100);
+                                    }}
+                                >
+                                    <Download className="w-4 h-4 mr-2" />
+                                    {tWorkflow('downloadResults') || 'Download Result'}
+                                </Button>
+                            )}
+                        </div>
                     </div>
                 </div>
             )}

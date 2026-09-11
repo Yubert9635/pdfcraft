@@ -918,6 +918,29 @@
       "codeCopied": "SVG-Code in die Zwischenablage kopiert",
       "copyCode": "SVG-Code kopieren",
       "downloadSvg": "Laden Sie SVG Asset herunter"
+    },
+    "updater": {
+      "title": "Software-Aktualisierung",
+      "checkBtn": "Nach Updates suchen",
+      "checking": "Suche nach Updates...",
+      "errorTitle": "Updates konnten nicht gesucht werden",
+      "retry": "Wiederholen",
+      "latest": "Sie sind auf dem neuesten Stand!",
+      "latestDesc": "PDFCraft ist aktuell auf der neuesten Version ({version}).",
+      "available": "Neue Version verfügbar",
+      "currentVersion": "Aktuelle Version",
+      "released": "Veröffentlicht am",
+      "releaseNotes": "Versionshinweise",
+      "downloadPortable": "Windows Portable herunterladen (ZIP)",
+      "downloadInstaller": "Windows-Installationsprogramm herunterladen (.exe / .msi)",
+      "downloadMac": "macOS herunterladen (.dmg)",
+      "downloadAppImage": "Linux AppImage herunterladen (Portable)",
+      "downloadDeb": "Linux Debian herunterladen (.deb)",
+      "allDownloads": "Alle Plattform-Downloads anzeigen",
+      "viewOnGithub": "Auf GitHub ansehen",
+      "skipVersion": "Diese Version überspringen",
+      "remindLater": "Später erinnern",
+      "close": "Schließen"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "Seiten zuschneiden und in der Größe ändern",
         "description": "PDF-Seiten zuschneiden und Seitenabmessungen anpassen"
       }
-    }
+    },
+    "autoLayout": "Automatisches Layout",
+    "duplicateNode": "Knoten duplizieren",
+    "downloadZip": "Als ZIP herunterladen",
+    "downloadIndividually": "Dateien einzeln herunterladen",
+    "flowControl": "Ablaufsteuerung",
+    "conditionGateway": "Bedingtes Gateway"
   },
   "tools": {
     "search": {

@@ -30,7 +30,9 @@ export interface ToolNodeData {
     /** Output format */
     outputFormat: string;
     /** Current processing status */
-    status: 'idle' | 'processing' | 'complete' | 'error';
+    status: 'idle' | 'processing' | 'complete' | 'error' | 'skipped';
+    /** Active branch for conditional gateway nodes */
+    activeBranch?: 'true' | 'false';
     /** Processing progress (0-100) */
     progress: number;
     /** Error message if any */

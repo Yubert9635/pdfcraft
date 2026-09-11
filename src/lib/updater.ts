@@ -1,0 +1,338 @@
+import {
+  AssetPlatformType,
+  HostPlatform,
+  ReleaseAsset,
+  ReleaseInfo,
+  UpdateCheckResult,
+  UpdateSettings,
+} from '@/types/updater';
+
+export const GITHUB_REPO = 'PDFCraftTool/pdfcraft';
+export const DEFAULT_CURRENT_VERSION =
+  process.env.NEXT_PUBLIC_APP_VERSION || '0.1.0';
+
+const STORAGE_KEY = 'pdfcraft_update_settings';
+const DEFAULT_CHECK_INTERVAL_HOURS = 24;
+
+/**
+ * Parses version numbers or tag strings into numeric components for comparison.
+ * Handles both SemVer (e.g. 0.1.0, 1.2.3) and Date-based tags (e.g. 2026.09.10-abc, v2026.09.10).
+ */
+export function parseVersionParts(version: string): { numbers: number[]; raw: string } {
+  const clean = version.trim().replace(/^v/i, '');
+  // Extract major numeric segments (ignoring trailing git commit hashes)
+  const baseVersion = clean.split('-')[0];
+  const parts = baseVersion
+    .split('.')
+    .map((p) => {
+      const n = parseInt(p, 10);
+      return Number.isNaN(n) ? 0 : n;
+    });
+
+  return { numbers: parts, raw: clean };
+}
+
+/**
+ * Compares two versions.
+ * Returns `true` if `latestVersion` is strictly newer than `currentVersion`.
+ */
+export function compareVersions(currentVersion: string, latestVersion: string): boolean {
+  if (!latestVersion) return false;
+  if (!currentVersion) return true;
+
+  const cur = parseVersionParts(currentVersion);
+  const lat = parseVersionParts(latestVersion);
+
+  if (cur.raw === lat.raw) {
+    return false;
+  }
+
+  // Compare numerical segments
+  const maxLen = Math.max(cur.numbers.length, lat.numbers.length);
+  for (let i = 0; i < maxLen; i++) {
+    const curNum = cur.numbers[i] || 0;
+    const latNum = lat.numbers[i] || 0;
+    if (latNum > curNum) return true;
+    if (latNum < curNum) return false;
+  }
+
+  // If numbers match, check if latest has a later commit hash or build tag
+  return false;
+}
+
+/**
+ * Categorizes a release asset by filename.
+ */
+export function categorizeAsset(filename: string): AssetPlatformType {
+  const lower = filename.toLowerCase();
+
+  if (lower.includes('portable') && lower.endsWith('.zip')) {
+    return 'windows-portable';
+  }
+  if (lower.endsWith('.msi') || (lower.endsWith('.exe') && !lower.includes('portable'))) {
+    return 'windows-installer';
+  }
+  if (lower.endsWith('.dmg')) {
+    return 'macos-dmg';
+  }
+  if (lower.endsWith('.appimage')) {
+    return 'linux-appimage';
+  }
+  if (lower.endsWith('.deb')) {
+    return 'linux-deb';
+  }
+  if (lower.endsWith('.zip') || lower.endsWith('.tar.gz')) {
+    return 'source';
+  }
+  return 'other';
+}
+
+/**
+ * Detects the client host platform.
+ */
+export function detectPlatform(): HostPlatform {
+  if (typeof window === 'undefined') return 'unknown';
+
+  const userAgent = (navigator.userAgent || '').toLowerCase();
+  const platform = (navigator.platform || '').toLowerCase();
+
+  if (userAgent.includes('win') || platform.includes('win')) {
+    return 'windows';
+  }
+  if (userAgent.includes('mac') || platform.includes('mac')) {
+    return 'macos';
+  }
+  if (userAgent.includes('linux') || platform.includes('linux')) {
+    return 'linux';
+  }
+  return 'unknown';
+}
+
+/**
+ * Matches assets according to the current client platform.
+ */
+export function matchPlatformAssets(
+  assets: ReleaseAsset[],
+  platform: HostPlatform
+): {
+  primary?: ReleaseAsset;
+  secondary?: ReleaseAsset;
+  all: ReleaseAsset[];
+} {
+  const validAssets = assets.filter(
+    (a) => a.platformType !== 'source' && a.platformType !== 'other'
+  );
+
+  let primary: ReleaseAsset | undefined;
+  let secondary: ReleaseAsset | undefined;
+
+  switch (platform) {
+    case 'windows':
+      primary = validAssets.find((a) => a.platformType === 'windows-portable') ||
+                validAssets.find((a) => a.platformType === 'windows-installer');
+      secondary = validAssets.find(
+        (a) =>
+          a !== primary &&
+          (a.platformType === 'windows-installer' || a.platformType === 'windows-portable')
+      );
+      break;
+    case 'macos':
+      primary = validAssets.find((a) => a.platformType === 'macos-dmg');
+      break;
+    case 'linux':
+      primary = validAssets.find((a) => a.platformType === 'linux-appimage') ||
+                validAssets.find((a) => a.platformType === 'linux-deb');
+      secondary = validAssets.find(
+        (a) =>
+          a !== primary &&
+          (a.platformType === 'linux-deb' || a.platformType === 'linux-appimage')
+      );
+      break;
+    default:
+      primary = validAssets[0];
+  }
+
+  return {
+    primary,
+    secondary,
+    all: validAssets,
+  };
+}
+
+/**
+ * Retrieves update settings from localStorage.
+ */
+export function getUpdateSettings(): UpdateSettings {
+  if (typeof window === 'undefined') {
+    return {
+      autoCheck: true,
+      checkFrequencyHours: DEFAULT_CHECK_INTERVAL_HOURS,
+      lastCheckedTimestamp: 0,
+      ignoredVersions: [],
+    };
+  }
+
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    if (!raw) {
+      return {
+        autoCheck: true,
+        checkFrequencyHours: DEFAULT_CHECK_INTERVAL_HOURS,
+        lastCheckedTimestamp: 0,
+        ignoredVersions: [],
+      };
+    }
+    const parsed = JSON.parse(raw);
+    return {
+      autoCheck: parsed.autoCheck ?? true,
+      checkFrequencyHours: parsed.checkFrequencyHours ?? DEFAULT_CHECK_INTERVAL_HOURS,
+      lastCheckedTimestamp: parsed.lastCheckedTimestamp ?? 0,
+      ignoredVersions: Array.isArray(parsed.ignoredVersions) ? parsed.ignoredVersions : [],
+    };
+  } catch {
+    return {
+      autoCheck: true,
+      checkFrequencyHours: DEFAULT_CHECK_INTERVAL_HOURS,
+      lastCheckedTimestamp: 0,
+      ignoredVersions: [],
+    };
+  }
+}
+
+/**
+ * Saves update settings to localStorage.
+ */
+export function saveUpdateSettings(settings: UpdateSettings): void {
+  if (typeof window === 'undefined') return;
+  try {
+    localStorage.setItem(STORAGE_KEY, JSON.stringify(settings));
+  } catch {
+    // ignore quota/storage errors
+  }
+}
+
+/**
+ * Checks whether it's time to run an automatic update check.
+ */
+export function shouldCheckUpdate(): boolean {
+  const settings = getUpdateSettings();
+  if (!settings.autoCheck) return false;
+
+  const now = Date.now();
+  const intervalMs = settings.checkFrequencyHours * 3600 * 1000;
+  return now - settings.lastCheckedTimestamp >= intervalMs;
+}
+
+/**
+ * Ignores a specific version so the user won't be prompted again.
+ */
+export function ignoreVersion(version: string): void {
+  const settings = getUpdateSettings();
+  if (!settings.ignoredVersions.includes(version)) {
+    settings.ignoredVersions.push(version);
+    saveUpdateSettings(settings);
+  }
+}
+
+/**
+ * Checks if a version is in the ignored list.
+ */
+export function isVersionIgnored(version: string): boolean {
+  const settings = getUpdateSettings();
+  return settings.ignoredVersions.includes(version);
+}
+
+/**
+ * Fetches the latest release from the GitHub API.
+ */
+export async function fetchLatestRelease(): Promise<ReleaseInfo> {
+  const controller = new AbortController();
+  const timeoutId = setTimeout(() => controller.abort(), 10000);
+
+  try {
+    const response = await fetch(
+      `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
+      {
+        headers: {
+          Accept: 'application/vnd.github.v3+json',
+        },
+        signal: controller.signal,
+      }
+    );
+
+    if (!response.ok) {
+      throw new Error(`GitHub API returned HTTP ${response.status}: ${response.statusText}`);
+    }
+
+    const data = await response.json();
+
+    const assets: ReleaseAsset[] = Array.isArray(data.assets)
+      ? data.assets.map((asset: { name: string; size: number; browser_download_url: string }) => ({
+          name: asset.name,
+          downloadUrl: asset.browser_download_url,
+          size: asset.size,
+          platformType: categorizeAsset(asset.name),
+          browserDownloadUrl: asset.browser_download_url,
+        }))
+      : [];
+
+    return {
+      tag: data.tag_name || '',
+      name: data.name || data.tag_name || '',
+      publishedAt: data.published_at || '',
+      htmlUrl: data.html_url || `https://github.com/${GITHUB_REPO}/releases`,
+      body: data.body || '',
+      assets,
+    };
+  } finally {
+    clearTimeout(timeoutId);
+  }
+}
+
+/**
+ * Performs an in-app check for software updates.
+ *
+ * @param force If true, skips interval check and queries GitHub immediately.
+ */
+export async function checkUpdate(force = false): Promise<UpdateCheckResult> {
+  const currentVersion = DEFAULT_CURRENT_VERSION;
+
+  if (!force && !shouldCheckUpdate()) {
+    return {
+      hasUpdate: false,
+      currentVersion,
+      latestVersion: currentVersion,
+      matchedAssets: { all: [] },
+    };
+  }
+
+  try {
+    const release = await fetchLatestRelease();
+    const latestVersion = release.tag;
+    const hasUpdate = compareVersions(currentVersion, latestVersion);
+
+    // Record check timestamp
+    const settings = getUpdateSettings();
+    settings.lastCheckedTimestamp = Date.now();
+    saveUpdateSettings(settings);
+
+    const platform = detectPlatform();
+    const matchedAssets = matchPlatformAssets(release.assets, platform);
+
+    return {
+      hasUpdate,
+      currentVersion,
+      latestVersion,
+      release,
+      matchedAssets,
+    };
+  } catch (error) {
+    return {
+      hasUpdate: false,
+      currentVersion,
+      latestVersion: currentVersion,
+      matchedAssets: { all: [] },
+      error: error instanceof Error ? error.message : String(error),
+    };
+  }
+}

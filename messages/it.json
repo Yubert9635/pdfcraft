@@ -918,6 +918,29 @@
       "codeCopied": "Codice SVG copiato negli appunti",
       "copyCode": "Copia il codice SVG",
       "downloadSvg": "Scarica risorsa SVG"
+    },
+    "updater": {
+      "title": "Aggiornamento software",
+      "checkBtn": "Verifica aggiornamenti",
+      "checking": "Controllo aggiornamenti in corso...",
+      "errorTitle": "Impossibile verificare gli aggiornamenti",
+      "retry": "Riprova",
+      "latest": "Sei aggiornato!",
+      "latestDesc": "PDFCraft è attualmente alla versione più recente ({version}).",
+      "available": "Nuova versione disponibile",
+      "currentVersion": "Versione corrente",
+      "released": "Rilasciato il",
+      "releaseNotes": "Note di rilascio",
+      "downloadPortable": "Scarica versione portatile per Windows (ZIP)",
+      "downloadInstaller": "Scarica programma di installazione per Windows (.exe / .msi)",
+      "downloadMac": "Scarica per macOS (.dmg)",
+      "downloadAppImage": "Scarica Linux AppImage (portatile)",
+      "downloadDeb": "Scarica pacchetto Linux Debian (.deb)",
+      "allDownloads": "Visualizza tutti i download per piattaforma",
+      "viewOnGithub": "Visualizza su GitHub",
+      "skipVersion": "Salta questa versione",
+      "remindLater": "Ricordamelo più tardi",
+      "close": "Chiudi"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "Ritaglia e ridimensiona pagine",
         "description": "Ritaglia le pagine del PDF e regola le dimensioni della pagina"
       }
-    }
+    },
+    "autoLayout": "Layout automatico",
+    "duplicateNode": "Duplica nodo",
+    "downloadZip": "Scarica come ZIP",
+    "downloadIndividually": "Scarica file singolarmente",
+    "flowControl": "Controllo di flusso",
+    "conditionGateway": "Gateway condizionale"
   },
   "tools": {
     "search": {

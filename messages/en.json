@@ -673,6 +673,20 @@
       "outputFormat": "Output File Format",
       "formatSearchablePdf": "Double-Layer Searchable PDF",
       "formatText": "Extract Plain Text File (.txt)",
+      "formatMarkdown": "Structured Markdown (.md)",
+      "formatJson": "Structured JSON (.json)",
+      "enhanceContrast": "Smart Image Quality Enhancement",
+      "enhanceContrastDesc": "Auto-enhances contrast and sharpens edges for faint ink and dark scans",
+      "copyText": "Copy Recognized Text",
+      "copied": "Copied to clipboard!",
+      "openInEditor": "Edit in PDF Editor",
+      "openInEditorDesc": "Directly edit text and layout in PDFCraft Editor without downloading",
+      "statsPages": "Pages",
+      "statsWords": "Words",
+      "statsChars": "Characters",
+      "statsConfidence": "Avg Confidence",
+      "tabText": "Text Preview",
+      "tabJson": "JSON Structure",
       "accuracyTitle": "OCR Engine Accuracy Resolution",
       "accuracySd": "Standard (Fast, clear documents)",
       "accuracyHd": "High Quality (Recommended, standard scans)",
@@ -918,6 +932,29 @@
       "codeCopied": "SVG code copied to clipboard",
       "copyCode": "Copy SVG Code",
       "downloadSvg": "Download SVG Asset"
+    },
+    "updater": {
+      "title": "Software Update",
+      "checkBtn": "Check for Updates",
+      "checking": "Checking for updates...",
+      "errorTitle": "Unable to check for updates",
+      "retry": "Retry",
+      "latest": "You are up to date!",
+      "latestDesc": "PDFCraft is currently at the latest version ({version}).",
+      "available": "New Version Available",
+      "currentVersion": "Current Version",
+      "released": "Released",
+      "releaseNotes": "Release Notes",
+      "downloadPortable": "Download Windows Portable (ZIP)",
+      "downloadInstaller": "Download Windows Installer (.exe / .msi)",
+      "downloadMac": "Download macOS (.dmg)",
+      "downloadAppImage": "Download Linux AppImage (Portable)",
+      "downloadDeb": "Download Linux Debian (.deb)",
+      "allDownloads": "View all platform downloads",
+      "viewOnGithub": "View on GitHub",
+      "skipVersion": "Skip this version",
+      "remindLater": "Remind me later",
+      "close": "Close"
     }
   },
   "toolsPage": {
@@ -1416,7 +1453,13 @@
         "name": "Crop & Resize Pages",
         "description": "Crop PDF pages and adjust page dimensions"
       }
-    }
+    },
+    "autoLayout": "Auto Layout",
+    "duplicateNode": "Duplicate Node",
+    "downloadZip": "Download as ZIP",
+    "downloadIndividually": "Download files individually",
+    "flowControl": "Flow Control",
+    "conditionGateway": "Condition Gateway"
   },
   "tools": {
     "search": {

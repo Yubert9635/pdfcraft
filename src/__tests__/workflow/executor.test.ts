@@ -132,4 +132,32 @@ describe('Workflow Executor', () => {
             expect(inputs[0]).toBeInstanceOf(Blob);
         });
     });
+
+    describe('executeNode - ocr-pdf', () => {
+        it('throws error if files array is empty', async () => {
+            const { executeNode } = await import('@/lib/workflow/executor');
+            const ocrNode: WorkflowNode = {
+                id: 'ocr-node',
+                type: 'toolNode',
+                position: { x: 0, y: 0 },
+                data: {
+                    toolId: 'ocr-pdf',
+                    label: 'OCR PDF',
+                    icon: 'scan-text',
+                    category: 'organize-manage',
+                    acceptedFormats: ['.pdf', '.png', '.jpg', '.jpeg', '.webp'],
+                    outputFormat: 'pdf',
+                    status: 'idle',
+                    progress: 0,
+                    settings: {
+                        language: 'chi_sim',
+                    },
+                },
+            };
+
+            const result = await executeNode(ocrNode, []);
+            expect(result.success).toBe(false);
+            expect(result.error?.message).toContain('No input file');
+        });
+    });
 });

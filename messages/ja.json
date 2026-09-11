@@ -918,6 +918,29 @@
       "codeCopied": "SVGコードがクリップボードにコピーされました",
       "copyCode": "SVGコードをコピー",
       "downloadSvg": "SVG アセットをダウンロード"
+    },
+    "updater": {
+      "title": "ソフトウェアの更新",
+      "checkBtn": "更新を確認",
+      "checking": "更新を確認しています...",
+      "errorTitle": "更新を確認できませんでした",
+      "retry": "再試行",
+      "latest": "最新バージョンです！",
+      "latestDesc": "PDFCraft は現在最新バージョン ({version}) です。",
+      "available": "新しいバージョンが利用可能です",
+      "currentVersion": "現在のバージョン",
+      "released": "リリース日",
+      "releaseNotes": "リリースノート",
+      "downloadPortable": "Windows ポータブル版をダウンロード (ZIP)",
+      "downloadInstaller": "Windows インストーラーをダウンロード (.exe / .msi)",
+      "downloadMac": "macOS 版をダウンロード (.dmg)",
+      "downloadAppImage": "Linux AppImage をダウンロード (ポータブル)",
+      "downloadDeb": "Linux Debian パッケージをダウンロード (.deb)",
+      "allDownloads": "すべてのプラットフォームのダウンロードを表示",
+      "viewOnGithub": "GitHub で表示",
+      "skipVersion": "このバージョンをスキップ",
+      "remindLater": "後で通知",
+      "close": "閉じる"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "ページのトリミングとサイズ変更",
         "description": "PDF ページのトリミングとページ寸法の調整"
       }
-    }
+    },
+    "autoLayout": "自動レイアウト",
+    "duplicateNode": "ノードを複製",
+    "downloadZip": "ZIPとしてダウンロード",
+    "downloadIndividually": "ファイルを個別にダウンロード",
+    "flowControl": "フロー制御",
+    "conditionGateway": "条件分岐"
   },
   "tools": {
     "search": {

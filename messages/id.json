@@ -918,6 +918,29 @@
       "codeCopied": "Kode SVG disalin ke papan klip",
       "copyCode": "Salin Kode SVG",
       "downloadSvg": "Unduh Aset SVG"
+    },
+    "updater": {
+      "title": "Pembaruan Perangkat Lunak",
+      "checkBtn": "Periksa Pembaruan",
+      "checking": "Memeriksa pembaruan...",
+      "errorTitle": "Tidak dapat memeriksa pembaruan",
+      "retry": "Coba lagi",
+      "latest": "Anda sudah menggunakan versi terbaru!",
+      "latestDesc": "PDFCraft saat ini berada pada versi terbaru ({version}).",
+      "available": "Versi Baru Tersedia",
+      "currentVersion": "Versi Saat Ini",
+      "released": "Dirilis pada",
+      "releaseNotes": "Catatan Rilis",
+      "downloadPortable": "Unduh Windows Portable (ZIP)",
+      "downloadInstaller": "Unduh Pemasang Windows (.exe / .msi)",
+      "downloadMac": "Unduh untuk macOS (.dmg)",
+      "downloadAppImage": "Unduh Linux AppImage (Portabel)",
+      "downloadDeb": "Unduh Linux Debian (.deb)",
+      "allDownloads": "Lihat unduhan semua platform",
+      "viewOnGithub": "Lihat di GitHub",
+      "skipVersion": "Lewati versi ini",
+      "remindLater": "Ingatkan nanti",
+      "close": "Tutup"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "Pangkas & Ubah Ukuran Halaman",
         "description": "Pangkas halaman PDF dan sesuaikan dimensi halaman"
       }
-    }
+    },
+    "autoLayout": "Tata Letak Otomatis",
+    "duplicateNode": "Duplikat Node",
+    "downloadZip": "Unduh sebagai ZIP",
+    "downloadIndividually": "Unduh file satu per satu",
+    "flowControl": "Kontrol Alur",
+    "conditionGateway": "Gerbang Kondisi"
   },
   "tools": {
     "search": {

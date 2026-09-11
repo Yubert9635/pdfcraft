@@ -11,16 +11,20 @@ on:
       - completed
     branches:
       - main
+  workflow_dispatch:
 
 # Prevent concurrent builds
 concurrency:
   group: release-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  ACTIONS_ALLOW_USE_UNSECURE_NODE_VERSION: "true"
+
 jobs:
   build-and-release:
     runs-on: ubuntu-latest
-    if: ${{ github.event_name == 'push' || github.event.workflow_run.conclusion == 'success' }}
+    if: ${{ github.event_name == 'push' || github.event_name == 'workflow_dispatch' || github.event.workflow_run.conclusion == 'success' }}
     
     permissions:
       contents: write  # Required for creating releases
@@ -44,9 +48,6 @@ jobs:
         run: npm ci
 
       # Build the project (generates static export in 'out' directory)
-      - name: Build project
-        run: npm run build
-
       # Generate version tag based on date and short commit hash
       - name: Generate version info
         id: version
@@ -56,6 +57,12 @@ jobs:
           echo "version=$VERSION" >> $GITHUB_OUTPUT
           echo "build_time=$BUILD_TIME" >> $GITHUB_OUTPUT
           echo "Generated version: $VERSION"
+
+      # Build the project (generates static export in 'out' directory)
+      - name: Build project
+        run: npm run build
+        env:
+          APP_VERSION: ${{ steps.version.outputs.version }}
 
       # Create release package from static export
       - name: Create release package
@@ -107,9 +114,10 @@ jobs:
 
             ### 📦 Download & Install
             Download the appropriate file for your platform:
-            - **Windows:** `.msi` or `.exe`
+            - **Windows (Portable):** `PDFCraft-Windows-x64-Portable.zip` (No installation needed, isolated data)
+            - **Windows (Installer):** `.msi` or `*-setup.exe`
             - **macOS:** `.dmg`
-            - **Linux:** `.deb` or `.AppImage`
+            - **Linux:** `.AppImage` (Portable) or `.deb`
 
             Install and run like any desktop application.
 
@@ -123,6 +131,7 @@ jobs:
             tauri-bundles/**/*.exe
             tauri-bundles/**/*.deb
             tauri-bundles/**/*.AppImage
+            tauri-bundles/**/*.zip
           draft: false
           prerelease: false
           generate_release_notes: true

@@ -918,6 +918,29 @@
       "codeCopied": "Código SVG copiado al portapapeles",
       "copyCode": "Copiar código SVG",
       "downloadSvg": "Descargar recurso SVG"
+    },
+    "updater": {
+      "title": "Actualización de software",
+      "checkBtn": "Buscar actualizaciones",
+      "checking": "Buscando actualizaciones...",
+      "errorTitle": "No se pudieron buscar actualizaciones",
+      "retry": "Reintentar",
+      "latest": "¡Estás actualizado!",
+      "latestDesc": "PDFCraft está actualmente en la versión más reciente ({version}).",
+      "available": "Nueva versión disponible",
+      "currentVersion": "Versión actual",
+      "released": "Publicado el",
+      "releaseNotes": "Notas de la versión",
+      "downloadPortable": "Descargar versión portátil para Windows (ZIP)",
+      "downloadInstaller": "Descargar instalador para Windows (.exe / .msi)",
+      "downloadMac": "Descargar para macOS (.dmg)",
+      "downloadAppImage": "Descargar Linux AppImage (portátil)",
+      "downloadDeb": "Descargar paquete Linux Debian (.deb)",
+      "allDownloads": "Ver descargas para todas las plataformas",
+      "viewOnGithub": "Ver en GitHub",
+      "skipVersion": "Omitir esta versión",
+      "remindLater": "Recordármelo más tarde",
+      "close": "Cerrar"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "Recortar y cambiar tamaño de páginas",
         "description": "Recortar páginas PDF y ajustar las dimensiones de la página"
       }
-    }
+    },
+    "autoLayout": "Diseño automático",
+    "duplicateNode": "Duplicar nodo",
+    "downloadZip": "Descargar como ZIP",
+    "downloadIndividually": "Descargar archivos individualmente",
+    "flowControl": "Control de flujo",
+    "conditionGateway": "Puerta de condición"
   },
   "tools": {
     "search": {

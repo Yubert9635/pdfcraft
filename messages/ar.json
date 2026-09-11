@@ -918,6 +918,29 @@
       "codeCopied": "تم نسخ كود SVG إلى الحافظة",
       "copyCode": "نسخ كود SVG",
       "downloadSvg": "تنزيل أصل SVG"
+    },
+    "updater": {
+      "title": "تحديث البرنامج",
+      "checkBtn": "التحقق من وجود تحديثات",
+      "checking": "جارٍ التحقق من وجود تحديثات...",
+      "errorTitle": "تعذر التحقق من وجود تحديثات",
+      "retry": "إعادة المحاولة",
+      "latest": "أنت تستخدم أحدث إصدار!",
+      "latestDesc": "PDFCraft يعمل حاليًا بأحدث إصدار ({version}).",
+      "available": "يتوفر إصدار جديد",
+      "currentVersion": "الإصدار الحالي",
+      "released": "تاريخ الإصدار",
+      "releaseNotes": "ملاحظات الإصدار",
+      "downloadPortable": "تنزيل نسخة Windows المحمولة (ZIP)",
+      "downloadInstaller": "تنزيل مثبت Windows (.exe / .msi)",
+      "downloadMac": "تنزيل لنظام macOS (.dmg)",
+      "downloadAppImage": "تنزيل Linux AppImage (محمول)",
+      "downloadDeb": "تنزيل حزمة Linux Debian (.deb)",
+      "allDownloads": "عرض تنزيلات جميع المنصات",
+      "viewOnGithub": "عرض على GitHub",
+      "skipVersion": "تخطي هذا الإصدار",
+      "remindLater": "تذكيري لاحقًا",
+      "close": "إغلاق"
     }
   },
   "toolsPage": {
@@ -1415,7 +1438,13 @@
         "name": "قص الصفحات وتغيير حجمها",
         "description": "قص صفحات PDF وضبط أبعاد الصفحة"
       }
-    }
+    },
+    "autoLayout": "تخطيط تلقائي",
+    "duplicateNode": "تكرار العقدة",
+    "downloadZip": "تنزيل كملف مضغوط ZIP",
+    "downloadIndividually": "تنزيل الملفات بشكل فردي",
+    "flowControl": "التحكم في التدفق",
+    "conditionGateway": "بوابة الشروط"
   },
   "tools": {
     "search": {

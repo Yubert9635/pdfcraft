@@ -2302,8 +2302,13 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
         ? toolSettingsConfigs[node.data.toolId]
         : null;
 
+    const isConditionGateway = node?.data.toolId === 'condition-gateway';
+
     const getToolTitle = (): string => {
         if (!node) return '';
+        if (node.data.toolId === 'condition-gateway') {
+            return locale === 'zh' ? '条件分支配置' : 'Condition Gateway';
+        }
         const content = getToolContent(locale, node.data.toolId);
         return content?.title || node.data.label;
     };
@@ -2373,40 +2378,22 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
 
                 if (exists) {
                     const result = t(key);
-                    if (result && typeof result === 'string' && result !== key && !result.startsWith('MISSING')) {
+                    if (result && typeof result === 'string' && !result.startsWith('MISSING') && result !== key) {
                         return result;
                     }
                 }
             } catch {
-                // Continue to root level
+                // Continue
             }
         } catch {
-            // Continue to root level
+            // Continue
         }
 
-        // Try root level translations
+        // Try root namespace for tools not in tools namespace (like compressPdf, mergePdf)
         try {
-            // Existence check for rootResult
-            let exists = false;
-            if (messages && typeof messages === 'object') {
-                let current: any = messages;
-                const parts = key.split('.');
-                for (const part of parts) {
-                    if (current && typeof current === 'object' && part in current) {
-                        current = current[part];
-                        exists = true;
-                    } else {
-                        exists = false;
-                        break;
-                    }
-                }
-            }
-
-            if (exists) {
-                const rootResult = tRoot(key);
-                if (rootResult && typeof rootResult === 'string' && rootResult !== key && !rootResult.startsWith('MISSING')) {
-                    return rootResult;
-                }
+            const result = tRoot(key);
+            if (result && typeof result === 'string' && !result.startsWith('MISSING') && result !== key) {
+                return result;
             }
         } catch {
             // Continue to fallback
@@ -2418,12 +2405,21 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
     };
 
     useEffect(() => {
-        if (node && config) {
-            const initialSettings: Record<string, unknown> = {};
-            config.fields.forEach(field => {
-                initialSettings[field.key] = node.data.settings?.[field.key] ?? field.defaultValue;
-            });
-            setSettings(initialSettings);
+        if (node) {
+            if (node.data.toolId === 'condition-gateway') {
+                setSettings({
+                    conditionType: node.data.settings?.conditionType ?? 'file-count',
+                    operator: node.data.settings?.operator ?? 'greater-than',
+                    value: node.data.settings?.value ?? 1,
+                    sizeUnit: node.data.settings?.sizeUnit ?? 'MB',
+                });
+            } else if (config) {
+                const initialSettings: Record<string, unknown> = {};
+                config.fields.forEach(field => {
+                    initialSettings[field.key] = node.data.settings?.[field.key] ?? field.defaultValue;
+                });
+                setSettings(initialSettings);
+            }
         }
         // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [node?.id, node?.data.toolId]);
@@ -2440,6 +2436,15 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
     };
 
     const handleReset = () => {
+        if (node?.data.toolId === 'condition-gateway') {
+            setSettings({
+                conditionType: 'file-count',
+                operator: 'greater-than',
+                value: 1,
+                sizeUnit: 'MB',
+            });
+            return;
+        }
         if (config) {
             const defaultSettings: Record<string, unknown> = {};
             config.fields.forEach(field => {
@@ -2471,7 +2476,139 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto p-4">
-                {!config || config.fields.length === 0 ? (
+                {isConditionGateway ? (
+                    <div className="space-y-4">
+                        <div className="p-3 rounded-lg bg-indigo-50/70 dark:bg-indigo-950/40 border border-indigo-200 dark:border-indigo-800 text-xs text-indigo-900 dark:text-indigo-200 leading-relaxed">
+                            {locale === 'zh'
+                                ? '根据流经此节点的文件特征进行规则判定。满足条件的文件流向 True 端口，不满足的文件流向 False 端口。'
+                                : 'Evaluates files dynamically based on your rule. Matching files flow to the True port, otherwise to False.'}
+                        </div>
+
+                        {/* Condition Type */}
+                        <div className="space-y-1.5">
+                            <label className="block text-sm font-medium text-[hsl(var(--color-foreground))]">
+                                {locale === 'zh' ? '判断维度 (Type)' : 'Dimension'}
+                            </label>
+                            <select
+                                value={(settings.conditionType as string) || 'file-count'}
+                                onChange={(e) => {
+                                    const nextType = e.target.value;
+                                    setSettings(prev => ({
+                                        ...prev,
+                                        conditionType: nextType,
+                                        operator: nextType === 'file-format' ? 'equals' : 'greater-than',
+                                        value: nextType === 'file-format' ? 'pdf' : (nextType === 'file-size' ? 10 : 1),
+                                    }));
+                                }}
+                                className="w-full px-3 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
+                            >
+                                <option value="file-count">{locale === 'zh' ? '文件数量 (File Count)' : 'File Count'}</option>
+                                <option value="file-size">{locale === 'zh' ? '总文件体积 (File Size)' : 'Total File Size'}</option>
+                                <option value="file-format">{locale === 'zh' ? '文件格式 (File Format / Ext)' : 'File Format / Ext'}</option>
+                            </select>
+                        </div>
+
+                        {/* Operator */}
+                        <div className="space-y-1.5">
+                            <label className="block text-sm font-medium text-[hsl(var(--color-foreground))]">
+                                {locale === 'zh' ? '比较规则 (Operator)' : 'Operator'}
+                            </label>
+                            <select
+                                value={(settings.operator as string) || (settings.conditionType === 'file-format' ? 'equals' : 'greater-than')}
+                                onChange={(e) => handleFieldChange('operator', e.target.value)}
+                                className="w-full px-3 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
+                            >
+                                {settings.conditionType === 'file-format' ? (
+                                    <>
+                                        <option value="equals">{locale === 'zh' ? '等于 (Equals)' : 'Equals'}</option>
+                                        <option value="not-equals">{locale === 'zh' ? '不等于 (Not Equals)' : 'Not Equals'}</option>
+                                        <option value="contains">{locale === 'zh' ? '包含 (Contains)' : 'Contains'}</option>
+                                        <option value="matches">{locale === 'zh' ? '正则匹配 (Regex Matches)' : 'Regex Matches'}</option>
+                                    </>
+                                ) : (
+                                    <>
+                                        <option value="greater-than">{locale === 'zh' ? '> 大于 (Greater Than)' : '> Greater Than'}</option>
+                                        <option value="less-than">{locale === 'zh' ? '< 小于 (Less Than)' : '< Less Than'}</option>
+                                        <option value="greater-or-equal">{locale === 'zh' ? '≥ 大于等于 (Greater or Equal)' : '≥ Greater or Equal'}</option>
+                                        <option value="less-or-equal">{locale === 'zh' ? '≤ 小于等于 (Less or Equal)' : '≤ Less or Equal'}</option>
+                                        <option value="equals">{locale === 'zh' ? '= 等于 (Equals)' : '= Equals'}</option>
+                                        <option value="not-equals">{locale === 'zh' ? '≠ 不等于 (Not Equals)' : '≠ Not Equals'}</option>
+                                    </>
+                                )}
+                            </select>
+                        </div>
+
+                        {/* Value Input */}
+                        <div className="space-y-1.5">
+                            <label className="block text-sm font-medium text-[hsl(var(--color-foreground))]">
+                                {locale === 'zh' ? '目标阈值 (Target Value)' : 'Target Value'}
+                            </label>
+
+                            {settings.conditionType === 'file-count' && (
+                                <input
+                                    type="number"
+                                    min={0}
+                                    step={1}
+                                    value={Number(settings.value ?? 1)}
+                                    onChange={(e) => handleFieldChange('value', Number(e.target.value))}
+                                    className="w-full px-3 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
+                                />
+                            )}
+
+                            {settings.conditionType === 'file-size' && (
+                                <div className="flex gap-2">
+                                    <input
+                                        type="number"
+                                        min={0}
+                                        step={0.1}
+                                        value={Number(settings.value ?? 10)}
+                                        onChange={(e) => handleFieldChange('value', Number(e.target.value))}
+                                        className="flex-1 px-3 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
+                                    />
+                                    <select
+                                        value={(settings.sizeUnit as string) || 'MB'}
+                                        onChange={(e) => handleFieldChange('sizeUnit', e.target.value)}
+                                        className="w-24 px-2 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
+                                    >
+                                        <option value="MB">MB</option>
+                                        <option value="KB">KB</option>
+                                        <option value="Bytes">Bytes</option>
+                                    </select>
+                                </div>
+                            )}
+
+                            {settings.conditionType === 'file-format' && (
+                                <input
+                                    type="text"
+                                    placeholder="例如: pdf, docx, png, jpg"
+                                    value={(settings.value as string) || ''}
+                                    onChange={(e) => handleFieldChange('value', e.target.value)}
+                                    className="w-full px-3 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))]"
+                                />
+                            )}
+                        </div>
+
+                        {/* Branch Route Explanation */}
+                        <div className="mt-4 p-3 rounded-lg border border-[hsl(var(--color-border))] bg-[hsl(var(--color-muted)/0.3)] space-y-2 text-xs">
+                            <p className="font-medium text-[hsl(var(--color-foreground))]">
+                                {locale === 'zh' ? '分支流向指引:' : 'Routing Guide:'}
+                            </p>
+                            <div className="flex items-start gap-1.5 text-emerald-700 dark:text-emerald-300">
+                                <span className="font-bold">✓ True:</span>
+                                <span>{locale === 'zh' ? '满足条件时流入此端口下游节点' : 'Files proceed here if condition is met'}</span>
+                            </div>
+                            <div className="flex items-start gap-1.5 text-amber-700 dark:text-amber-300">
+                                <span className="font-bold">✗ False:</span>
+                                <span>{locale === 'zh' ? '不满足条件时流入此端口下游节点' : 'Files proceed here if condition is not met'}</span>
+                            </div>
+                            <p className="text-[10px] text-[hsl(var(--color-muted-foreground))] pt-1 border-t border-[hsl(var(--color-border)/0.5)]">
+                                {locale === 'zh'
+                                    ? '* 执行时未命中的下游分支将被自动跳过并置灰，无需担心额外开销。'
+                                    : '* Inactive branch nodes will be skipped during execution.'}
+                            </p>
+                        </div>
+                    </div>
+                ) : !config || config.fields.length === 0 ? (
                     <div className="text-center py-8">
                         <Settings className="w-12 h-12 mx-auto text-[hsl(var(--color-muted-foreground))] opacity-50" />
                         <p className="mt-3 text-sm text-[hsl(var(--color-muted-foreground))]">
@@ -2637,7 +2774,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
             </div>
 
             {/* Footer */}
-            {config && config.fields.length > 0 && (
+            {(isConditionGateway || (config && config.fields.length > 0)) && (
                 <div className="flex items-center justify-between gap-3 px-4 py-3 border-t border-[hsl(var(--color-border))] bg-[hsl(var(--color-muted)/0.3)]">
                     <Button
                         variant="ghost"

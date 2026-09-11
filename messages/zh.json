@@ -673,6 +673,20 @@
       "outputFormat": "输出文件格式",
       "formatSearchablePdf": "双层可搜索 PDF",
       "formatText": "提取纯文本文件 (.txt)",
+      "formatMarkdown": "结构化 Markdown (.md)",
+      "formatJson": "结构化 JSON (.json)",
+      "enhanceContrast": "智能画质增强 (对比度与边缘锐化)",
+      "enhanceContrastDesc": "自动校正暗部、发黄扫描件与浅色发票印记，大幅提升识别率",
+      "copyText": "复制识别文本",
+      "copied": "已复制到剪贴板！",
+      "openInEditor": "在直接编辑器中编辑",
+      "openInEditorDesc": "无需下载，立即对生成的 PDF 进行正文修改与排版",
+      "statsPages": "处理页数",
+      "statsWords": "识别词数",
+      "statsChars": "总字符数",
+      "statsConfidence": "平均置信度",
+      "tabText": "文本预览",
+      "tabJson": "JSON 结构",
       "accuracyTitle": "渲染识别精度",
       "accuracySd": "标清 (适合清晰原件)",
       "accuracyHd": "高清 (推荐，识别更稳)",
@@ -918,6 +932,29 @@
       "codeCopied": "代码已复制",
       "copyCode": "复制 SVG 源代码",
       "downloadSvg": "下载选中矢量图"
+    },
+    "updater": {
+      "title": "软件更新",
+      "checkBtn": "检查更新",
+      "checking": "正在检查更新...",
+      "errorTitle": "无法检查更新",
+      "retry": "重试",
+      "latest": "已是最新版本！",
+      "latestDesc": "您当前使用的是最新版本的 PDFCraft ({version})。",
+      "available": "发现新版本",
+      "currentVersion": "当前版本",
+      "released": "发布于",
+      "releaseNotes": "更新日志",
+      "downloadPortable": "下载 Windows 便携版 (ZIP)",
+      "downloadInstaller": "下载 Windows 安装包 (.exe / .msi)",
+      "downloadMac": "下载 macOS 安装包 (.dmg)",
+      "downloadAppImage": "下载 Linux AppImage (便携版)",
+      "downloadDeb": "下载 Linux Debian 安装包 (.deb)",
+      "allDownloads": "查看所有平台下载",
+      "viewOnGithub": "前往 GitHub 查看",
+      "skipVersion": "跳过此版本",
+      "remindLater": "稍后提醒",
+      "close": "关闭"
     }
   },
   "toolsPage": {
@@ -1416,7 +1453,13 @@
         "name": "裁剪并调整大小",
         "description": "裁剪PDF页面并调整页面尺寸"
       }
-    }
+    },
+    "autoLayout": "一键整理布局",
+    "duplicateNode": "复制节点",
+    "downloadZip": "打包为 ZIP 下载",
+    "downloadIndividually": "分别下载各文件",
+    "flowControl": "流程控制",
+    "conditionGateway": "条件分支"
   },
   "tools": {
     "search": {

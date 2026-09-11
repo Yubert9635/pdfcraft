@@ -13,6 +13,7 @@ import { fileMatchesAcceptedFormats } from '@/lib/workflow/engine';
 import type { ProcessOutput, ProgressCallback, ProcessInput } from '@/types/pdf';
 import { PDFErrorCode, ErrorCategory } from '@/types/pdf';
 import { logger } from '@/lib/utils/logger';
+import { evaluateCondition, Condition, ConditionType, ComparisonOperator } from '@/types/workflow-conditional';
 
 // Import Processor classes
 import { MergePDFProcessor } from '@/lib/pdf/processors/merge';
@@ -179,6 +180,48 @@ export async function executeNode(
 
     try {
         switch (toolId) {
+            // ==================== Flow Control ====================
+            case 'condition-gateway': {
+                const conditionType = (settings.conditionType as ConditionType) || 'file-count';
+                const operator = (settings.operator as ComparisonOperator) || 'greater-than';
+                let rawValue = settings.value ?? 1;
+
+                // Handle file-size unit conversion if specified (e.g. MB/KB to Bytes)
+                if (conditionType === 'file-size') {
+                    const unit = (settings.sizeUnit as string) || 'MB';
+                    const num = Number(rawValue) || 0;
+                    if (unit === 'MB') rawValue = num * 1024 * 1024;
+                    else if (unit === 'KB') rawValue = num * 1024;
+                    else rawValue = num;
+                }
+
+                const condition: Condition = {
+                    type: conditionType,
+                    operator: operator,
+                    value: rawValue as string | number | boolean,
+                };
+
+                const isMet = evaluateCondition(condition, files);
+                const activeBranch: 'true' | 'false' = isMet ? 'true' : 'false';
+
+                logger.log(
+                    `[Workflow] Condition Gateway (${node.id}) evaluation: ${conditionType} ${operator} ${settings.value} -> ${isMet} (Active: ${activeBranch})`
+                );
+
+                onProgress?.(100);
+
+                return {
+                    success: true,
+                    result: files.length === 1 ? files[0] : (files.length > 1 ? files : undefined),
+                    filename: files.length === 1 ? files[0].name : undefined,
+                    metadata: {
+                        activeBranch,
+                        conditionMet: isMet,
+                        outputFiles: files.map(f => f.name),
+                    },
+                };
+            }
+
             // ==================== Organize & Manage ====================
             case 'merge-pdf': {
                 const processor = new MergePDFProcessor();
@@ -729,10 +772,17 @@ export async function executeNode(
             }
 
             case 'ocr-pdf': {
-                if (files.length === 0) throw new Error('No input file');
+                if (files.length === 0) throw new Error('No input file provided for OCR');
                 const processor = new OCRProcessor();
+                const rawLangs = settings.languages || settings.language || 'eng';
+                const languages = Array.isArray(rawLangs)
+                    ? (rawLangs as any)
+                    : String(rawLangs).split('+').map((s: string) => s.trim());
                 const options = {
-                    language: String(settings.language || 'eng'),
+                    languages,
+                    language: Array.isArray(rawLangs) ? rawLangs.join('+') : String(rawLangs),
+                    outputFormat: (['text', 'markdown', 'json'].includes(settings.outputFormat as string) ? settings.outputFormat : 'searchable-pdf') as any,
+                    scale: Number(settings.scale) || 2,
                 };
                 return await processor.process(createProcessInput(files, options), onProgress);
             }
@@ -1063,14 +1113,16 @@ export async function executeNode(
 }
 
 /**
- * Get input files for a node from parent nodes
+ * Get input files for a node from parent nodes.
+ * Automatically filters out edges coming from inactive conditional branches.
  */
 export function collectInputFiles(
     nodeId: string,
     nodes: WorkflowNode[],
     edges: WorkflowEdge[],
     nodeOutputs: Map<string, (Blob | WorkflowOutputFile)[]>,
-    inputAssignments?: Map<string, File[]>
+    inputAssignments?: Map<string, File[]>,
+    activeBranches?: Map<string, 'true' | 'false'>
 ): (Blob | WorkflowOutputFile)[] {
     const parentEdges = edges.filter(e => e.target === nodeId);
 
@@ -1087,6 +1139,21 @@ export function collectInputFiles(
 
     const inputFiles: (Blob | WorkflowOutputFile)[] = [];
     for (const edge of parentEdges) {
+        const sourceNode = nodes.find(n => n.id === edge.source);
+        const activeBranch = activeBranches?.get(edge.source) ?? sourceNode?.data.activeBranch;
+
+        // If edge emanates from a condition gateway or specific true/false branch
+        if (sourceNode?.data.toolId === 'condition-gateway' || edge.sourceHandle === 'true' || edge.sourceHandle === 'false') {
+            if (edge.sourceHandle === 'true' && activeBranch && activeBranch !== 'true') {
+                // True branch was not taken
+                continue;
+            }
+            if (edge.sourceHandle === 'false' && activeBranch && activeBranch !== 'false') {
+                // False branch was not taken
+                continue;
+            }
+        }
+
         const parentOutputs = nodeOutputs.get(edge.source);
         if (parentOutputs) {
             inputFiles.push(...parentOutputs);

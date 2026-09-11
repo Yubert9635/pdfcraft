@@ -918,6 +918,29 @@
       "codeCopied": "代码已複製",
       "copyCode": "複製 SVG 源代码",
       "downloadSvg": "下载選中矢量图"
+    },
+    "updater": {
+      "title": "軟體更新",
+      "checkBtn": "檢查更新",
+      "checking": "正在檢查更新...",
+      "errorTitle": "無法檢查更新",
+      "retry": "重試",
+      "latest": "已是最新版本！",
+      "latestDesc": "您目前使用的是最新版本的 PDFCraft ({version})。",
+      "available": "發現新版本",
+      "currentVersion": "目前版本",
+      "released": "發佈於",
+      "releaseNotes": "更新日誌",
+      "downloadPortable": "下載 Windows 免安裝版 (ZIP)",
+      "downloadInstaller": "下載 Windows 安裝包 (.exe / .msi)",
+      "downloadMac": "下載 macOS 安裝包 (.dmg)",
+      "downloadAppImage": "下載 Linux AppImage (免安裝版)",
+      "downloadDeb": "下載 Linux Debian 安裝包 (.deb)",
+      "allDownloads": "查看所有平台下載",
+      "viewOnGithub": "前往 GitHub 查看",
+      "skipVersion": "略過此版本",
+      "remindLater": "稍後提醒",
+      "close": "關閉"
     }
   },
   "toolsPage": {
@@ -1416,7 +1439,13 @@
         "name": "裁剪並調整大小",
         "description": "裁剪 PDF 頁面並調整頁面尺寸"
       }
-    }
+    },
+    "autoLayout": "一鍵整理版面",
+    "duplicateNode": "複製節點",
+    "downloadZip": "打包為 ZIP 下載",
+    "downloadIndividually": "分別下載各檔案",
+    "flowControl": "流程控制",
+    "conditionGateway": "條件分支"
   },
   "tools": {
     "search": {

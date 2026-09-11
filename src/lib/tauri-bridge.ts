@@ -11,7 +11,10 @@ export interface FileFilter {
 const browserFileStore = new Map<string, File>();
 
 export const isTauri = (): boolean => {
-  return typeof window !== 'undefined' && '__TAURI__' in window;
+  return (
+    typeof window !== 'undefined' &&
+    ('__TAURI__' in window || '__TAURI_INTERNALS__' in window)
+  );
 };
 
 /**
