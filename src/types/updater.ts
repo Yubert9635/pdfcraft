@@ -19,6 +19,7 @@ export interface ReleaseAsset {
   size: number;
   platformType: AssetPlatformType;
   browserDownloadUrl: string;
+  mirrorDownloadUrl?: string;
 }
 
 export interface ReleaseInfo {

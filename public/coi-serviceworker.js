@@ -1,4 +1,4 @@
-﻿/*! coi-serviceworker v0.1.7 - modified for PDFCraft & LibreOffice WASM */
+/*! coi-serviceworker v0.1.7 - modified for PDFCraft & LibreOffice WASM */
 let coepCredentialless = false;
 if (typeof window === 'undefined') {
   self.addEventListener('install', () => self.skipWaiting());
@@ -20,9 +20,14 @@ if (typeof window === 'undefined') {
     if (r.cache === 'only-if-cached' && r.mode !== 'same-origin') return;
 
     const url = new URL(r.url);
-    // CRITICAL: Bypass heavy LibreOffice WASM and PyMuPDF binary files completely
-    // to prevent ServiceWorker memory exhaustion or fetch corruption
-    if (url.pathname.includes('/libreoffice-wasm/') || url.pathname.includes('/pymupdf-wasm/')) {
+    // CRITICAL: Bypass heavy WASM binaries and data files to prevent ServiceWorker
+    // memory exhaustion, but allow scripts (.js) through so they receive CORP/COEP headers.
+    const isHeavyBinary =
+      url.pathname.endsWith('.wasm') ||
+      url.pathname.endsWith('.wasm.bin') ||
+      url.pathname.endsWith('.data') ||
+      url.pathname.endsWith('.data.bin');
+    if (isHeavyBinary) {
       return;
     }
 

@@ -16,7 +16,7 @@ import {
 import { Modal } from '@/components/ui/Modal';
 import { Button } from '@/components/ui/Button';
 import { UpdateCheckResult, ReleaseAsset } from '@/types/updater';
-import { ignoreVersion } from '@/lib/updater';
+import { ignoreVersion, GITHUB_REPO } from '@/lib/updater';
 
 export interface UpdateModalProps {
   isOpen: boolean;
@@ -81,9 +81,10 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
     }
   };
 
-  const handleDownload = (asset: ReleaseAsset) => {
+  const handleDownload = (asset: ReleaseAsset, useMirror = false) => {
     if (typeof window !== 'undefined') {
-      window.open(asset.browserDownloadUrl, '_blank', 'noopener,noreferrer');
+      const url = useMirror && asset.mirrorDownloadUrl ? asset.mirrorDownloadUrl : asset.browserDownloadUrl;
+      window.open(url, '_blank', 'noopener,noreferrer');
     }
   };
 
@@ -126,10 +127,25 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
                 {result.error}
               </p>
             </div>
-            <Button variant="outline" size="sm" onClick={onRetry} className="gap-2">
-              <RefreshCw className="h-4 w-4" />
-              {getMsg('retry', 'Retry')}
-            </Button>
+            <div className="flex flex-wrap items-center justify-center gap-2.5 pt-1">
+              <Button variant="outline" size="sm" onClick={onRetry} className="gap-2">
+                <RefreshCw className="h-4 w-4" />
+                {getMsg('retry', 'Retry')}
+              </Button>
+              <Button
+                variant="primary"
+                size="sm"
+                className="gap-1.5"
+                onClick={() => {
+                  if (typeof window !== 'undefined') {
+                    window.open(`https://github.com/${GITHUB_REPO}/releases`, '_blank', 'noopener,noreferrer');
+                  }
+                }}
+              >
+                <ExternalLink className="h-3.5 w-3.5" />
+                <span>{getMsg('viewOnGithub', 'View on GitHub')}</span>
+              </Button>
+            </div>
           </div>
         )}
 
@@ -229,6 +245,19 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
                     {formatFileSize(result.matchedAssets.secondary.size)}
                   </span>
                 </Button>
+              )}
+
+              {/* Fast mirror option */}
+              {result.matchedAssets.primary?.mirrorDownloadUrl && (
+                <div className="flex items-center justify-center pt-0.5">
+                  <button
+                    type="button"
+                    onClick={() => handleDownload(result.matchedAssets.primary!, true)}
+                    className="text-[11px] text-[hsl(var(--color-primary))] hover:underline inline-flex items-center gap-1 font-medium py-1 px-2 rounded hover:bg-[hsl(var(--color-primary))/0.08] transition-colors"
+                  >
+                    <span>⚡ 国内高速镜像通道下载</span>
+                  </button>
+                </div>
               )}
 
               {/* Toggle all assets */}

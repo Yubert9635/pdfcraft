@@ -242,51 +242,64 @@ export function isVersionIgnored(version: string): boolean {
   return settings.ignoredVersions.includes(version);
 }
 
+export const GITHUB_RELEASE_ENDPOINTS = [
+  `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
+  `https://gh-proxy.com/https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
+];
+
 /**
- * Fetches the latest release from the GitHub API.
+ * Fetches the latest release with multi-endpoint failover.
+ * Tries official GitHub API first, falling back to mirror endpoints for global & domestic reliability.
  */
 export async function fetchLatestRelease(): Promise<ReleaseInfo> {
-  const controller = new AbortController();
-  const timeoutId = setTimeout(() => controller.abort(), 10000);
+  let lastError: Error | null = null;
 
-  try {
-    const response = await fetch(
-      `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
-      {
+  for (const endpoint of GITHUB_RELEASE_ENDPOINTS) {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 6000);
+
+    try {
+      const response = await fetch(endpoint, {
         headers: {
           Accept: 'application/vnd.github.v3+json',
         },
         signal: controller.signal,
+      });
+
+      if (!response.ok) {
+        throw new Error(`API returned HTTP ${response.status}: ${response.statusText}`);
       }
-    );
 
-    if (!response.ok) {
-      throw new Error(`GitHub API returned HTTP ${response.status}: ${response.statusText}`);
+      const data = await response.json();
+
+      const assets: ReleaseAsset[] = Array.isArray(data.assets)
+        ? data.assets.map((asset: { name: string; size: number; browser_download_url: string }) => ({
+            name: asset.name,
+            downloadUrl: asset.browser_download_url,
+            size: asset.size,
+            platformType: categorizeAsset(asset.name),
+            browserDownloadUrl: asset.browser_download_url,
+            mirrorDownloadUrl: `https://gh-proxy.com/${asset.browser_download_url}`,
+          }))
+        : [];
+
+      return {
+        tag: data.tag_name || '',
+        name: data.name || data.tag_name || '',
+        publishedAt: data.published_at || '',
+        htmlUrl: data.html_url || `https://github.com/${GITHUB_REPO}/releases`,
+        body: data.body || '',
+        assets,
+      };
+    } catch (err) {
+      lastError = err instanceof Error ? err : new Error(String(err));
+      console.warn(`[Updater] Endpoint failed (${endpoint}):`, lastError.message);
+    } finally {
+      clearTimeout(timeoutId);
     }
-
-    const data = await response.json();
-
-    const assets: ReleaseAsset[] = Array.isArray(data.assets)
-      ? data.assets.map((asset: { name: string; size: number; browser_download_url: string }) => ({
-          name: asset.name,
-          downloadUrl: asset.browser_download_url,
-          size: asset.size,
-          platformType: categorizeAsset(asset.name),
-          browserDownloadUrl: asset.browser_download_url,
-        }))
-      : [];
-
-    return {
-      tag: data.tag_name || '',
-      name: data.name || data.tag_name || '',
-      publishedAt: data.published_at || '',
-      htmlUrl: data.html_url || `https://github.com/${GITHUB_REPO}/releases`,
-      body: data.body || '',
-      assets,
-    };
-  } finally {
-    clearTimeout(timeoutId);
   }
+
+  throw lastError || new Error('Failed to fetch from all release endpoints');
 }
 
 /**
@@ -327,12 +340,17 @@ export async function checkUpdate(force = false): Promise<UpdateCheckResult> {
       matchedAssets,
     };
   } catch (error) {
+    const rawError = error instanceof Error ? error.message : String(error);
+    let friendlyError = rawError;
+    if (rawError.includes('Failed to fetch') || rawError.includes('abort') || rawError.includes('NetworkError')) {
+      friendlyError = `${rawError}: 无法连接至更新服务器（请检查网络连接、代理或客户端安全策略）`;
+    }
     return {
       hasUpdate: false,
       currentVersion,
       latestVersion: currentVersion,
       matchedAssets: { all: [] },
-      error: error instanceof Error ? error.message : String(error),
+      error: friendlyError,
     };
   }
 }

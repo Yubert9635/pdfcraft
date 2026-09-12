@@ -29,6 +29,7 @@
 import { WorkerBrowserConverter } from '@matbee/libreoffice-converter/browser';
 import { fetchAssembledBlob } from '../utils/asset-loader';
 import { withBasePath } from '../utils/path';
+import { isTauri } from '../tauri-bridge';
 
 const LIBREOFFICE_PATH = withBasePath('/libreoffice-wasm/');
 const ASSET_VERSION = '20240212-4';
@@ -191,14 +192,17 @@ export class LibreOfficeConverter {
     private async checkEnvironment(): Promise<void> {
         console.warn('[LibreOffice] === Environment Check ===');
 
-        // Unregister conflicting service workers, but preserve coi-serviceworker
-        // which provides Cross-Origin Isolation headers for SharedArrayBuffer.
+        // In Tauri desktop app, headers are provided natively by Tauri (app.security.headers).
+        // Any registered ServiceWorker should be removed to prevent it from intercepting
+        // or corrupting local asset loading.
+        // In browser environments, preserve coi-serviceworker for cross-origin isolation.
         if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
             try {
+                const inTauri = isTauri();
                 const registrations = await navigator.serviceWorker.getRegistrations();
                 for (const reg of registrations) {
                     const scriptUrl = reg.active?.scriptURL || reg.waiting?.scriptURL || reg.installing?.scriptURL || '';
-                    if (scriptUrl.includes('coi-serviceworker')) {
+                    if (!inTauri && scriptUrl.includes('coi-serviceworker')) {
                         console.log(`[LibreOffice] Preserving coi-serviceworker for cross-origin isolation: ${scriptUrl}`);
                         continue;
                     }
@@ -219,7 +223,7 @@ export class LibreOfficeConverter {
         console.warn(`[LibreOffice] SharedArrayBuffer: ${hasSAB ? 'Available ✅' : 'NOT available ❌'}`);
 
         if (!isIsolated || !hasSAB) {
-            if (typeof window !== 'undefined' && 'serviceWorker' in navigator) {
+            if (!isTauri() && typeof window !== 'undefined' && 'serviceWorker' in navigator) {
                 try {
                     const basePath = window.location.pathname.startsWith('/pdfcraft') ? '/pdfcraft/' : '/';
                     navigator.serviceWorker.register(`${basePath}coi-serviceworker.js`).then((reg) => {

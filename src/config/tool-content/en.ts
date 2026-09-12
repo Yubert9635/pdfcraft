@@ -2218,6 +2218,33 @@ export const toolContentEn: Record<string, ToolContent> = {
     ],
   },
 
+  'redact-pdf': {
+    title: 'Redact PDF',
+    metaDescription: 'Visually blackout, mosaic, or blur sensitive information in PDF files. Irreversible physical rasterization and deep metadata sanitization for privacy protection.',
+    keywords: ['redact pdf', 'blackout pdf', 'mosaic pdf', 'blur pdf', 'pdf privacy', 'remove sensitive data', 'secure pdf editor'],
+    description: `
+      <p>Redact PDF provides a visual, interactive editor to permanently conceal and protect sensitive data in your PDF documents. Drag to mark any confidential area—such as names, addresses, ID numbers, signatures, official seals, financial figures, or portraits—and apply blackout, whiteout, mosaic, or blur effects.</p>
+      <p>Unlike standard PDF editors that simply superimpose superficial black rectangles over existing text, this tool performs <strong>irreversible physical pixel rasterization</strong>. The underlying text layers, vector graphics, and OCR streams are completely destroyed and cannot be recovered by copy-pasting or reverse-engineering.</p>
+      <p>Additionally, the tool performs deep metadata wiping, eliminating author information, creation history, and XMP streams. All processing runs 100% locally in your browser with zero server uploads.</p>
+    `,
+    howToUse: [
+      { step: 1, title: 'Upload PDF Document', description: 'Select or drag-and-drop the PDF file you wish to redact.' },
+      { step: 2, title: 'Mark Sensitive Areas', description: 'Click and drag on any page to draw redaction boxes around confidential content.' },
+      { step: 3, title: 'Choose Redaction Style', description: 'Select blackout, whiteout, mosaic (adjustable pixel size), or blur. Toggle real-time preview to inspect the result.' },
+      { step: 4, title: 'Export Secured PDF', description: 'Click "Generate Secured PDF" to execute irreversible flattening, metadata wiping, and download your secured document.' },
+    ],
+    useCases: [
+      { title: 'Privacy & Regulatory Compliance', description: 'Safely mask Personally Identifiable Information (PII) to comply with GDPR, HIPAA, or CCPA requirements.', icon: 'shield' },
+      { title: 'Confidential Legal & Business Sharing', description: 'Obscure trade secrets, settlement terms, signatures, and stamps prior to public disclosure or external distribution.', icon: 'file-text' },
+      { title: 'Financial & Identity Protection', description: 'Conceal bank account numbers, tax IDs, credit card details, and ID card numbers from statements and invoices.', icon: 'lock' },
+    ],
+    faq: [
+      { question: 'Can anyone recover redacted information by copying text or inspecting layers?', answer: 'No. The redacted areas undergo physical pixel burn-in flattening. Underlying text, vectors, and objects are completely removed from the file structure, making recovery impossible.' },
+      { question: 'What is the difference between blackout, mosaic, and blur?', answer: 'Blackout creates a solid black mask (standard for legal documents); whiteout provides a clean white mask; mosaic creates a pixelated grid; and blur produces a soft frosted glass effect.' },
+      { question: 'Are files uploaded to your servers?', answer: 'No. All rendering, redaction, flattening, and PDF generation occur entirely within your browser memory. Your documents never leave your device.' },
+      { question: 'What metadata is removed?', answer: 'Document Title, Author, Subject, Keywords, Creator, Producer, CreationDate, ModDate, and extended XMP metadata streams are thoroughly erased.' },
+    ],
+  },
 
   'decrypt-pdf': {
     title: 'Decrypt PDF',

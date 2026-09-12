@@ -1882,6 +1882,28 @@ export const toolContentPl: Record<string, ToolContent> = {
     ],
   },
 
+  'redact-pdf': {
+    title: "Zaciemnij i zamaskuj PDF",
+    metaDescription: "Wizualne zaciemnianie, mozaika lub rozmycie poufnych informacji w plikach PDF. Nieodwracalna rasteryzacja i czyszczenie metadanych dla ochrony prywatności.",
+    keywords: ["zaciemnij pdf", "cenzura pdf", "mozaika pdf", "rozmycie pdf", "ochrona prywatności pdf", "bezpieczny edytor pdf"],
+    description: "\n      <p>Zaciemnij i zamaskuj PDF pozwala na trwałe i bezpieczne ukrywanie wrażliwych danych w dokumentach PDF. Zaznacz obszary na stronach i zastosuj zaciemnienie, biały pasek, mozaikę lub rozmycie.</p>\n      <p>Narzędzie trwale usuwa podlegający tekst i obiekty wektorowe poprzez nieodwracalną fizyczną rasteryzację pikseli, uniemożliwiając odzyskanie treści.</p>\n      <p>Wszystko odbywa się lokalnie w przeglądarce bez wysyłania plików na serwer.</p>\n    ",
+    howToUse: [
+      { step: 1, title: "Prześlij plik PDF", description: "Wybierz lub przeciągnij plik PDF na stronę." },
+      { step: 2, title: "Zaznacz poufne obszary", description: "Przeciągnij myszką, aby zaznaczyć obszary do ukrycia." },
+      { step: 3, title: "Wybierz styl zaciemnienia", description: "Wybierz czarny pasek, biały pasek, mozaikę lub rozmycie z podglądem na żywo." },
+      { step: 4, title: "Pobierz zabezpieczony PDF", description: "Kliknij przycisk generowania i pobierz zanonimizowany plik." },
+    ],
+    useCases: [
+      { title: "Zgodność z RODO", description: "Usuwanie danych osobowych przed udostępnieniem dokumentów.", icon: 'shield' },
+      { title: "Dokumenty prawne", description: "Ukrywanie poufnych danych w umowach i pismach procesowych.", icon: 'file-text' },
+      { title: "Dane finansowe", description: "Cenzurowanie numerów kont bankowych i kwot na wyciągach.", icon: 'credit-card' },
+    ],
+    faq: [
+      { question: "Czy ukryte dane można odzyskać?", answer: "Nie, proces jest w 100% nieodwracalny, a tekst pod spodem zostaje całkowicie zniszczony." },
+      { question: "Czy pliki są wysyłane na serwer?", answer: "Nie, przetwarzanie odbywa się wyłącznie lokalnie w przeglądarce." },
+      { question: "Jakie metadane są usuwane?", answer: "Usuwane są informacje o autorze, dacie utworzenia, tytule oraz strumienie XMP." },
+    ],
+  },
 
   'decrypt-pdf': {
     title: "Odszyfruj plik PDF",
