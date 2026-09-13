@@ -148,12 +148,111 @@ function convertToFile(
 }
 
 /**
+ * Helper to interpolate dynamic template tokens in filenames or text options
+ * Supported tokens: {filename}, {basename}, {ext}, {date}, {time}, {timestamp}, {index}, {total}, {tool}
+ */
+export function interpolateTokens(
+    template: string,
+    context: {
+        filename?: string;
+        index?: number;
+        total?: number;
+        toolId?: string;
+        outputExt?: string;
+    }
+): string {
+    if (!template) return '';
+
+    const now = new Date();
+    const pad = (n: number) => String(n).padStart(2, '0');
+    const dateStr = `${now.getFullYear()}-${pad(now.getMonth() + 1)}-${pad(now.getDate())}`;
+    const timeStr = `${pad(now.getHours())}${pad(now.getMinutes())}${pad(now.getSeconds())}`;
+    const timestampStr = `${dateStr}_${timeStr}`;
+
+    const rawFilename = context.filename || 'document';
+    const basename = rawFilename.replace(/\.[^/.]+$/, '');
+    const extMatch = rawFilename.match(/\.([^/.]+)$/);
+    const originalExt = extMatch ? extMatch[1] : (context.outputExt || 'pdf');
+
+    const index = (context.index ?? 0) + 1; // 1-based index
+    const total = context.total ?? 1;
+    const tool = context.toolId ? context.toolId.replace(/-(pdf|to-pdf|from-pdf)$/, '') : '';
+
+    return template
+        .replace(/\{filename\}/gi, basename)
+        .replace(/\{basename\}/gi, basename)
+        .replace(/\{date\}/gi, dateStr)
+        .replace(/\{time\}/gi, timeStr)
+        .replace(/\{timestamp\}/gi, timestampStr)
+        .replace(/\{index\}/gi, String(index))
+        .replace(/\{total\}/gi, String(total))
+        .replace(/\{tool\}/gi, tool)
+        .replace(/\{ext\}/gi, context.outputExt || originalExt);
+}
+
+/**
  * Create ProcessInput from files and settings
  */
 function createProcessInput(files: File[], settings: Record<string, unknown>): ProcessInput {
     return {
         files,
         options: settings,
+    };
+}
+
+/**
+ * Helper to execute a processor either on a single file, or in batch mode if multiple files are provided
+ * for a processor that operates on 1 file at a time (inspired by BentoPDF processBatch).
+ */
+async function executeBatchOrSingle(
+    files: File[],
+    processorFactory: () => { process: (input: ProcessInput, onProgress?: ProgressCallback) => Promise<ProcessOutput> },
+    options: Record<string, unknown>,
+    onProgress?: ProgressCallback
+): Promise<ProcessOutput> {
+    if (files.length === 0) throw new Error('No input file');
+    if (files.length === 1) {
+        const processor = processorFactory();
+        return await processor.process(createProcessInput(files, options), onProgress);
+    }
+
+    // Multiple files passed to a single-file processor -> Automatic Batch Processing
+    const results: Blob[] = [];
+    const outputFilenames: string[] = [];
+    const total = files.length;
+
+    for (let i = 0; i < total; i++) {
+        const file = files[i];
+        const processor = processorFactory();
+        const singleProgress: ProgressCallback = (percent, msg) => {
+            const overall = Math.round(((i + (percent / 100)) / total) * 100);
+            onProgress?.(overall, `[${i + 1}/${total}] ${msg || file.name}`);
+        };
+
+        const output = await processor.process(createProcessInput([file], options), singleProgress);
+        if (!output.success || !output.result) {
+            throw new Error(output.error?.message || `Failed to process ${file.name}`);
+        }
+
+        if (Array.isArray(output.result)) {
+            for (let j = 0; j < output.result.length; j++) {
+                results.push(output.result[j]);
+                outputFilenames.push(output.filename || `${file.name.replace(/\.[^.]+$/, '')}_out_${j + 1}.pdf`);
+            }
+        } else {
+            results.push(output.result as Blob);
+            outputFilenames.push(output.filename || file.name);
+        }
+    }
+
+    return {
+        success: true,
+        result: results,
+        filename: outputFilenames.join(', '),
+        metadata: {
+            outputFiles: outputFilenames,
+            batchCount: total,
+        },
     };
 }
 
@@ -245,7 +344,7 @@ export async function executeNode(
                 const totalPages = pdf.numPages;
 
                 let ranges: { start: number; end: number }[] = [];
-                if (mode === 'every') {
+                if (mode === 'every' || mode === 'every-n-pages') {
                     for (let i = 0; i < totalPages; i += pagesPerSplit) {
                         ranges.push({ start: i + 1, end: Math.min(i + pagesPerSplit, totalPages) });
                     }
@@ -279,10 +378,8 @@ export async function executeNode(
             }
 
             case 'rotate-pdf': {
-                if (files.length === 0) throw new Error('No input file');
                 const angle = Number(settings.angle) || 90;
-                const processor = new RotatePDFProcessor();
-                return await processor.process(createProcessInput(files, { angle }), onProgress);
+                return await executeBatchOrSingle(files, () => new RotatePDFProcessor(), { angle }, onProgress);
             }
 
             case 'alternate-merge': {
@@ -443,8 +540,6 @@ export async function executeNode(
             }
 
             case 'add-watermark': {
-                if (files.length === 0) throw new Error('No input file');
-                const processor = new WatermarkProcessor();
                 // Parse hex color to RGB object (values 0-1)
                 const hexColor = String(settings.color || '#888888');
                 const hexMatch = hexColor.match(/^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i);
@@ -459,8 +554,16 @@ export async function executeNode(
                     rotation: Number(settings.rotation) || -45,
                     color,
                     position: String(settings.position || 'center') as 'top-left' | 'top-right' | 'bottom-left' | 'bottom-right' | 'center' | 'diagonal',
+                    x: settings.x !== undefined ? Number(settings.x) : undefined,
+                    y: settings.y !== undefined ? Number(settings.y) : undefined,
+                    imageScale: settings.imageScale !== undefined ? Number(settings.imageScale) : undefined,
+                    flatten: settings.flatten !== undefined ? Boolean(settings.flatten) : false,
+                    repeat: settings.repeat !== undefined ? Boolean(settings.repeat) : false,
+                    stagger: settings.stagger !== undefined ? Boolean(settings.stagger) : true,
+                    repeatSpacingX: settings.repeatSpacingX !== undefined ? Number(settings.repeatSpacingX) : 200,
+                    repeatSpacingY: settings.repeatSpacingY !== undefined ? Number(settings.repeatSpacingY) : 150,
                 };
-                return await processor.process(createProcessInput(files, options), onProgress);
+                return await executeBatchOrSingle(files, () => new WatermarkProcessor(), options, onProgress);
             }
 
             case 'header-footer': {
@@ -715,30 +818,26 @@ export async function executeNode(
 
             // ==================== Optimize & Repair ====================
             case 'compress-pdf': {
-                if (files.length === 0) throw new Error('No input file');
-                const processor = new CompressPDFProcessor();
                 const quality = String(settings.quality || 'medium') as 'low' | 'medium' | 'high' | 'maximum';
                 const algorithm = String(settings.algorithm || 'standard') as 'standard' | 'condense' | 'photon';
                 const optimizeImages = settings.optimizeImages !== undefined ? Boolean(settings.optimizeImages) : true;
                 const removeMetadata = settings.removeMetadata !== undefined ? Boolean(settings.removeMetadata) : false;
                 const photonDpi = Number(settings.photonDpi) || 150;
-                return await processor.process(createProcessInput(files, { 
+                return await executeBatchOrSingle(files, () => new CompressPDFProcessor(), { 
                     quality,
                     algorithm,
                     optimizeImages,
                     removeMetadata,
                     photonDpi,
-                }), onProgress);
+                }, onProgress);
             }
 
             case 'flatten-pdf': {
-                if (files.length === 0) throw new Error('No input file');
-                const processor = new FlattenPDFProcessor();
                 const options = {
                     flattenForms: settings.flattenForms !== undefined ? Boolean(settings.flattenForms) : true,
                     flattenAnnotations: settings.flattenAnnotations !== undefined ? Boolean(settings.flattenAnnotations) : true,
                 };
-                return await processor.process(createProcessInput(files, options), onProgress);
+                return await executeBatchOrSingle(files, () => new FlattenPDFProcessor(), options, onProgress);
             }
 
             case 'fix-page-size': {
@@ -991,7 +1090,11 @@ export async function executeNode(
             case 'djvu-to-pdf': {
                 if (files.length === 0) throw new Error('No input file');
                 const processor = new DJVUToPDFProcessor();
-                return await processor.process(createProcessInput(files, {}), onProgress);
+                const options = {
+                    dpi: Number(settings.dpi || 150),
+                    quality: Number(settings.quality || 0.92),
+                };
+                return await processor.process(createProcessInput(files, options), onProgress);
             }
 
             case 'cbz-to-pdf': {
@@ -1075,6 +1178,83 @@ export async function executeNode(
                     detectTables: settings.detectTables !== undefined ? Boolean(settings.detectTables) : true,
                 };
                 return await processor.process(createProcessInput(files, options), onProgress);
+            }
+
+            // ==================== Output Nodes ====================
+            case 'download-pdf': {
+                if (files.length === 0) throw new Error('No input file');
+                const rawCustomName = String(settings.filename || '').trim();
+                const template = rawCustomName || '{filename}.pdf';
+
+                onProgress?.(100);
+                if (files.length === 1) {
+                    let filename = interpolateTokens(template, {
+                        filename: files[0].name,
+                        index: 0,
+                        total: 1,
+                        toolId,
+                        outputExt: 'pdf',
+                    });
+                    if (!filename.toLowerCase().endsWith('.pdf')) filename += '.pdf';
+                    return {
+                        success: true,
+                        result: files[0],
+                        filename,
+                    };
+                }
+
+                // Multiple files
+                const outputFilenames = files.map((f, i) => {
+                    let name = interpolateTokens(
+                        template.includes('{index}') || template.includes('{filename}') 
+                            ? template 
+                            : template.replace(/\.pdf$/i, '_{index}.pdf'),
+                        {
+                            filename: f.name,
+                            index: i,
+                            total: files.length,
+                            toolId,
+                            outputExt: 'pdf',
+                        }
+                    );
+                    if (!name.toLowerCase().endsWith('.pdf')) name += '.pdf';
+                    return name;
+                });
+
+                return {
+                    success: true,
+                    result: files,
+                    filename: outputFilenames.join(', '),
+                    metadata: {
+                        outputFiles: outputFilenames,
+                    },
+                };
+            }
+
+            case 'download-zip': {
+                if (files.length === 0) throw new Error('No input file');
+                const { createZip } = await import('@/lib/zip');
+                const rawCustomName = String(settings.filename || '').trim();
+                const template = rawCustomName || 'archive_{date}.zip';
+                let zipFilename = interpolateTokens(template, {
+                    filename: files[0].name,
+                    index: 0,
+                    total: files.length,
+                    toolId,
+                    outputExt: 'zip',
+                });
+                if (!zipFilename.toLowerCase().endsWith('.zip')) zipFilename += '.zip';
+
+                const zipBlob = await createZip(files);
+                onProgress?.(100);
+                return {
+                    success: true,
+                    result: zipBlob,
+                    filename: zipFilename,
+                    metadata: {
+                        fileCount: files.length,
+                    },
+                };
             }
 
             // ==================== Passthrough (tools without processors or interactive tools) ====================

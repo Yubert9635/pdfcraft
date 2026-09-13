@@ -5,7 +5,7 @@ import { useTranslations, useLocale, useMessages } from 'next-intl';
 import { WorkflowNode } from '@/types/workflow';
 import { getToolContent } from '@/config/tool-content';
 import { Locale } from '@/lib/i18n/config';
-import { X, Settings, RotateCcw } from 'lucide-react';
+import { X, Settings, RotateCcw, Check } from 'lucide-react';
 import { Button } from '@/components/ui/Button';
 
 interface NodeSettingsPanelProps {
@@ -37,6 +37,18 @@ interface ToolSettingsConfig {
     titleKey: string;
     fields: FieldConfig[];
 }
+
+const POSITION_GRID_ITEMS = [
+    { value: 'top-left', label: 'TL', title: 'Top Left' },
+    { value: 'top-center', label: 'TC', title: 'Top Center' },
+    { value: 'top-right', label: 'TR', title: 'Top Right' },
+    { value: 'center-left', label: 'CL', title: 'Center Left' },
+    { value: 'center', label: 'C', title: 'Center' },
+    { value: 'center-right', label: 'CR', title: 'Center Right' },
+    { value: 'bottom-left', label: 'BL', title: 'Bottom Left' },
+    { value: 'bottom-center', label: 'BC', title: 'Bottom Center' },
+    { value: 'bottom-right', label: 'BR', title: 'Bottom Right' },
+];
 
 /**
  * Complete tool settings configuration matching original tool components
@@ -119,6 +131,25 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
                 type: 'text',
                 defaultValue: 'CONFIDENTIAL',
                 placeholderKey: 'watermark.textPlaceholder',
+                showWhen: { field: 'watermarkType', value: 'text' },
+            },
+            {
+                key: 'imageFile',
+                labelKey: 'watermark.uploadImage',
+                type: 'file',
+                accept: 'image/*',
+                defaultValue: null,
+                showWhen: { field: 'watermarkType', value: 'image' },
+            },
+            {
+                key: 'imageScale',
+                labelKey: 'watermark.scale',
+                type: 'range',
+                defaultValue: 1,
+                min: 0.1,
+                max: 3,
+                step: 0.1,
+                showWhen: { field: 'watermarkType', value: 'image' },
             },
             {
                 key: 'position',
@@ -133,6 +164,38 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
                     { value: 'bottom-left', labelKey: 'watermark.posBottomLeft' },
                     { value: 'bottom-right', labelKey: 'watermark.posBottomRight' },
                 ],
+                showWhen: { field: 'repeat', value: false },
+            },
+            {
+                key: 'repeat',
+                labelKey: 'watermark.repeatTitle',
+                type: 'checkbox',
+                defaultValue: false,
+            },
+            {
+                key: 'stagger',
+                labelKey: 'watermark.staggerTitle',
+                type: 'checkbox',
+                defaultValue: true,
+                showWhen: { field: 'repeat', value: true },
+            },
+            {
+                key: 'repeatSpacingX',
+                labelKey: 'watermark.spacingX',
+                type: 'number',
+                defaultValue: 200,
+                min: 50,
+                max: 800,
+                showWhen: { field: 'repeat', value: true },
+            },
+            {
+                key: 'repeatSpacingY',
+                labelKey: 'watermark.spacingY',
+                type: 'number',
+                defaultValue: 150,
+                min: 50,
+                max: 800,
+                showWhen: { field: 'repeat', value: true },
             },
             {
                 key: 'fontSize',
@@ -141,21 +204,23 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
                 defaultValue: 48,
                 min: 10,
                 max: 200,
+                showWhen: { field: 'watermarkType', value: 'text' },
             },
             {
                 key: 'color',
                 labelKey: 'watermark.color',
                 type: 'color',
                 defaultValue: '#888888',
+                showWhen: { field: 'watermarkType', value: 'text' },
             },
             {
                 key: 'opacity',
                 labelKey: 'watermark.opacity',
                 type: 'range',
                 defaultValue: 0.3,
-                min: 0.1,
+                min: 0.05,
                 max: 1,
-                step: 0.1,
+                step: 0.05,
             },
             {
                 key: 'rotation',
@@ -165,6 +230,13 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
                 min: -90,
                 max: 90,
                 step: 5,
+            },
+            {
+                key: 'flatten',
+                labelKey: 'watermark.flattenTitle',
+                type: 'checkbox',
+                defaultValue: false,
+                descriptionKey: 'watermark.flattenDescription',
             },
         ],
     },
@@ -272,6 +344,7 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
                 defaultValue: 1,
                 min: 1,
                 max: 100,
+                showWhen: { field: 'splitMode', value: 'every-n-pages' },
             },
             {
                 key: 'pageRanges',
@@ -279,6 +352,7 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
                 type: 'text',
                 defaultValue: '',
                 placeholderKey: 'splitPdf.pageRangesPlaceholder',
+                showWhen: { field: 'splitMode', value: 'ranges' },
             },
         ],
     },
@@ -806,6 +880,10 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
 
     // ==================== PowerPoint to PDF ====================
     'ppt-to-pdf': {
+        titleKey: 'pptToPdf.optionsTitle',
+        fields: [],
+    },
+    'pptx-to-pdf': {
         titleKey: 'pptToPdf.optionsTitle',
         fields: [],
     },
@@ -2281,6 +2359,56 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
             },
         ],
     },
+    'djvu-to-pdf': {
+        titleKey: 'djvuToPdf.optionsTitle',
+        fields: [
+            {
+                key: 'dpi',
+                labelKey: 'djvuToPdf.dpiLabel',
+                type: 'select',
+                defaultValue: '150',
+                options: [
+                    { value: '100', labelKey: '100 DPI' },
+                    { value: '150', labelKey: '150 DPI' },
+                    { value: '200', labelKey: '200 DPI' },
+                    { value: '300', labelKey: '300 DPI' },
+                ],
+            },
+            {
+                key: 'quality',
+                labelKey: 'djvuToPdf.qualityLabel',
+                type: 'range',
+                defaultValue: 0.92,
+                min: 0.5,
+                max: 1,
+                step: 0.05,
+            },
+        ],
+    },
+
+    // ==================== Output Nodes ====================
+    'download-pdf': {
+        titleKey: 'workflow.downloadPdf',
+        fields: [
+            {
+                key: 'filename',
+                labelKey: 'workflow.filenameLabel',
+                type: 'text',
+                defaultValue: 'output.pdf',
+            },
+        ],
+    },
+    'download-zip': {
+        titleKey: 'workflow.downloadZip',
+        fields: [
+            {
+                key: 'filename',
+                labelKey: 'workflow.filenameLabel',
+                type: 'text',
+                defaultValue: 'output.zip',
+            },
+        ],
+    },
 });
 
 /**
@@ -2308,6 +2436,12 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
         if (!node) return '';
         if (node.data.toolId === 'condition-gateway') {
             return locale === 'zh' ? '条件分支配置' : 'Condition Gateway';
+        }
+        if (node.data.toolId === 'download-pdf') {
+            return tWorkflow('downloadPdf') || (locale === 'zh' ? '下载 PDF' : 'Download PDF');
+        }
+        if (node.data.toolId === 'download-zip') {
+            return tWorkflow('downloadZip') || (locale === 'zh' ? '打包 ZIP 下载' : 'Download ZIP');
         }
         const content = getToolContent(locale, node.data.toolId);
         return content?.title || node.data.label;
@@ -2425,32 +2559,39 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
     }, [node?.id, node?.data.toolId]);
 
     const handleFieldChange = (key: string, value: unknown) => {
-        setSettings(prev => ({ ...prev, [key]: value }));
+        setSettings(prev => {
+            const next = { ...prev, [key]: value };
+            if (node) {
+                onUpdateSettings(node.id, next);
+            }
+            return next;
+        });
     };
 
     const handleApply = () => {
         if (node) {
             onUpdateSettings(node.id, settings);
-            onClose();
         }
+        onClose();
     };
 
     const handleReset = () => {
+        let defaultSettings: Record<string, unknown> = {};
         if (node?.data.toolId === 'condition-gateway') {
-            setSettings({
+            defaultSettings = {
                 conditionType: 'file-count',
                 operator: 'greater-than',
                 value: 1,
                 sizeUnit: 'MB',
-            });
-            return;
-        }
-        if (config) {
-            const defaultSettings: Record<string, unknown> = {};
+            };
+        } else if (config) {
             config.fields.forEach(field => {
                 defaultSettings[field.key] = field.defaultValue;
             });
-            setSettings(defaultSettings);
+        }
+        setSettings(defaultSettings);
+        if (node) {
+            onUpdateSettings(node.id, defaultSettings);
         }
     };
 
@@ -2622,9 +2763,12 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                         </p>
 
                         {config.fields.map(field => {
-                            // Check showWhen condition
+                            // Check showWhen condition with defaultValue fallback
                             if (field.showWhen) {
-                                const depValue = settings[field.showWhen.field];
+                                const depField = config.fields.find(f => f.key === field.showWhen!.field);
+                                const depValue = settings[field.showWhen.field] !== undefined
+                                    ? settings[field.showWhen.field]
+                                    : depField?.defaultValue;
                                 if (depValue !== field.showWhen.value) return null;
                             }
 
@@ -2641,6 +2785,7 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                                 )}
 
                                 {field.type === 'text' && (
+                                    <>
                                     <input
                                         type="text"
                                         value={(settings[field.key] as string) || ''}
@@ -2648,6 +2793,45 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                                         placeholder={field.placeholderKey ? getTranslation(field.placeholderKey) : undefined}
                                         className="w-full px-3 py-2 text-sm rounded-md border border-[hsl(var(--color-border))] bg-[hsl(var(--color-background))] focus:outline-none focus:ring-2 focus:ring-[hsl(var(--color-primary))] placeholder:text-[hsl(var(--color-muted-foreground))]"
                                     />
+                                    {field.key === 'filename' && (
+                                        <div className="pt-1">
+                                            <div className="flex items-center gap-1 text-[11px] text-[hsl(var(--color-muted-foreground))] mb-1">
+                                                <span>{locale === 'zh' ? '点击插入动态变量:' : 'Insert variable:'}</span>
+                                            </div>
+                                            <div className="flex flex-wrap gap-1">
+                                                {[
+                                                    { token: '{filename}', label: '{filename}', desc: locale === 'zh' ? '原文件名' : 'Original file name' },
+                                                    { token: '{date}', label: '{date}', desc: locale === 'zh' ? '当前日期 (YYYY-MM-DD)' : 'Date' },
+                                                    { token: '{time}', label: '{time}', desc: locale === 'zh' ? '当前时间' : 'Time' },
+                                                    { token: '{index}', label: '{index}', desc: locale === 'zh' ? '文件序号' : 'File Index' },
+                                                    { token: '{total}', label: '{total}', desc: locale === 'zh' ? '文件总数' : 'Total Count' },
+                                                ].map(({ token, desc }) => (
+                                                    <button
+                                                        key={token}
+                                                        type="button"
+                                                        title={desc}
+                                                        onClick={() => {
+                                                            const current = (settings[field.key] as string) || '';
+                                                            const extMatch = current.match(/(\.[a-zA-Z0-9]+)$/);
+                                                            let next: string;
+                                                            if (extMatch) {
+                                                                const ext = extMatch[1];
+                                                                const base = current.slice(0, -ext.length);
+                                                                next = `${base}_${token}${ext}`;
+                                                            } else {
+                                                                next = `${current}_${token}`;
+                                                            }
+                                                            handleFieldChange(field.key, next);
+                                                        }}
+                                                        className="px-1.5 py-0.5 text-[10px] font-mono rounded bg-[hsl(var(--color-muted))] hover:bg-[hsl(var(--color-primary)/0.15)] text-[hsl(var(--color-foreground))] hover:text-[hsl(var(--color-primary))] border border-[hsl(var(--color-border))] transition-colors"
+                                                    >
+                                                        + {token}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </div>
+                                    )}
+                                    </>
                                 )}
 
                                 {field.type === 'number' && (
@@ -2664,6 +2848,42 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
 
                                 {field.type === 'select' && (
                                     <>
+                                    {field.key === 'position' && field.options?.some(o => o.value === 'top-left' || o.value === 'center') && (
+                                        <div className="mb-2 p-2 bg-[hsl(var(--color-muted)/0.4)] rounded-lg border border-[hsl(var(--color-border))]">
+                                            <div className="text-[11px] text-[hsl(var(--color-muted-foreground))] mb-1.5 font-medium text-center">
+                                                {locale === 'zh' ? '九宫格快速定位' : 'Position Grid'}
+                                            </div>
+                                            <div className="grid grid-cols-3 gap-1.5 max-w-[150px] mx-auto">
+                                                {POSITION_GRID_ITEMS.map(pos => {
+                                                    const isAvailable = field.options?.some(o => o.value === pos.value);
+                                                    const isSelected = (settings[field.key] as string) === pos.value;
+                                                    if (!isAvailable) {
+                                                        return (
+                                                            <div
+                                                                key={pos.value}
+                                                                className="h-7 rounded border border-dashed border-[hsl(var(--color-border)/0.5)] bg-[hsl(var(--color-muted)/0.2)] opacity-30 cursor-not-allowed"
+                                                            />
+                                                        );
+                                                    }
+                                                    return (
+                                                        <button
+                                                            key={pos.value}
+                                                            type="button"
+                                                            title={getTranslation(field.options?.find(o => o.value === pos.value)?.labelKey || pos.title)}
+                                                            onClick={() => handleFieldChange(field.key, pos.value)}
+                                                            className={`h-7 text-xs font-semibold rounded border transition-all flex items-center justify-center ${
+                                                                isSelected
+                                                                    ? 'bg-[hsl(var(--color-primary))] text-[hsl(var(--color-primary-foreground))] border-[hsl(var(--color-primary))] shadow-sm scale-105'
+                                                                    : 'bg-[hsl(var(--color-background))] text-[hsl(var(--color-foreground))] border-[hsl(var(--color-border))] hover:border-[hsl(var(--color-primary)/0.6)] hover:bg-[hsl(var(--color-primary)/0.05)]'
+                                                            }`}
+                                                        >
+                                                            {pos.label}
+                                                        </button>
+                                                    );
+                                                })}
+                                            </div>
+                                        </div>
+                                    )}
                                     <select
                                         value={(settings[field.key] as string) || ''}
                                         onChange={(e) => handleFieldChange(field.key, e.target.value)}
@@ -2781,23 +3001,20 @@ export function NodeSettingsPanel({ node, onClose, onUpdateSettings }: NodeSetti
                         size="sm"
                         onClick={handleReset}
                     >
-                        <RotateCcw className="w-4 h-4 mr-2" />
+                        <RotateCcw className="w-4 h-4 mr-1.5" />
                         {tWorkflow('reset') || 'Reset'}
                     </Button>
-                    <div className="flex gap-2">
-                        <Button
-                            variant="outline"
-                            size="sm"
-                            onClick={onClose}
-                        >
-                            {tWorkflow('cancel') || 'Cancel'}
-                        </Button>
+                    <div className="flex items-center gap-2.5">
+                        <span className="text-[11px] text-emerald-600 dark:text-emerald-400 font-medium">
+                            {locale === 'zh' ? '即时已同步' : 'Auto-synced'}
+                        </span>
                         <Button
                             variant="primary"
                             size="sm"
                             onClick={handleApply}
                         >
-                            {tWorkflow('apply') || 'Apply'}
+                            <Check className="w-4 h-4 mr-1.5" />
+                            {locale === 'zh' ? '完成' : (tWorkflow('done') || 'Done')}
                         </Button>
                     </div>
                 </div>

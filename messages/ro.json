@@ -940,7 +940,17 @@
       "viewOnGithub": "Vizualizați pe GitHub",
       "skipVersion": "Omiteți această versiune",
       "remindLater": "Amintește-mi mai târziu",
-      "close": "Închide"
+      "close": "Închide",
+      "newVersionBadge": "Versiune nouă",
+      "toastPrompt": "O nouă versiune este disponibilă cu stabilitate și performanță îmbunătățite. Actualizați acum pentru o experiență optimă.",
+      "viewDetails": "Actualizează acum / Vezi detalii",
+      "mirrorDownload": "⚡ Descărcare rapidă mirror",
+      "copyLink": "Copiază linkul",
+      "copyMirrorLink": "Copiază linkul mirror",
+      "openingBrowser": "Se deschide browserul...",
+      "downloadStartedNotice": "Descărcarea a început în browser! Dacă nu începe, copiați linkul și inserați-l în browser.",
+      "downloadFailedNotice": "Nu s-a putut deschide browserul. Copiați linkul și descărcați manual.",
+      "linkCopied": "Linkul de descărcare a fost copiat în clipboard!"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "Descărcare ca ZIP",
     "downloadIndividually": "Descărcați fișierele individual",
     "flowControl": "Control flux",
-    "conditionGateway": "Ramură condițională"
+    "conditionGateway": "Ramură condițională",
+    "downloadPdf": "Descărcare PDF",
+    "outputCategory": "Ieșire și Export",
+    "filenameLabel": "Nume fișier de ieșire"
   },
   "tools": {
     "search": {
@@ -2593,7 +2606,18 @@
       "rangePlaceholder": "de ex., 1, 3, 5-10",
       "previewTitle": "Previzualizare",
       "previewNote": "Se afișează doar prima pagină pentru o performanță mai bună",
-      "previewGenerating": "Se generează previzualizarea..."
+      "previewGenerating": "Se generează previzualizarea...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "Încărcați fișierul PDF",

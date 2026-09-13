@@ -24,26 +24,18 @@ async function extractTextFromXLSX(arrayBuffer) {
 
 async function loadCJKFont() {
     if (cjkFontLoaded) return true;
-    self.postMessage({ type: 'status', message: 'Downloading CJK fonts...' });
-
-    const urls = [
-        'https://cdn.jsdelivr.net/gh/ArtifexSoftware/mupdf@master/resources/fonts/droid/DroidSansFallbackFull.ttf',
-        'https://raw.githubusercontent.com/ArtifexSoftware/mupdf/master/resources/fonts/droid/DroidSansFallbackFull.ttf'
-    ];
-
-    for (const url of urls) {
-        try {
-            const res = await fetch(url, { cache: 'force-cache' });
-            if (res.ok) {
-                const data = await res.arrayBuffer();
-                if (data.byteLength > 100000) {
-                    pyodide.FS.writeFile('/cjk_font.ttf', new Uint8Array(data));
-                    cjkFontLoaded = true;
-                    self.postMessage({ type: 'status', message: 'CJK font loaded!' });
-                    return true;
-                }
+    try {
+        const res = await fetch('/fonts/NotoSansSC-Regular.ttf');
+        if (res.ok) {
+            const data = await res.arrayBuffer();
+            if (data.byteLength > 100000) {
+                pyodide.FS.writeFile('/cjk_font.ttf', new Uint8Array(data));
+                cjkFontLoaded = true;
+                return true;
             }
-        } catch (e) {}
+        }
+    } catch (e) {
+        // Fallback gracefully to PyMuPDF's built-in CJK fonts (e.g. china-s)
     }
     return false;
 }

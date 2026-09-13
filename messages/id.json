@@ -940,7 +940,17 @@
       "viewOnGithub": "Lihat di GitHub",
       "skipVersion": "Lewati versi ini",
       "remindLater": "Ingatkan nanti",
-      "close": "Tutup"
+      "close": "Tutup",
+      "newVersionBadge": "Versi Baru",
+      "toastPrompt": "Versi baru telah tersedia dengan peningkatan stabilitas dan fitur inti. Perbarui sekarang untuk pengalaman terbaik.",
+      "viewDetails": "Perbarui Sekarang / Lihat Detail",
+      "mirrorDownload": "⚡ Unduhan Mirror Cepat",
+      "copyLink": "Salin tautan",
+      "copyMirrorLink": "Salin tautan mirror",
+      "openingBrowser": "Membuka peramban...",
+      "downloadStartedNotice": "Unduhan dimulai di browser! Jika belum mulai, salin tautan dan tempel di peramban Anda.",
+      "downloadFailedNotice": "Tidak dapat membuka browser secara otomatis. Silakan salin tautan dan unduh secara manual.",
+      "linkCopied": "Tautan unduhan berhasil disalin!"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "Unduh sebagai ZIP",
     "downloadIndividually": "Unduh file satu per satu",
     "flowControl": "Kontrol Alur",
-    "conditionGateway": "Gerbang Kondisi"
+    "conditionGateway": "Gerbang Kondisi",
+    "downloadPdf": "Unduh PDF",
+    "outputCategory": "Keluaran & Ekspor",
+    "filenameLabel": "Nama file keluaran"
   },
   "tools": {
     "search": {
@@ -2593,7 +2606,18 @@
       "rangePlaceholder": "misalnya, 1, 3, 5-10",
       "previewTitle": "Pratinjau",
       "previewNote": "Menampilkan halaman pertama saja untuk kinerja yang lebih baik",
-      "previewGenerating": "Membuat pratinjau..."
+      "previewGenerating": "Membuat pratinjau...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "Unggah File PDF",

@@ -76,6 +76,45 @@ fn get_temp_dir() -> String {
     env::temp_dir().display().to_string()
 }
 
+#[tauri::command]
+fn open_url(url: String) -> Result<(), String> {
+    if !url.starts_with("http://") && !url.starts_with("https://") {
+        return Err("Invalid URL scheme".to_string());
+    }
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        std::process::Command::new("cmd")
+            .args(["/c", "start", "", &url])
+            .creation_flags(CREATE_NO_WINDOW)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(target_os = "macos")]
+    {
+        std::process::Command::new("open")
+            .arg(&url)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(target_os = "linux")]
+    {
+        std::process::Command::new("xdg-open")
+            .arg(&url)
+            .spawn()
+            .map_err(|e| e.to_string())?;
+        Ok(())
+    }
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        Err("Unsupported platform for opening URL".to_string())
+    }
+}
+
 fn main() {
     #[cfg(target_os = "windows")]
     {
@@ -109,7 +148,8 @@ fn main() {
             save_file,
             read_file,
             write_file,
-            get_temp_dir
+            get_temp_dir,
+            open_url
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");

@@ -103,3 +103,49 @@ export async function writeFileBytes(path: string, data: Uint8Array): Promise<vo
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
+
+/**
+ * Opens a URL in the system's default web browser.
+ * In a desktop Tauri environment, it invokes the native open_url command.
+ * In a standard browser environment, it falls back to window.open or anchor click.
+ */
+export async function openExternalUrl(url: string): Promise<boolean> {
+  if (!url) return false;
+
+  if (isTauri()) {
+    try {
+      const invoke = await getTauriInvoke();
+      await invoke('open_url', { url });
+      return true;
+    } catch (err) {
+      console.warn('Tauri native open_url failed, trying browser fallbacks:', err);
+    }
+  }
+
+  if (typeof window !== 'undefined') {
+    try {
+      const win = window.open(url, '_blank', 'noopener,noreferrer');
+      if (win) return true;
+    } catch {
+      // ignore
+    }
+
+    try {
+      const a = document.createElement('a');
+      a.href = url;
+      a.target = '_blank';
+      a.rel = 'noopener noreferrer';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(() => {
+        document.body.removeChild(a);
+      }, 100);
+      return true;
+    } catch (e) {
+      console.error('Failed to open link via fallback anchor:', e);
+    }
+  }
+
+  return false;
+}
+

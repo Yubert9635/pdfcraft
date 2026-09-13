@@ -149,6 +149,13 @@ export function fileMatchesAcceptedFormats(filename: string, acceptedFormats: st
     const lower = filename.toLowerCase();
     return acceptedFormats.some((format) => {
         if (format === '*' || format === '.*') return true;
+        if (format.includes('/')) {
+            if (format === 'application/pdf' && lower.endsWith('.pdf')) return true;
+            if (format.startsWith('image/') && /\.(png|jpe?g|webp|svg|gif|bmp|tiff?)$/i.test(lower)) return true;
+            if (format === 'application/zip' && lower.endsWith('.zip')) return true;
+            const sub = format.split('/')[1];
+            return lower.endsWith(`.${sub}`);
+        }
         const ext = format.startsWith('.') ? format.toLowerCase() : `.${format.toLowerCase()}`;
         return lower.endsWith(ext);
     });

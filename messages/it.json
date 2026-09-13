@@ -940,7 +940,17 @@
       "viewOnGithub": "Visualizza su GitHub",
       "skipVersion": "Salta questa versione",
       "remindLater": "Ricordamelo più tardi",
-      "close": "Chiudi"
+      "close": "Chiudi",
+      "newVersionBadge": "Nuova versione",
+      "toastPrompt": "È disponibile una nuova versione con stabilità e prestazioni migliorate. Aggiorna ora per un'esperienza ottimale.",
+      "viewDetails": "Aggiorna ora / Visualizza dettagli",
+      "mirrorDownload": "⚡ Download mirror veloce",
+      "copyLink": "Copia link",
+      "copyMirrorLink": "Copia link mirror",
+      "openingBrowser": "Apertura del browser in corso...",
+      "downloadStartedNotice": "Download avviato nel browser! Se non si avvia, copia il link e incollalo nel tuo browser.",
+      "downloadFailedNotice": "Impossibile aprire il browser. Copia il link e incollalo manualmente nel browser.",
+      "linkCopied": "Link di download copiato negli appunti!"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "Scarica come ZIP",
     "downloadIndividually": "Scarica file singolarmente",
     "flowControl": "Controllo di flusso",
-    "conditionGateway": "Gateway condizionale"
+    "conditionGateway": "Gateway condizionale",
+    "downloadPdf": "Scarica PDF",
+    "outputCategory": "Uscita ed Esportazione",
+    "filenameLabel": "Nome file di output"
   },
   "tools": {
     "search": {
@@ -2593,7 +2606,18 @@
       "rangePlaceholder": "ad esempio, 1, 3, 5-10",
       "previewTitle": "Anteprima",
       "previewNote": "Mostra solo la prima pagina per prestazioni migliori",
-      "previewGenerating": "Generazione dell'anteprima in corso..."
+      "previewGenerating": "Generazione dell'anteprima in corso...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "Carica file PDF",

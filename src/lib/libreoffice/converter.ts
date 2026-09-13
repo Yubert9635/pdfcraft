@@ -118,24 +118,64 @@ export class LibreOfficeConverter {
                 : '';
             this.progressCallback?.({ phase: 'loading', percent: 5, message: `Loading conversion engine${totalInfo}...` });
 
-            const filesToFetch = [
-                { name: 'soffice.wasm.bin', url: `${this.basePath}${SOFFICE_WASM_FILE}?v=${ASSET_VERSION}`, estSize: 147 * 1024 * 1024 },
-                { name: 'soffice.data.bin', url: `${this.basePath}${SOFFICE_DATA_FILE}?v=${ASSET_VERSION}`, estSize: 99 * 1024 * 1024 },
-                { name: 'NotoSansSC-Regular.ttf', url: withBasePath(`/fonts/NotoSansSC-Regular.ttf?v=${ASSET_VERSION}`), estSize: 16.4 * 1024 * 1024 }
-            ];
+            let sofficeWasmUrl: string;
+            let sofficeDataUrl: string;
+            let fontArrayBuffer: ArrayBuffer;
 
-            // Fetch and reassemble assets (handles chunking on Cloudflare Pages)
-            const [sofficeWasmBlob, sofficeDataBlob, fontBlob] = await Promise.all(
-                filesToFetch.map(f => fetchAssembledBlob(f.url))
-            );
+            let useDirectStreaming = false;
+            if (isTauri()) {
+                try {
+                    const testRes = await fetch(`${this.basePath}${SOFFICE_WASM_FILE}?v=${ASSET_VERSION}`, { method: 'HEAD' });
+                    useDirectStreaming = testRes.ok;
+                } catch {
+                    useDirectStreaming = false;
+                }
+            }
 
-            const sofficeWasmUrl = URL.createObjectURL(sofficeWasmBlob);
-            const sofficeDataUrl = URL.createObjectURL(sofficeDataBlob);
+            if (useDirectStreaming) {
+                console.log('[LibreOffice] Running in Tauri environment with unchunked assets: using direct asset URLs for zero-copy streaming');
+                sofficeWasmUrl = `${this.basePath}${SOFFICE_WASM_FILE}?v=${ASSET_VERSION}`;
+                sofficeDataUrl = `${this.basePath}${SOFFICE_DATA_FILE}?v=${ASSET_VERSION}`;
 
-            this.blobUrls = [sofficeWasmUrl, sofficeDataUrl];
+                this.progressCallback?.({ phase: 'loading', percent: 15, message: 'Loading fonts...' });
+                const fontRes = await fetch(withBasePath(`/fonts/NotoSansSC-Regular.ttf?v=${ASSET_VERSION}`));
+                if (!fontRes.ok) {
+                    throw new Error(`Failed to load font: ${fontRes.statusText}`);
+                }
+                fontArrayBuffer = await fontRes.arrayBuffer();
+            } else {
+                const filesToFetch = [
+                    { name: 'soffice.wasm.bin', url: `${this.basePath}${SOFFICE_WASM_FILE}?v=${ASSET_VERSION}`, estSize: 147 * 1024 * 1024 },
+                    { name: 'soffice.data.bin', url: `${this.basePath}${SOFFICE_DATA_FILE}?v=${ASSET_VERSION}`, estSize: 99 * 1024 * 1024 },
+                    { name: 'NotoSansSC-Regular.ttf', url: withBasePath(`/fonts/NotoSansSC-Regular.ttf?v=${ASSET_VERSION}`), estSize: 16.4 * 1024 * 1024 }
+                ];
 
-            // Load CJK font into ArrayBuffer for the converter
-            const fontArrayBuffer = await fontBlob.arrayBuffer();
+                const totalBytesEst = filesToFetch.reduce((sum, f) => sum + f.estSize, 0);
+                const loadedBytesMap: { [key: string]: number } = {};
+
+                const reportProgress = () => {
+                    const currentLoaded = Object.values(loadedBytesMap).reduce((a, b) => a + b, 0);
+                    const pct = Math.min(90, Math.round((currentLoaded / totalBytesEst) * 90));
+                    this.progressCallback?.({
+                        phase: 'loading',
+                        percent: pct,
+                        message: this.buildProgressMessage({ percent: pct }),
+                    });
+                };
+
+                // Fetch and reassemble assets (handles chunking on Cloudflare Pages)
+                const [sofficeWasmBlob, sofficeDataBlob, fontBlob] = await Promise.all(
+                    filesToFetch.map(f => fetchAssembledBlob(f.url, (p) => {
+                        loadedBytesMap[f.name] = p.loadedBytes;
+                        reportProgress();
+                    }))
+                );
+
+                sofficeWasmUrl = URL.createObjectURL(sofficeWasmBlob);
+                sofficeDataUrl = URL.createObjectURL(sofficeDataBlob);
+                this.blobUrls = [sofficeWasmUrl, sofficeDataUrl];
+                fontArrayBuffer = await fontBlob.arrayBuffer();
+            }
 
             this.converter = new WorkerBrowserConverter({
                 sofficeJs: `${this.basePath}soffice.js?v=${ASSET_VERSION}`,

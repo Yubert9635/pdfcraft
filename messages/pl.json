@@ -954,7 +954,17 @@
       "viewOnGithub": "Zobacz na GitHubie",
       "skipVersion": "Pomiń tę wersję",
       "remindLater": "Przypomnij mi później",
-      "close": "Zamknij"
+      "close": "Zamknij",
+      "newVersionBadge": "Nowa wersja",
+      "toastPrompt": "Dostępna jest nowa wersja z ulepszoną stabilnością i kluczowymi funkcjami. Zalecamy aktualizację już teraz.",
+      "viewDetails": "Zaktualizuj teraz / Zobacz szczegóły",
+      "mirrorDownload": "⚡ Szybkie pobieranie mirror",
+      "copyLink": "Kopiuj link",
+      "copyMirrorLink": "Kopiuj link mirror",
+      "openingBrowser": "Otwieranie przeglądarki...",
+      "downloadStartedNotice": "Pobieranie rozpoczęte w przeglądarce! Jeśli nie ruszyło, skopiuj link i wklej w przeglądarce.",
+      "downloadFailedNotice": "Nie udało się otworzyć przeglądarki. Skopiuj link i wklej ręcznie w przeglądarce.",
+      "linkCopied": "Link do pobrania skopiowany do schowka!"
     }
   },
   "toolsPage": {
@@ -1459,7 +1469,10 @@
     "downloadZip": "Pobierz jako ZIP",
     "downloadIndividually": "Pobierz pliki pojedynczo",
     "flowControl": "Sterowanie przepływem",
-    "conditionGateway": "Bramka warunkowa"
+    "conditionGateway": "Bramka warunkowa",
+    "downloadPdf": "Pobierz PDF",
+    "outputCategory": "Wyjście i Eksport",
+    "filenameLabel": "Nazwa pliku wyjściowego"
   },
   "tools": {
     "search": {
@@ -2616,7 +2629,18 @@
       "rangePlaceholder": "np. 1, 3, 5-10",
       "previewTitle": "Podgląd",
       "previewNote": "Wyświetlana jest tylko pierwsza strona, aby poprawić wydajność",
-      "previewGenerating": "Tworzenie podglądu..."
+      "previewGenerating": "Tworzenie podglądu...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "Prześlij plik PDF",

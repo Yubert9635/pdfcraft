@@ -49,7 +49,7 @@ export function ToolSidebar({
 
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-        new Set(['flow-control', 'organize-manage', 'convert-to-pdf'])
+        new Set(['flow-control', 'organize-manage', 'convert-to-pdf', 'output'])
     );
     const pointerDragRef = useRef<PointerDragState | null>(null);
 
@@ -65,6 +65,12 @@ export function ToolSidebar({
     const getToolName = (toolId: string): string => {
         if (toolId === 'condition-gateway') {
             return tWorkflow('conditionGateway') || (locale === 'zh' ? '条件分支 (Condition Gateway)' : 'Condition Gateway');
+        }
+        if (toolId === 'download-pdf') {
+            return tWorkflow('downloadPdf') || (locale === 'zh' ? '下载 PDF (Download PDF)' : 'Download PDF');
+        }
+        if (toolId === 'download-zip') {
+            return tWorkflow('downloadZip') || (locale === 'zh' ? '打包 ZIP 下载 (Download ZIP)' : 'Download ZIP');
         }
         const content = getToolContent(locale, toolId);
         if (content && content.title) {
@@ -93,6 +99,35 @@ export function ToolSidebar({
             },
         ];
         categoryMap['flow-control'] = flowControlTools;
+
+        // Output and export terminal nodes
+        const outputTools: typeof tools = [
+            {
+                id: 'download-pdf',
+                slug: 'download-pdf',
+                icon: 'file-down',
+                category: 'output' as unknown as typeof tools[0]['category'],
+                acceptedFormats: ['.pdf'],
+                outputFormat: '.pdf',
+                maxFileSize: Infinity,
+                maxFiles: 100,
+                features: ['download', 'rename'],
+                relatedTools: [],
+            },
+            {
+                id: 'download-zip',
+                slug: 'download-zip',
+                icon: 'archive',
+                category: 'output' as unknown as typeof tools[0]['category'],
+                acceptedFormats: ['*'],
+                outputFormat: '.zip',
+                maxFileSize: Infinity,
+                maxFiles: 100,
+                features: ['zip', 'archive'],
+                relatedTools: [],
+            },
+        ];
+        categoryMap['output'] = outputTools;
 
         // Tools that require interactive UI and should be excluded from workflow
         const interactiveToolsBlacklist = new Set([
@@ -130,6 +165,7 @@ export function ToolSidebar({
             'convert-from-pdf',
             'optimize-repair',
             'secure-pdf',
+            'output',
         ];
 
         const categoryNames: Record<string, string> = {
@@ -140,6 +176,7 @@ export function ToolSidebar({
             'convert-from-pdf': 'Convert from PDF',
             'optimize-repair': 'Optimize & Repair',
             'secure-pdf': 'Security & Privacy',
+            'output': tWorkflow('outputCategory') || (locale === 'zh' ? '输出与导出 (Output & Export)' : 'Output & Export'),
         };
 
         const categoryIcons: Record<string, string> = {
@@ -150,6 +187,7 @@ export function ToolSidebar({
             'convert-from-pdf': 'file-down',
             'optimize-repair': 'zap',
             'secure-pdf': 'shield',
+            'output': 'download',
         };
 
         return categoryOrder
@@ -211,6 +249,10 @@ export function ToolSidebar({
             operator: 'greater-than',
             value: 1,
             sizeUnit: 'MB',
+        } : tool.id === 'download-pdf' ? {
+            filename: 'output.pdf',
+        } : tool.id === 'download-zip' ? {
+            filename: 'output.zip',
         } : {},
     });
 

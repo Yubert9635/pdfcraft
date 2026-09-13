@@ -940,7 +940,17 @@
       "viewOnGithub": "عرض على GitHub",
       "skipVersion": "تخطي هذا الإصدار",
       "remindLater": "تذكيري لاحقًا",
-      "close": "إغلاق"
+      "close": "إغلاق",
+      "newVersionBadge": "إصدار جديد",
+      "toastPrompt": "يتوفر إصدار جديد مع تحسينات في الاستقرار والأداء. قم بالتحديث الآن للحصول على أفضل تجربة.",
+      "viewDetails": "تحديث الآن / عرض التفاصيل",
+      "mirrorDownload": "⚡ تنزيل عبر خادم مرآة سريع",
+      "copyLink": "نسخ الرابط",
+      "copyMirrorLink": "نسخ رابط المرآة",
+      "openingBrowser": "جارٍ فتح المتصفح...",
+      "downloadStartedNotice": "بدأ التنزيل في المتصفح! إذا لم يبدأ، انسخ الرابط والصقه في متصفحك.",
+      "downloadFailedNotice": "تعذر فتح المتصفح تلقائيًا. يرجى نسخ الرابط والتنزيل يدويًا.",
+      "linkCopied": "تم نسخ رابط التنزيل إلى الحافظة!"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "تنزيل كملف مضغوط ZIP",
     "downloadIndividually": "تنزيل الملفات بشكل فردي",
     "flowControl": "التحكم في التدفق",
-    "conditionGateway": "بوابة الشروط"
+    "conditionGateway": "بوابة الشروط",
+    "downloadPdf": "تنزيل PDF",
+    "outputCategory": "الإخراج والتصدير",
+    "filenameLabel": "اسم ملف الإخراج"
   },
   "tools": {
     "search": {
@@ -2593,7 +2606,18 @@
       "rangePlaceholder": "على سبيل المثال، 1، 3، 5-10",
       "previewTitle": "معاينة",
       "previewNote": "عرض الصفحة الأولى فقط للحصول على أداء أفضل",
-      "previewGenerating": "جاري إنشاء المعاينة..."
+      "previewGenerating": "جاري إنشاء المعاينة...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "تحميل ملف PDF",

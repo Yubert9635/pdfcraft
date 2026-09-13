@@ -16,6 +16,8 @@ import { X } from 'lucide-react';
  */
 export function CustomEdge({
     id,
+    source,
+    target,
     sourceX,
     sourceY,
     targetX,
@@ -25,9 +27,10 @@ export function CustomEdge({
     style = {},
     markerEnd,
     selected,
+    animated,
     sourceHandleId,
 }: EdgeProps) {
-    const { setEdges } = useReactFlow();
+    const { setEdges, getNode } = useReactFlow();
     const [edgePath, labelX, labelY] = getBezierPath({
         sourceX,
         sourceY,
@@ -44,11 +47,17 @@ export function CustomEdge({
     const isTrueBranch = sourceHandleId === 'true';
     const isFalseBranch = sourceHandleId === 'false';
 
+    const sourceNode = getNode(source);
+    const targetNode = getNode(target);
+    const isProcessing = sourceNode?.data?.status === 'processing' || targetNode?.data?.status === 'processing' || animated;
+
     let strokeColor = (style?.stroke as string) || (selected ? '#3b82f6' : '#94a3b8');
     if (isTrueBranch) {
         strokeColor = selected ? '#059669' : '#10b981';
     } else if (isFalseBranch) {
         strokeColor = selected ? '#d97706' : '#f59e0b';
+    } else if (isProcessing) {
+        strokeColor = '#3b82f6';
     }
 
     return (
@@ -56,12 +65,23 @@ export function CustomEdge({
             <BaseEdge 
                 path={edgePath} 
                 markerEnd={markerEnd} 
+                interactionWidth={20}
                 style={{
                     ...style,
-                    strokeWidth: selected ? 3 : 2,
+                    strokeWidth: selected ? 3 : (isProcessing ? 2.5 : 1.75),
                     stroke: strokeColor,
+                    strokeDasharray: isProcessing ? '6 4' : undefined,
+                    animation: isProcessing ? 'flowDash 1s linear infinite' : undefined,
                 }}
             />
+            {isProcessing && (
+                <style>{`
+                    @keyframes flowDash {
+                        from { stroke-dashoffset: 20; }
+                        to { stroke-dashoffset: 0; }
+                    }
+                `}</style>
+            )}
             <EdgeLabelRenderer>
                 <div
                     style={{

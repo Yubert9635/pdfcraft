@@ -940,7 +940,17 @@
       "viewOnGithub": "Xem trên GitHub",
       "skipVersion": "Bỏ qua phiên bản này",
       "remindLater": "Nhắc tôi sau",
-      "close": "Đóng"
+      "close": "Đóng",
+      "newVersionBadge": "Phiên bản mới",
+      "toastPrompt": "Phiên bản mới đã ra mắt, tối ưu hóa độ ổn định và các tính năng chính. Khuyến nghị cập nhật ngay để trải nghiệm.",
+      "viewDetails": "Cập nhật ngay / Xem chi tiết",
+      "mirrorDownload": "⚡ Tải xuống qua máy chủ phản chiếu nhanh",
+      "copyLink": "Sao chép liên kết",
+      "copyMirrorLink": "Sao chép link mirror",
+      "openingBrowser": "Đang mở trình duyệt...",
+      "downloadStartedNotice": "Đã mở tải xuống trong trình duyệt! Nếu không tự động tải, hãy sao chép link và dán vào trình duyệt.",
+      "downloadFailedNotice": "Không thể tự động mở trình duyệt. Vui lòng sao chép liên kết và tải thủ công.",
+      "linkCopied": "Đã sao chép liên kết tải xuống!"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "Tải xuống dưới dạng ZIP",
     "downloadIndividually": "Tải xuống từng tệp riêng lẻ",
     "flowControl": "Kiểm soát luồng",
-    "conditionGateway": "Cổng điều kiện"
+    "conditionGateway": "Cổng điều kiện",
+    "downloadPdf": "Tải xuống PDF",
+    "outputCategory": "Đầu ra & Xuất",
+    "filenameLabel": "Tên tệp đầu ra"
   },
   "tools": {
     "search": {
@@ -2593,7 +2606,18 @@
       "rangePlaceholder": "ví dụ: 1, 3, 5-10",
       "previewTitle": "Xem trước",
       "previewNote": "Chỉ hiển thị trang đầu tiên để có hiệu suất tốt hơn",
-      "previewGenerating": "Đang tạo bản xem trước..."
+      "previewGenerating": "Đang tạo bản xem trước...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "Tải lên tệp PDF",

@@ -940,7 +940,17 @@
       "viewOnGithub": "GitHub で表示",
       "skipVersion": "このバージョンをスキップ",
       "remindLater": "後で通知",
-      "close": "閉じる"
+      "close": "閉じる",
+      "newVersionBadge": "新バージョン",
+      "toastPrompt": "新しいバージョンがリリースされました。安定性と機能が向上しています。今すぐ更新することをお勧めします。",
+      "viewDetails": "今すぐ更新 / 詳細を表示",
+      "mirrorDownload": "⚡ 高速ミラーダウンロード",
+      "copyLink": "リンクをコピー",
+      "copyMirrorLink": "ミラーリンクをコピー",
+      "openingBrowser": "ブラウザを開いています...",
+      "downloadStartedNotice": "ブラウザでダウンロードを開始しました！開始されない場合はリンクをコピーして手動で開いてください。",
+      "downloadFailedNotice": "ブラウザを自動で開けませんでした。リンクをコピーしてブラウザに貼り付けてください。",
+      "linkCopied": "ダウンロードリンクをクリップボードにコピーしました！"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "ZIPとしてダウンロード",
     "downloadIndividually": "ファイルを個別にダウンロード",
     "flowControl": "フロー制御",
-    "conditionGateway": "条件分岐"
+    "conditionGateway": "条件分岐",
+    "downloadPdf": "PDFをダウンロード",
+    "outputCategory": "出力とエクスポート",
+    "filenameLabel": "出力ファイル名"
   },
   "tools": {
     "search": {
@@ -2593,7 +2606,18 @@
       "rangePlaceholder": "例: 1, 3, 5-10",
       "previewTitle": "プレビュー",
       "previewNote": "プレビュー生成速度向上のため最初のページのみ表示しています",
-      "previewGenerating": "プレビューを生成中..."
+      "previewGenerating": "プレビューを生成中...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "PDFファイルをアップロード",

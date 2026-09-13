@@ -35,8 +35,13 @@ export function parseVersionParts(version: string): { numbers: number[]; raw: st
 /**
  * Compares two versions.
  * Returns `true` if `latestVersion` is strictly newer than `currentVersion`.
+ * Handles both SemVer (0.1.0, 1.2.3) and Date-based tags (e.g. 2026.09.12-6178132, v2026.09.10).
  */
-export function compareVersions(currentVersion: string, latestVersion: string): boolean {
+export function compareVersions(
+  currentVersion: string,
+  latestVersion: string,
+  releasePublishedAt?: string
+): boolean {
   if (!latestVersion) return false;
   if (!currentVersion) return true;
 
@@ -45,6 +50,11 @@ export function compareVersions(currentVersion: string, latestVersion: string): 
 
   if (cur.raw === lat.raw) {
     return false;
+  }
+
+  // Local development or initial fallback version
+  if ((cur.raw === '0.1.0' || cur.raw === '0.0.0') && lat.raw !== cur.raw) {
+    return true;
   }
 
   // Compare numerical segments
@@ -56,7 +66,21 @@ export function compareVersions(currentVersion: string, latestVersion: string): 
     if (latNum < curNum) return false;
   }
 
-  // If numbers match, check if latest has a later commit hash or build tag
+  // If numerical segments match (e.g. both built on 2026.09.12) but raw tags differ:
+  if (cur.raw !== lat.raw) {
+    const buildDateStr = process.env.NEXT_PUBLIC_BUILD_DATE;
+    if (releasePublishedAt && buildDateStr) {
+      const releaseTime = new Date(releasePublishedAt).getTime();
+      const buildTime = new Date(buildDateStr).getTime();
+      if (!Number.isNaN(releaseTime) && !Number.isNaN(buildTime)) {
+        return releaseTime > buildTime;
+      }
+    }
+    // If we have different commit hashes on the same date and no verifiable timestamp,
+    // treat differing build hashes as an update opportunity
+    return true;
+  }
+
   return false;
 }
 
@@ -242,9 +266,37 @@ export function isVersionIgnored(version: string): boolean {
   return settings.ignoredVersions.includes(version);
 }
 
+const SESSION_SNOOZE_KEY = 'pdfcraft_update_snoozed_version';
+
+/**
+ * Checks if a specific version has been snoozed (reminded later) in the current browser/app session.
+ */
+export function isUpdateSnoozedInSession(version: string): boolean {
+  if (typeof window === 'undefined') return false;
+  try {
+    const snoozed = sessionStorage.getItem(SESSION_SNOOZE_KEY);
+    return snoozed === version;
+  } catch {
+    return false;
+  }
+}
+
+/**
+ * Snoozes update reminders for a specific version during the current session.
+ */
+export function snoozeUpdateInSession(version: string): void {
+  if (typeof window === 'undefined') return;
+  try {
+    sessionStorage.setItem(SESSION_SNOOZE_KEY, version);
+  } catch {
+    // ignore quota/storage issues
+  }
+}
+
 export const GITHUB_RELEASE_ENDPOINTS = [
   `https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
   `https://gh-proxy.com/https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
+  `https://mirror.ghproxy.com/https://api.github.com/repos/${GITHUB_REPO}/releases/latest`,
 ];
 
 /**
@@ -256,7 +308,7 @@ export async function fetchLatestRelease(): Promise<ReleaseInfo> {
 
   for (const endpoint of GITHUB_RELEASE_ENDPOINTS) {
     const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 6000);
+    const timeoutId = setTimeout(() => controller.abort(), 3500);
 
     try {
       const response = await fetch(endpoint, {
@@ -302,15 +354,28 @@ export async function fetchLatestRelease(): Promise<ReleaseInfo> {
   throw lastError || new Error('Failed to fetch from all release endpoints');
 }
 
+export interface CheckUpdateOptions {
+  force?: boolean;
+  isDesktop?: boolean;
+}
+
 /**
  * Performs an in-app check for software updates.
  *
- * @param force If true, skips interval check and queries GitHub immediately.
+ * @param optionsOrForce If true or options.force is true, skips interval check and queries GitHub immediately.
  */
-export async function checkUpdate(force = false): Promise<UpdateCheckResult> {
-  const currentVersion = DEFAULT_CURRENT_VERSION;
+export async function checkUpdate(
+  optionsOrForce: boolean | CheckUpdateOptions = false
+): Promise<UpdateCheckResult> {
+  const options: CheckUpdateOptions =
+    typeof optionsOrForce === 'boolean'
+      ? { force: optionsOrForce }
+      : optionsOrForce;
 
-  if (!force && !shouldCheckUpdate()) {
+  const currentVersion = DEFAULT_CURRENT_VERSION;
+  const shouldBypassInterval = Boolean(options.force || options.isDesktop);
+
+  if (!shouldBypassInterval && !shouldCheckUpdate()) {
     return {
       hasUpdate: false,
       currentVersion,
@@ -322,7 +387,7 @@ export async function checkUpdate(force = false): Promise<UpdateCheckResult> {
   try {
     const release = await fetchLatestRelease();
     const latestVersion = release.tag;
-    const hasUpdate = compareVersions(currentVersion, latestVersion);
+    const hasUpdate = compareVersions(currentVersion, latestVersion, release.publishedAt);
 
     // Record check timestamp
     const settings = getUpdateSettings();

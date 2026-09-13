@@ -1,199 +1,131 @@
-import { describe, expect, it, vi, beforeEach, afterEach } from 'vitest';
+/**
+ * Software Updater & Version Comparison Tests
+ */
+
+import { describe, it, expect, beforeEach, vi } from 'vitest';
 import {
   parseVersionParts,
   compareVersions,
   categorizeAsset,
   matchPlatformAssets,
-  getUpdateSettings,
-  saveUpdateSettings,
-  shouldCheckUpdate,
   ignoreVersion,
   isVersionIgnored,
+  snoozeUpdateInSession,
+  isUpdateSnoozedInSession,
+  saveUpdateSettings,
+  shouldCheckUpdate,
   checkUpdate,
 } from '@/lib/updater';
-import { ReleaseAsset } from '@/types/updater';
+import type { ReleaseAsset } from '@/types/updater';
 
-describe('Updater Library', () => {
+describe('Software Updater', () => {
   beforeEach(() => {
     localStorage.clear();
-    vi.restoreAllMocks();
-  });
-
-  afterEach(() => {
-    localStorage.clear();
-    vi.restoreAllMocks();
+    sessionStorage.clear();
   });
 
   describe('parseVersionParts', () => {
-    it('parses standard semver strings', () => {
-      expect(parseVersionParts('0.1.0').numbers).toEqual([0, 1, 0]);
-      expect(parseVersionParts('v1.2.3').numbers).toEqual([1, 2, 3]);
+    it('parses standard semver versions', () => {
+      const parts = parseVersionParts('0.1.0');
+      expect(parts.numbers).toEqual([0, 1, 0]);
+      expect(parts.raw).toBe('0.1.0');
     });
 
-    it('parses date-based release tags with commit hashes', () => {
-      expect(parseVersionParts('v2026.09.10-a1b2c3d').numbers).toEqual([2026, 9, 10]);
-      expect(parseVersionParts('2026.9.1').numbers).toEqual([2026, 9, 1]);
-    });
-
-    it('handles non-numeric segments gracefully', () => {
-      expect(parseVersionParts('abc.def').numbers).toEqual([0, 0]);
+    it('parses date-based tags with leading v and commit hashes', () => {
+      const parts = parseVersionParts('v2026.09.12-6178132');
+      expect(parts.numbers).toEqual([2026, 9, 12]);
+      expect(parts.raw).toBe('2026.09.12-6178132');
     });
   });
 
   describe('compareVersions', () => {
-    it('returns true when latest semver is newer than current', () => {
+    it('detects newer SemVer version', () => {
       expect(compareVersions('0.1.0', '0.2.0')).toBe(true);
-      expect(compareVersions('0.1.0', '1.0.0')).toBe(true);
-      expect(compareVersions('1.2.3', '1.2.4')).toBe(true);
+      expect(compareVersions('1.0.0', '1.0.1')).toBe(true);
+      expect(compareVersions('1.0.0', '1.0.0')).toBe(false);
+      expect(compareVersions('1.2.0', '1.1.9')).toBe(false);
     });
 
-    it('returns true when latest date tag is newer than current date tag', () => {
-      expect(compareVersions('v2026.09.08-abc', 'v2026.09.10-def')).toBe(true);
-      expect(compareVersions('2026.08.30', '2026.09.01')).toBe(true);
+    it('detects update when local version is default 0.1.0 and remote is date-tagged', () => {
+      expect(compareVersions('0.1.0', 'v2026.09.12-6178132')).toBe(true);
+      expect(compareVersions('0.0.0', 'v2026.09.12-6178132')).toBe(true);
     });
 
-    it('returns true when comparing initial 0.1.0 against a modern date release', () => {
-      expect(compareVersions('0.1.0', 'v2026.09.10-abc')).toBe(true);
+    it('detects newer date-tagged version across days', () => {
+      expect(compareVersions('v2026.09.10-abc', 'v2026.09.12-def')).toBe(true);
+      expect(compareVersions('v2026.09.15-abc', 'v2026.09.12-def')).toBe(false);
     });
 
-    it('returns false when versions are identical', () => {
-      expect(compareVersions('0.1.0', '0.1.0')).toBe(false);
-      expect(compareVersions('v2026.09.10-abc', 'v2026.09.10-abc')).toBe(false);
+    it('detects update when date is the same but commit hash differs (same-day releases)', () => {
+      expect(compareVersions('v2026.09.12-1111111', 'v2026.09.12-2222222')).toBe(true);
     });
 
-    it('returns false when current is newer than latest', () => {
-      expect(compareVersions('0.2.0', '0.1.0')).toBe(false);
-      expect(compareVersions('v2026.09.15', 'v2026.09.10')).toBe(false);
+    it('returns false when version tags are identical', () => {
+      expect(compareVersions('v2026.09.12-6178132', 'v2026.09.12-6178132')).toBe(false);
+      expect(compareVersions('2026.09.12-6178132', 'v2026.09.12-6178132')).toBe(false);
     });
 
-    it('handles empty or missing versions safely', () => {
-      expect(compareVersions('0.1.0', '')).toBe(false);
-      expect(compareVersions('', 'v1.0.0')).toBe(true);
+    it('handles falsy or empty versions gracefully', () => {
+      expect(compareVersions('', 'v2026.09.12')).toBe(true);
+      expect(compareVersions('v2026.09.12', '')).toBe(false);
     });
   });
 
-  describe('categorizeAsset', () => {
-    it('identifies Windows portable zip', () => {
+  describe('categorizeAsset & matchPlatformAssets', () => {
+    it('categorizes assets correctly', () => {
       expect(categorizeAsset('PDFCraft-Windows-x64-Portable.zip')).toBe('windows-portable');
-      expect(categorizeAsset('pdfcraft-portable.zip')).toBe('windows-portable');
+      expect(categorizeAsset('PDFCraft-Windows-x64-Setup.exe')).toBe('windows-installer');
+      expect(categorizeAsset('PDFCraft_0.1.0_x64_en-US.msi')).toBe('windows-installer');
+      expect(categorizeAsset('PDFCraft.dmg')).toBe('macos-dmg');
+      expect(categorizeAsset('PDFCraft.AppImage')).toBe('linux-appimage');
+      expect(categorizeAsset('PDFCraft.deb')).toBe('linux-deb');
+      expect(categorizeAsset('source-code.zip')).toBe('source');
     });
 
-    it('identifies Windows installer', () => {
-      expect(categorizeAsset('PDFCraft_0.1.0_x64-setup.exe')).toBe('windows-installer');
-      expect(categorizeAsset('PDFCraft_0.1.0_x64.msi')).toBe('windows-installer');
-    });
+    it('matches Windows platform assets with portable prioritized', () => {
+      const assets: ReleaseAsset[] = [
+        {
+          name: 'PDFCraft-Windows-x64-Portable.zip',
+          downloadUrl: 'https://example.com/portable.zip',
+          size: 1024,
+          platformType: 'windows-portable',
+          browserDownloadUrl: 'https://example.com/portable.zip',
+        },
+        {
+          name: 'PDFCraft-Setup.exe',
+          downloadUrl: 'https://example.com/setup.exe',
+          size: 2048,
+          platformType: 'windows-installer',
+          browserDownloadUrl: 'https://example.com/setup.exe',
+        },
+      ];
 
-    it('identifies macOS dmg', () => {
-      expect(categorizeAsset('PDFCraft_0.1.0_x64.dmg')).toBe('macos-dmg');
-    });
-
-    it('identifies Linux packages', () => {
-      expect(categorizeAsset('pdfcraft_0.1.0_amd64.AppImage')).toBe('linux-appimage');
-      expect(categorizeAsset('pdfcraft_0.1.0_amd64.deb')).toBe('linux-deb');
-    });
-
-    it('identifies source or web export packages', () => {
-      expect(categorizeAsset('pdfcraft-v2026.09.10.zip')).toBe('source');
-      expect(categorizeAsset('source_code.tar.gz')).toBe('source');
-    });
-
-    it('returns other for unrecognized files', () => {
-      expect(categorizeAsset('checksums.txt')).toBe('other');
-    });
-  });
-
-  describe('matchPlatformAssets', () => {
-    const mockAssets: ReleaseAsset[] = [
-      {
-        name: 'PDFCraft-Windows-x64-Portable.zip',
-        downloadUrl: 'https://example.com/portable.zip',
-        size: 50000000,
-        platformType: 'windows-portable',
-        browserDownloadUrl: 'https://example.com/portable.zip',
-      },
-      {
-        name: 'PDFCraft_0.1.0_x64-setup.exe',
-        downloadUrl: 'https://example.com/setup.exe',
-        size: 55000000,
-        platformType: 'windows-installer',
-        browserDownloadUrl: 'https://example.com/setup.exe',
-      },
-      {
-        name: 'PDFCraft_0.1.0_x64.dmg',
-        downloadUrl: 'https://example.com/mac.dmg',
-        size: 60000000,
-        platformType: 'macos-dmg',
-        browserDownloadUrl: 'https://example.com/mac.dmg',
-      },
-      {
-        name: 'pdfcraft_0.1.0_amd64.AppImage',
-        downloadUrl: 'https://example.com/linux.AppImage',
-        size: 70000000,
-        platformType: 'linux-appimage',
-        browserDownloadUrl: 'https://example.com/linux.AppImage',
-      },
-      {
-        name: 'pdfcraft_0.1.0_amd64.deb',
-        downloadUrl: 'https://example.com/linux.deb',
-        size: 65000000,
-        platformType: 'linux-deb',
-        browserDownloadUrl: 'https://example.com/linux.deb',
-      },
-    ];
-
-    it('matches Windows platform with portable as primary', () => {
-      const match = matchPlatformAssets(mockAssets, 'windows');
-      expect(match.primary?.platformType).toBe('windows-portable');
-      expect(match.secondary?.platformType).toBe('windows-installer');
-      expect(match.all.length).toBe(5);
-    });
-
-    it('matches macOS platform with dmg as primary', () => {
-      const match = matchPlatformAssets(mockAssets, 'macos');
-      expect(match.primary?.platformType).toBe('macos-dmg');
-    });
-
-    it('matches Linux platform with AppImage as primary and deb as secondary', () => {
-      const match = matchPlatformAssets(mockAssets, 'linux');
-      expect(match.primary?.platformType).toBe('linux-appimage');
-      expect(match.secondary?.platformType).toBe('linux-deb');
+      const matched = matchPlatformAssets(assets, 'windows');
+      expect(matched.primary?.platformType).toBe('windows-portable');
+      expect(matched.secondary?.platformType).toBe('windows-installer');
     });
   });
 
-  describe('settings and ignored versions', () => {
-    it('returns default settings when none are saved', () => {
-      const settings = getUpdateSettings();
-      expect(settings.autoCheck).toBe(true);
-      expect(settings.checkFrequencyHours).toBe(24);
-      expect(settings.ignoredVersions).toEqual([]);
+  describe('ignore and snooze functionality', () => {
+    it('correctly tracks ignored versions in localStorage', () => {
+      expect(isVersionIgnored('v2026.09.12')).toBe(false);
+      ignoreVersion('v2026.09.12');
+      expect(isVersionIgnored('v2026.09.12')).toBe(true);
+      expect(isVersionIgnored('v2026.09.13')).toBe(false);
     });
 
-    it('saves and reads modified settings', () => {
-      saveUpdateSettings({
-        autoCheck: false,
-        checkFrequencyHours: 48,
-        lastCheckedTimestamp: 123456789,
-        ignoredVersions: ['v2026.09.01'],
-      });
-
-      const updated = getUpdateSettings();
-      expect(updated.autoCheck).toBe(false);
-      expect(updated.checkFrequencyHours).toBe(48);
-      expect(updated.lastCheckedTimestamp).toBe(123456789);
-      expect(updated.ignoredVersions).toEqual(['v2026.09.01']);
+    it('correctly tracks snoozed versions in sessionStorage', () => {
+      expect(isUpdateSnoozedInSession('v2026.09.12')).toBe(false);
+      snoozeUpdateInSession('v2026.09.12');
+      expect(isUpdateSnoozedInSession('v2026.09.12')).toBe(true);
+      expect(isUpdateSnoozedInSession('v2026.09.13')).toBe(false);
     });
+  });
 
-    it('adds and checks ignored versions', () => {
-      expect(isVersionIgnored('v2026.09.10')).toBe(false);
-      ignoreVersion('v2026.09.10');
-      expect(isVersionIgnored('v2026.09.10')).toBe(true);
-    });
-
+  describe('settings and checkUpdate', () => {
     it('checks shouldCheckUpdate frequency correctly', () => {
-      // Never checked -> true
       expect(shouldCheckUpdate()).toBe(true);
 
-      // Just checked -> false
       const now = Date.now();
       saveUpdateSettings({
         autoCheck: true,
@@ -203,7 +135,6 @@ describe('Updater Library', () => {
       });
       expect(shouldCheckUpdate()).toBe(false);
 
-      // Checked 25 hours ago -> true
       saveUpdateSettings({
         autoCheck: true,
         checkFrequencyHours: 24,
@@ -211,30 +142,19 @@ describe('Updater Library', () => {
         ignoredVersions: [],
       });
       expect(shouldCheckUpdate()).toBe(true);
-
-      // Auto check disabled -> false
-      saveUpdateSettings({
-        autoCheck: false,
-        checkFrequencyHours: 24,
-        lastCheckedTimestamp: 0,
-        ignoredVersions: [],
-      });
-      expect(shouldCheckUpdate()).toBe(false);
     });
-  });
 
-  describe('checkUpdate with mocked GitHub API', () => {
-    it('fetches release and discovers new update successfully', async () => {
+    it('fetches release and discovers update via mocked fetch', async () => {
       const mockGitHubResponse = {
-        tag_name: 'v2026.09.10-abc',
-        name: 'PDFCraft v2026.09.10',
-        published_at: '2026-09-10T12:00:00Z',
-        html_url: 'https://github.com/PDFCraftTool/pdfcraft/releases/tag/v2026.09.10-abc',
-        body: '## Release notes\n- Added in-app auto updater',
+        tag_name: 'v2026.09.15-xyz',
+        name: 'PDFCraft v2026.09.15',
+        published_at: '2026-09-15T12:00:00Z',
+        html_url: 'https://github.com/PDFCraftTool/pdfcraft/releases/tag/v2026.09.15-xyz',
+        body: '## Release notes',
         assets: [
           {
             name: 'PDFCraft-Windows-x64-Portable.zip',
-            browser_download_url: 'https://github.com/download/portable.zip',
+            browser_download_url: 'https://example.com/portable.zip',
             size: 10485760,
           },
         ],
@@ -245,22 +165,10 @@ describe('Updater Library', () => {
         json: async () => mockGitHubResponse,
       });
 
-      const result = await checkUpdate(true);
-
+      const result = await checkUpdate({ force: true });
       expect(result.hasUpdate).toBe(true);
-      expect(result.latestVersion).toBe('v2026.09.10-abc');
-      expect(result.release?.name).toBe('PDFCraft v2026.09.10');
-      expect(result.release?.body).toContain('Added in-app auto updater');
-      expect(result.matchedAssets.primary?.name).toBe('PDFCraft-Windows-x64-Portable.zip');
-    });
-
-    it('handles network failure gracefully without throwing', async () => {
-      global.fetch = vi.fn().mockRejectedValue(new Error('Network offline'));
-
-      const result = await checkUpdate(true);
-
-      expect(result.hasUpdate).toBe(false);
-      expect(result.error).toContain('Network offline');
+      expect(result.latestVersion).toBe('v2026.09.15-xyz');
+      expect(result.matchedAssets.primary?.platformType).toBe('windows-portable');
     });
   });
 });

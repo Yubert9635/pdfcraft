@@ -940,7 +940,17 @@
       "viewOnGithub": "GitHub에서 보기",
       "skipVersion": "이 버전 건너뛰기",
       "remindLater": "나중에 알림",
-      "close": "닫기"
+      "close": "닫기",
+      "newVersionBadge": "새 버전",
+      "toastPrompt": "새 버전이 출시되었습니다. 안정성과 핵심 기능이 최적화되었습니다. 지금 업데이트하여 최상의 환경을 경험해보세요.",
+      "viewDetails": "지금 업데이트 / 자세히 보기",
+      "mirrorDownload": "⚡ 고속 미러 다운로드",
+      "copyLink": "링크 복사",
+      "copyMirrorLink": "미러 링크 복사",
+      "openingBrowser": "브라우저를 여는 중...",
+      "downloadStartedNotice": "브라우저에서 다운로드가 시작되었습니다! 자동으로 시작되지 않으면 링크를 복사하여 브라우저에 붙여넣으세요.",
+      "downloadFailedNotice": "브라우저를 자동으로 열 수 없습니다. 링크를 복사하여 브라우저에서 다운로드하세요.",
+      "linkCopied": "다운로드 링크가 클립보드에 복사되었습니다!"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "ZIP으로 다운로드",
     "downloadIndividually": "파일 개별 다운로드",
     "flowControl": "흐름 제어",
-    "conditionGateway": "조건부 분기"
+    "conditionGateway": "조건부 분기",
+    "downloadPdf": "PDF 다운로드",
+    "outputCategory": "출력 및 내보내기",
+    "filenameLabel": "출력 파일 이름"
   },
   "tools": {
     "search": {
@@ -2593,7 +2606,18 @@
       "rangePlaceholder": "예: 1, 3, 5-10",
       "previewTitle": "미리보기",
       "previewNote": "로딩 성능 최적화를 위해 첫 번째 페이지만 미리보기로 표시합니다",
-      "previewGenerating": "미리보기 생성 중..."
+      "previewGenerating": "미리보기 생성 중...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "PDF 파일 업로드",

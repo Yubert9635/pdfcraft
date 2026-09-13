@@ -940,7 +940,17 @@
       "viewOnGithub": "Ver en GitHub",
       "skipVersion": "Omitir esta versión",
       "remindLater": "Recordármelo más tarde",
-      "close": "Cerrar"
+      "close": "Cerrar",
+      "newVersionBadge": "Nueva versión",
+      "toastPrompt": "Hay una nueva versión disponible con mejoras de estabilidad y rendimiento. Actualice ahora para obtener la mejor experiencia.",
+      "viewDetails": "Actualizar ahora / Ver detalles",
+      "mirrorDownload": "⚡ Descarga espejo rápida",
+      "copyLink": "Copiar enlace",
+      "copyMirrorLink": "Copiar enlace espejo",
+      "openingBrowser": "Abriendo el navegador...",
+      "downloadStartedNotice": "¡Descarga iniciada en el navegador! Si no empieza, copie el enlace y péguelo en su navegador.",
+      "downloadFailedNotice": "No se pudo abrir el navegador. Copie el enlace y péguelo manualmente.",
+      "linkCopied": "¡Enlace de descarga copiado al portapapeles!"
     }
   },
   "toolsPage": {
@@ -1444,7 +1454,10 @@
     "downloadZip": "Descargar como ZIP",
     "downloadIndividually": "Descargar archivos individualmente",
     "flowControl": "Control de flujo",
-    "conditionGateway": "Puerta de condición"
+    "conditionGateway": "Puerta de condición",
+    "downloadPdf": "Descargar PDF",
+    "outputCategory": "Salida y Exportación",
+    "filenameLabel": "Nombre del archivo de salida"
   },
   "tools": {
     "search": {
@@ -2601,7 +2614,18 @@
       "rangePlaceholder": "por ejemplo, 1, 3, 5-10",
       "previewTitle": "Vista previa",
       "previewNote": "Mostrar la primera página solo para un mejor rendimiento",
-      "previewGenerating": "Generando vista previa..."
+      "previewGenerating": "Generando vista previa...",
+      "flattenTitle": "Flatten Watermark",
+      "flattenDescription": "Rasterize pages into tamper-resistant images so watermarks cannot be removed or extracted",
+      "dragHint": "Drag watermark directly on preview or drag corners to resize",
+      "posTop": "Top",
+      "posBottom": "Bottom",
+      "posLeft": "Left",
+      "posRight": "Right",
+      "scale": "Image Scale",
+      "page": "Page",
+      "of": "of",
+      "pages": "pages"
     },
     "headerFooter": {
       "uploadLabel": "Subir archivo PDF",

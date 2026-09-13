@@ -12,14 +12,19 @@ let converterInstance: LibreOfficeConverter | null = null;
 export async function getSharedLibreOfficeConverter(
   onProgress?: (percent: number, message: string) => void
 ): Promise<LibreOfficeConverter> {
+  const { getLibreOfficeConverter } = await import('./converter');
+  const instance = getLibreOfficeConverter();
+  if (instance.isReady()) {
+    converterInstance = instance;
+    return instance;
+  }
+
   if (converterInstance?.isReady()) {
     return converterInstance;
   }
 
   if (!converterPromise) {
     converterPromise = (async () => {
-      const { getLibreOfficeConverter } = await import('./converter');
-      const instance = getLibreOfficeConverter();
       await instance.initialize((progress) => {
         onProgress?.(progress.percent, progress.message);
       });
