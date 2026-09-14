@@ -216,7 +216,7 @@ self.onmessage = async (event) => {
     const { type, id, data } = event.data;
     try {
         if (type === 'init') {
-            if (!initPromise) initPromise = init();
+            if (!initPromise) initPromise = init(true);
             await initPromise;
             self.postMessage({ id, type: 'init-complete' });
             return;

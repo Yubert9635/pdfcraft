@@ -18,9 +18,16 @@ const MAX_FILE_SIZE = 50 * 1024 * 1024;
 /** Conversion timeout: 5 minutes */
 const CONVERT_TIMEOUT_MS = 5 * 60 * 1000;
 
-import { getSharedLibreOfficeConverter } from '@/lib/libreoffice/shared-converter';
+import {
+    getSharedLibreOfficeConverter,
+    isLibreOfficeFailed,
+    isLibreOfficeReady,
+} from '@/lib/libreoffice/shared-converter';
 import { isCrossOriginIsolated } from '@/lib/utils/cross-origin-isolated';
-import { convertExcelToPdfPyodide } from './excel-to-pdf-pyodide';
+import {
+    convertExcelToPdfPyodide,
+    isExcelPyodideReady,
+} from './excel-to-pdf-pyodide';
 
 export interface ExcelToPDFOptions {
     /** Reserved for future options */
@@ -78,10 +85,14 @@ export class ExcelToPDFProcessor extends BasePDFProcessor {
     }
 
     private async convertWithPyodideFallback(file: File): Promise<Blob> {
-        this.updateProgress(10, 'Using compatibility converter (Python engine)...');
+        this.updateProgress(20, 'Converting Excel to PDF...');
 
         return await convertExcelToPdfPyodide(file, (message) => {
-            this.updateProgress(Math.min(this.progress + 2, 90), message);
+            const mappedMessage =
+                message === 'Converting...' || message === 'Analyzing...'
+                    ? 'Converting Excel to PDF...'
+                    : message;
+            this.updateProgress(Math.min(this.progress + 15, 92), mappedMessage);
         });
     }
 
@@ -123,10 +134,13 @@ export class ExcelToPDFProcessor extends BasePDFProcessor {
             );
         }
 
-        const useLibreOffice = isCrossOriginIsolated();
         const canPyodideFallback = ext === 'xlsx' || ext === 'csv';
+        const isolated = isCrossOriginIsolated();
+        const isPyodideReady = isExcelPyodideReady();
+        const loReady = isLibreOfficeReady();
+        const loFailed = isLibreOfficeFailed();
 
-        if (!useLibreOffice && !canPyodideFallback) {
+        if (!isolated && !canPyodideFallback) {
             return this.createErrorOutput(
                 PDFErrorCode.PROCESSING_FAILED,
                 `.${ext} files require LibreOffice, which needs Cross-Origin Isolation on your server.`,
@@ -134,26 +148,42 @@ export class ExcelToPDFProcessor extends BasePDFProcessor {
             );
         }
 
+        // Determine best engine to use without redundant reload:
+        // If file is .xlsx/.csv:
+        // - If Pyodide is already preloaded and ready, use it immediately
+        // - If LibreOffice failed or host is not isolated, use Pyodide
+        // - If LibreOffice is already ready, use it
+        // - Otherwise default to Pyodide for instant, reliable Excel processing
+        let preferPyodide = false;
+        if (canPyodideFallback) {
+            if (isPyodideReady || loFailed || !isolated) {
+                preferPyodide = true;
+            } else if (loReady) {
+                preferPyodide = false;
+            } else {
+                preferPyodide = true;
+            }
+        }
+
         try {
             let pdfBlob: Blob;
-            let engine: 'libreoffice' | 'pyodide' = 'libreoffice';
+            let engine: 'libreoffice' | 'pyodide' = preferPyodide ? 'pyodide' : 'libreoffice';
 
-            if (useLibreOffice) {
+            if (preferPyodide) {
+                pdfBlob = await this.convertWithPyodideFallback(file);
+            } else {
                 try {
                     pdfBlob = await this.convertWithLibreOffice(file);
                 } catch (loErr) {
                     if (canPyodideFallback && !this.checkCancelled()) {
                         console.warn('[ExcelToPDF] LibreOffice failed or timed out, falling back to Pyodide:', loErr);
-                        this.updateProgress(20, 'LibreOffice engine unavailable, falling back to Python converter...');
+                        this.updateProgress(25, 'Converting Excel to PDF...');
                         pdfBlob = await this.convertWithPyodideFallback(file);
                         engine = 'pyodide';
                     } else {
                         throw loErr;
                     }
                 }
-            } else {
-                pdfBlob = await this.convertWithPyodideFallback(file);
-                engine = 'pyodide';
             }
 
             if (this.checkCancelled()) {

@@ -73,9 +73,17 @@ async function ensureWorkerReady(
   await initPromise;
 }
 
+export function isExcelPyodideReady(): boolean {
+  return workerReady;
+}
+
 export async function preloadExcelPyodide(
   onStatus?: (message: string) => void
 ): Promise<void> {
+  if (workerReady) {
+    onStatus?.('Conversion engine ready.');
+    return;
+  }
   await ensureWorkerReady(onStatus);
 }
 

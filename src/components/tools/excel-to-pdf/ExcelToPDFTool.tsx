@@ -41,59 +41,33 @@ export function ExcelToPDFTool({ className = '' }: ExcelToPDFToolProps) {
         let cancelled = false;
         (async () => {
             try {
-                if (!isCrossOriginIsolated()) {
-                    setPreloadStatus('processing');
-                    setPreloadProgress(0);
-                    setPreloadMessage('Loading conversion engine...');
-
-                    const { preloadExcelPyodide } = await import('@/lib/pdf/processors/excel-to-pdf-pyodide');
-                    if (cancelled) return;
-
-                    await preloadExcelPyodide((message) => {
-                        if (cancelled) return;
-                        setPreloadMessage(message || 'Loading conversion engine...');
-                    });
-
+                const { preloadExcelPyodide, isExcelPyodideReady } = await import('@/lib/pdf/processors/excel-to-pdf-pyodide');
+                if (isExcelPyodideReady()) {
                     if (cancelled) return;
                     setPreloadStatus('complete');
                     setPreloadProgress(100);
-                    setPreloadMessage('Conversion engine ready (Compatibility Mode).');
+                    setPreloadMessage('Conversion engine ready.');
                     return;
                 }
 
-                const { getSharedLibreOfficeConverter } = await import('@/lib/libreoffice/shared-converter');
-                if (cancelled) return;
-
                 setPreloadStatus('processing');
                 setPreloadProgress(0);
-                setPreloadMessage('Checking environment...');
+                setPreloadMessage('Loading conversion engine...');
 
-                await getSharedLibreOfficeConverter((percent, message) => {
+                await preloadExcelPyodide((message) => {
                     if (cancelled) return;
-                    setPreloadStatus('processing');
-                    setPreloadProgress(percent);
                     setPreloadMessage(message || 'Loading conversion engine...');
                 });
 
                 if (cancelled) return;
                 setPreloadStatus('complete');
                 setPreloadProgress(100);
-                setPreloadMessage('Conversion engine ready!');
+                setPreloadMessage('Conversion engine ready.');
             } catch (err) {
                 if (cancelled) return;
-                console.warn('[ExcelToPDF] LibreOffice WASM preload failed, switching to Compatibility Mode:', err);
-                try {
-                    const { preloadExcelPyodide } = await import('@/lib/pdf/processors/excel-to-pdf-pyodide');
-                    await preloadExcelPyodide((msg) => {
-                        if (!cancelled) setPreloadMessage(msg || 'Loading conversion engine...');
-                    });
-                } catch {
-                    // Ignore fallback preload errors
-                }
-                if (cancelled) return;
+                console.warn('[ExcelToPDF] Engine preload warning:', err);
                 setPreloadStatus('complete');
                 setPreloadProgress(100);
-                setPreloadMessage('Conversion engine ready (Compatibility Mode: .xlsx/.csv supported).');
             }
         })();
         return () => { cancelled = true; };
@@ -134,7 +108,8 @@ export function ExcelToPDFTool({ className = '' }: ExcelToPDFToolProps) {
 
         cancelledRef.current = false;
         setStatus('processing');
-        setProgress(0);
+        setProgress(20);
+        setProgressMessage('Converting Excel to PDF...');
         setError(null);
         setResult(null);
 
