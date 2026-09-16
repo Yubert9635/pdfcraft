@@ -7,6 +7,7 @@ import { Button } from '@/components/ui/Button';
 import { FileListPanel } from './FileListPanel';
 import { createZip } from '@/lib/zip';
 import { logger } from '@/lib/utils/logger';
+import { saveBlobFile } from '@/lib/tauri-bridge';
 import {
     Play,
     Pause,
@@ -302,14 +303,8 @@ export function WorkflowControls({
                                                     return { blob: item.blob, filename: item.filename || `output_${index + 1}.pdf` };
                                                 });
                                                 const zipBlob = await createZip(filesForZip);
-                                                const url = URL.createObjectURL(zipBlob);
-                                                const a = document.createElement('a');
-                                                a.href = url;
-                                                a.download = `workflow_results_${new Date().toISOString().slice(0, 10)}.zip`;
-                                                document.body.appendChild(a);
-                                                a.click();
-                                                document.body.removeChild(a);
-                                                setTimeout(() => URL.revokeObjectURL(url), 100);
+                                                const zipFilename = `workflow_results_${new Date().toISOString().slice(0, 10)}.zip`;
+                                                await saveBlobFile(zipBlob, zipFilename);
                                             } catch (error) {
                                                 logger.error('Failed to create ZIP package:', error);
                                             } finally {
@@ -340,14 +335,7 @@ export function WorkflowControls({
                                                     filename = item.filename || `output_${index + 1}.pdf`;
                                                 }
 
-                                                const url = URL.createObjectURL(blob);
-                                                const a = document.createElement('a');
-                                                a.href = url;
-                                                a.download = filename;
-                                                document.body.appendChild(a);
-                                                a.click();
-                                                document.body.removeChild(a);
-                                                setTimeout(() => URL.revokeObjectURL(url), 100);
+                                                saveBlobFile(blob, filename);
                                             });
                                         }}
                                         title={tWorkflow('downloadIndividually') || 'Download files individually'}
@@ -360,7 +348,7 @@ export function WorkflowControls({
                                 <Button
                                     variant="primary"
                                     size="sm"
-                                    onClick={() => {
+                                    onClick={async () => {
                                         const item = executionState.outputFiles![0];
                                         let blob: Blob;
                                         let filename: string;
@@ -373,14 +361,7 @@ export function WorkflowControls({
                                             filename = item.filename || `output_1.pdf`;
                                         }
 
-                                        const url = URL.createObjectURL(blob);
-                                        const a = document.createElement('a');
-                                        a.href = url;
-                                        a.download = filename;
-                                        document.body.appendChild(a);
-                                        a.click();
-                                        document.body.removeChild(a);
-                                        setTimeout(() => URL.revokeObjectURL(url), 100);
+                                        await saveBlobFile(blob, filename);
                                     }}
                                 >
                                     <Download className="w-4 h-4 mr-2" />

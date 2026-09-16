@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 
 import React, { useState, useCallback, useRef, useEffect } from 'react';
 import { useTranslations } from 'next-intl';
 import { FileUploader } from '../FileUploader';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
+import { isTauri, saveBlobFile } from '@/lib/tauri-bridge';
 
 export interface StampsToolProps {
   className?: string;
@@ -81,8 +82,14 @@ export function StampsTool({ className = '' }: StampsToolProps) {
       // and forward any download-triggering click to the top-level window,
       // which is always allowed to initiate a download.
 
-      const downloadFromParent = (href: string, name: string) => {
+      const downloadFromParent = async (href: string, name: string) => {
         try {
+          if (isTauri()) {
+            const res = await fetch(href);
+            const blob = await res.blob();
+            await saveBlobFile(blob, name || 'annotated.pdf');
+            return;
+          }
           const a = document.createElement('a');
           a.href = href;
           a.download = name || 'annotated.pdf';

@@ -8,6 +8,7 @@
 'use client';
 
 import { useState, useCallback, useRef } from 'react';
+import { saveBlobFile } from '@/lib/tauri-bridge';
 
 export interface BatchFile {
   id: string;
@@ -224,14 +225,7 @@ export function useBatchProcessing(options: BatchProcessingOptions = {}): UseBat
     });
 
     const blob = await zip.generateAsync({ type: 'blob' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = zipFilename;
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
+    await saveBlobFile(blob, zipFilename);
   }, [files]);
 
   // Calculate derived state

@@ -40,6 +40,7 @@ import { DownloadButton } from '../DownloadButton';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { loadPdfjs } from '@/lib/pdf/loader';
+import { saveBlobFile } from '@/lib/tauri-bridge';
 import {
   redactPDF,
   renderRedactionAreaOnCanvas,
@@ -1305,20 +1306,11 @@ export function RedactPDFTool({ className = '' }: RedactPDFToolProps) {
       setProgress(100);
       setProgressMessage('脱敏完成，正在启动下载...');
 
-      // Automatically trigger browser download
+      // Automatically trigger file download
       const downloadFilename = file.name
         ? `${file.name.replace(/\.pdf$/i, '')}_redacted.pdf`
         : 'redacted.pdf';
-      const downloadUrl = URL.createObjectURL(outputBlob);
-      const link = document.createElement('a');
-      link.href = downloadUrl;
-      link.download = downloadFilename;
-      document.body.appendChild(link);
-      link.click();
-      document.body.removeChild(link);
-      setTimeout(() => {
-        URL.revokeObjectURL(downloadUrl);
-      }, 15000);
+      await saveBlobFile(outputBlob, downloadFilename);
     } catch (err: any) {
       console.error('Redaction failed:', err);
       setError(err?.message || '处理脱敏 PDF 时出错');

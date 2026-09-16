@@ -6,6 +6,7 @@ import { FileUploader } from '../FileUploader';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { withBasePath } from '@/lib/utils/path';
+import { saveBlobFile } from '@/lib/tauri-bridge';
 
 export interface SignPDFToolProps {
   className?: string;
@@ -220,15 +221,8 @@ export function SignPDFTool({ className = '' }: SignPDFToolProps) {
           : new Uint8Array(rawPdfBytes);
 
       const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = `signed_${signState.file?.name || 'document.pdf'}`;
-      document.body.appendChild(a);
-      a.click();
-      document.body.removeChild(a);
-      URL.revokeObjectURL(url);
+      const downloadName = `signed_${signState.file?.name || 'document.pdf'}`;
+      await saveBlobFile(blob, downloadName);
 
       setIsProcessing(false);
     } catch (err) {

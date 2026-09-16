@@ -8,6 +8,7 @@ import { DownloadButton } from '../DownloadButton';
 import { Button } from '@/components/ui/Button';
 import { Card } from '@/components/ui/Card';
 import { configurePdfjsWorker } from '@/lib/pdf/loader';
+import { saveBlobFile } from '@/lib/tauri-bridge';
 
 export interface PDFMultiToolProps {
   className?: string;
@@ -377,13 +378,7 @@ export function PDFMultiTool({ className = '' }: PDFMultiToolProps) {
 
       const pdfBytes = await newPdf.save();
       const blob = new Blob([new Uint8Array(pdfBytes)], { type: 'application/pdf' });
-
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
-      a.href = url;
-      a.download = 'selected_pages.pdf';
-      a.click();
-      URL.revokeObjectURL(url);
+      await saveBlobFile(blob, 'selected_pages.pdf');
 
       setStatus('idle');
     } catch (err) {
