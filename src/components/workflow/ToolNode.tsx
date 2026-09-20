@@ -324,13 +324,64 @@ const ToolNode = memo(({ id, data, selected = false, isConnectable = true }: Too
                 </p>
             )}
 
-            {/* Output file count indicator */}
+            {/* Download Action Area for download-pdf & download-zip nodes */}
+            {data.toolId && (data.toolId === 'download-pdf' || data.toolId === 'download-zip') && data.status === 'complete' && data.outputFiles && data.outputFiles.length > 0 && (
+                <div className="mt-2.5">
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            data.outputFiles?.forEach((file, index) => {
+                                const blob = file instanceof Blob ? file : file.blob;
+                                const originalName = file instanceof Blob ? undefined : file.filename;
+                                const fallbackExt = data.toolId === 'download-zip' ? 'zip' : 'pdf';
+                                const defaultName = originalName || (data.settings?.filename as string) || `workflow-output-${index + 1}.${fallbackExt}`;
+                                const url = URL.createObjectURL(blob);
+                                const a = document.createElement('a');
+                                a.href = url;
+                                a.download = defaultName;
+                                document.body.appendChild(a);
+                                a.click();
+                                document.body.removeChild(a);
+                                setTimeout(() => URL.revokeObjectURL(url), 5000);
+                            });
+                        }}
+                        className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 rounded-lg bg-emerald-600 hover:bg-emerald-700 active:scale-98 text-white text-xs font-semibold shadow-sm transition-all"
+                    >
+                        <LucideIcons.Download className="w-3.5 h-3.5" />
+                        <span>立即下载产物</span>
+                    </button>
+                </div>
+            )}
+
+            {/* Output file count indicator & Quick Preview Button */}
             {data.status === 'complete' && data.outputFiles && data.outputFiles.length > 0 && (
-                <div className="mt-2 flex items-center gap-1.5">
-                    <LucideIcons.CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400" />
-                    <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
-                        {data.outputFiles.length} 个生成文件
-                    </span>
+                <div className="mt-2 flex items-center justify-between gap-1.5 pt-1 border-t border-[hsl(var(--color-border)/0.4)]">
+                    <div className="flex items-center gap-1.5">
+                        <LucideIcons.CheckCircle className="w-3 h-3 text-emerald-600 dark:text-emerald-400 shrink-0" />
+                        <span className="text-[10px] text-emerald-600 dark:text-emerald-400 font-medium">
+                            {data.outputFiles.length} 个生成文件
+                        </span>
+                    </div>
+                    {/* Quick Preview Button */}
+                    <button
+                        type="button"
+                        onClick={(e) => {
+                            e.stopPropagation();
+                            const first = data.outputFiles?.[0];
+                            if (first) {
+                                const blob = first instanceof Blob ? first : first.blob;
+                                const url = URL.createObjectURL(blob);
+                                window.open(url, '_blank');
+                                setTimeout(() => URL.revokeObjectURL(url), 60000);
+                            }
+                        }}
+                        className="flex items-center gap-1 px-1.5 py-0.5 rounded text-[10px] text-indigo-600 dark:text-indigo-400 bg-indigo-50 dark:bg-indigo-950/60 hover:bg-indigo-100 dark:hover:bg-indigo-900/80 transition-colors"
+                        title="在新标签页中快速预览当前步骤输出"
+                    >
+                        <LucideIcons.Eye className="w-3 h-3" />
+                        <span>预览步骤</span>
+                    </button>
                 </div>
             )}
 

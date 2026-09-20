@@ -170,5 +170,22 @@ describe('Software Updater', () => {
       expect(result.latestVersion).toBe('v2026.09.15-xyz');
       expect(result.matchedAssets.primary?.platformType).toBe('windows-portable');
     });
+
+    it('disables update checking when NEXT_PUBLIC_DISABLE_UPDATE_CHECK is true', async () => {
+      const originalEnv = process.env.NEXT_PUBLIC_DISABLE_UPDATE_CHECK;
+      try {
+        process.env.NEXT_PUBLIC_DISABLE_UPDATE_CHECK = 'true';
+        expect(shouldCheckUpdate()).toBe(false);
+
+        const result = await checkUpdate();
+        expect(result.hasUpdate).toBe(false);
+      } finally {
+        if (originalEnv !== undefined) {
+          process.env.NEXT_PUBLIC_DISABLE_UPDATE_CHECK = originalEnv;
+        } else {
+          delete process.env.NEXT_PUBLIC_DISABLE_UPDATE_CHECK;
+        }
+      }
+    });
   });
 });

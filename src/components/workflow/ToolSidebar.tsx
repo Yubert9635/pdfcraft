@@ -49,7 +49,7 @@ export function ToolSidebar({
 
     const [searchQuery, setSearchQuery] = useState('');
     const [expandedCategories, setExpandedCategories] = useState<Set<string>>(
-        new Set(['flow-control', 'organize-manage', 'convert-to-pdf', 'output'])
+        new Set(['input', 'flow-control', 'organize-manage', 'convert-to-pdf', 'output'])
     );
     const pointerDragRef = useRef<PointerDragState | null>(null);
 
@@ -63,6 +63,15 @@ export function ToolSidebar({
 
     // Helper function to get tool name with fallback using getToolContent
     const getToolName = (toolId: string): string => {
+        if (toolId === 'pdf-input') {
+            return tWorkflow('pdfInput') || (locale === 'zh' ? 'PDF 输入源 (PDF Input)' : 'PDF Input');
+        }
+        if (toolId === 'image-input') {
+            return tWorkflow('imageInput') || (locale === 'zh' ? '图片输入源 (Image Input)' : 'Image Input');
+        }
+        if (toolId === 'file-input') {
+            return tWorkflow('fileInput') || (locale === 'zh' ? '通用文件输入 (File Input)' : 'File Input');
+        }
         if (toolId === 'condition-gateway') {
             return tWorkflow('conditionGateway') || (locale === 'zh' ? '条件分支 (Condition Gateway)' : 'Condition Gateway');
         }
@@ -82,6 +91,47 @@ export function ToolSidebar({
     // Group tools by category
     const categories: CategoryGroup[] = useMemo(() => {
         const categoryMap: Record<string, typeof tools> = {};
+
+        // Input source nodes (inspired by BentoPDF)
+        const inputTools: typeof tools = [
+            {
+                id: 'pdf-input',
+                slug: 'pdf-input',
+                icon: 'file-text',
+                category: 'input' as unknown as typeof tools[0]['category'],
+                acceptedFormats: ['.pdf'],
+                outputFormat: 'pdf',
+                maxFileSize: Infinity,
+                maxFiles: 100,
+                features: ['input', 'pdf-source'],
+                relatedTools: [],
+            },
+            {
+                id: 'image-input',
+                slug: 'image-input',
+                icon: 'images',
+                category: 'input' as unknown as typeof tools[0]['category'],
+                acceptedFormats: ['.jpg', '.jpeg', '.png', '.webp', '.bmp', '.tiff', '.tif', '.svg', '.heic'],
+                outputFormat: 'image',
+                maxFileSize: Infinity,
+                maxFiles: 100,
+                features: ['input', 'image-source'],
+                relatedTools: [],
+            },
+            {
+                id: 'file-input',
+                slug: 'file-input',
+                icon: 'folder-input',
+                category: 'input' as unknown as typeof tools[0]['category'],
+                acceptedFormats: ['*'],
+                outputFormat: '*',
+                maxFileSize: Infinity,
+                maxFiles: 100,
+                features: ['input', 'file-source'],
+                relatedTools: [],
+            },
+        ];
+        categoryMap['input'] = inputTools;
 
         // Flow control gateway node
         const flowControlTools: typeof tools = [
@@ -158,6 +208,7 @@ export function ToolSidebar({
             });
 
         const categoryOrder = [
+            'input',
             'flow-control',
             'organize-manage',
             'edit-annotate',
@@ -169,17 +220,19 @@ export function ToolSidebar({
         ];
 
         const categoryNames: Record<string, string> = {
-            'flow-control': tWorkflow('flowControl') || (locale === 'zh' ? '流程控制 (Flow Control)' : 'Flow Control'),
-            'organize-manage': 'Organize & Manage',
-            'edit-annotate': 'Edit & Annotate',
-            'convert-to-pdf': 'Convert to PDF',
-            'convert-from-pdf': 'Convert from PDF',
-            'optimize-repair': 'Optimize & Repair',
-            'secure-pdf': 'Security & Privacy',
-            'output': tWorkflow('outputCategory') || (locale === 'zh' ? '输出与导出 (Output & Export)' : 'Output & Export'),
+            'input': tWorkflow('inputCategory') || (locale === 'zh' ? '输入源' : 'Input Sources'),
+            'flow-control': tWorkflow('flowControl') || (locale === 'zh' ? '流程控制' : 'Flow Control'),
+            'organize-manage': locale === 'zh' ? '文档组织' : 'Organize & Manage',
+            'edit-annotate': locale === 'zh' ? '编辑与标注' : 'Edit & Annotate',
+            'convert-to-pdf': locale === 'zh' ? '转换为 PDF' : 'Convert to PDF',
+            'convert-from-pdf': locale === 'zh' ? '从 PDF 导出' : 'Convert from PDF',
+            'optimize-repair': locale === 'zh' ? '压缩与优化' : 'Optimize & Repair',
+            'secure-pdf': locale === 'zh' ? '安全与隐私' : 'Security & Privacy',
+            'output': tWorkflow('outputCategory') || (locale === 'zh' ? '输出与交付' : 'Output & Export'),
         };
 
         const categoryIcons: Record<string, string> = {
+            'input': 'upload',
             'flow-control': 'git-fork',
             'organize-manage': 'files',
             'edit-annotate': 'pencil',
@@ -232,6 +285,8 @@ export function ToolSidebar({
     };
 
     const handleDragStart = (e: React.DragEvent, tool: typeof tools[0]) => {
+        // Cancel pointer fallback drag since native HTML5 drag-and-drop has taken over
+        pointerDragRef.current = null;
         onDragStart(e, createNodeData(tool));
     };
 

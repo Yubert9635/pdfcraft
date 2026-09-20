@@ -279,6 +279,29 @@ export async function executeNode(
 
     try {
         switch (toolId) {
+            // ==================== Dedicated Inputs (inspired by BentoPDF) ====================
+            case 'pdf-input':
+            case 'image-input':
+            case 'file-input': {
+                const sourceFiles = (node.data.inputFiles && node.data.inputFiles.length > 0)
+                    ? node.data.inputFiles
+                    : files;
+
+                if (sourceFiles.length === 0) {
+                    throw new Error(`请先在【${node.data.label || '输入节点'}】中上传或拖入文件`);
+                }
+
+                onProgress?.(100);
+                return {
+                    success: true,
+                    result: sourceFiles.length === 1 ? sourceFiles[0] : sourceFiles,
+                    filename: sourceFiles.length === 1 ? sourceFiles[0].name : `${sourceFiles.length} files`,
+                    metadata: {
+                        outputFiles: sourceFiles.map(f => f.name),
+                    },
+                };
+            }
+
             // ==================== Flow Control ====================
             case 'condition-gateway': {
                 const conditionType = (settings.conditionType as ConditionType) || 'file-count';
@@ -890,9 +913,13 @@ export async function executeNode(
             case 'encrypt-pdf': {
                 if (files.length === 0) throw new Error('No input file');
                 const processor = new EncryptPDFProcessor();
+                const rawUserPassword = String(settings.userPassword || '');
+                const rawOwnerPassword = String(settings.ownerPassword || '');
+                // Fallback to default password if neither user nor owner password was configured in workflow
+                const userPassword = (rawUserPassword || rawOwnerPassword) ? rawUserPassword : '123456';
                 const options = {
-                    userPassword: String(settings.userPassword || ''),
-                    ownerPassword: String(settings.ownerPassword || ''),
+                    userPassword,
+                    ownerPassword: rawOwnerPassword,
                     permissions: {
                         printing: settings.allowPrinting !== undefined ? Boolean(settings.allowPrinting) : true,
                         copying: settings.allowCopying !== undefined ? Boolean(settings.allowCopying) : false,
@@ -1307,11 +1334,11 @@ export function collectInputFiles(
     const parentEdges = edges.filter(e => e.target === nodeId);
 
     if (parentEdges.length === 0) {
-        if (inputAssignments?.has(nodeId)) {
+        if (inputAssignments && inputAssignments.has(nodeId)) {
             return inputAssignments.get(nodeId)!;
         }
         const node = nodes.find(n => n.id === nodeId);
-        if (node?.data.inputFiles) {
+        if (node?.data.inputFiles && node.data.inputFiles.length > 0) {
             return node.data.inputFiles;
         }
         return [];

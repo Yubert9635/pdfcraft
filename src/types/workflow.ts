@@ -43,6 +43,12 @@ export interface ToolNodeData {
     outputFiles?: (Blob | WorkflowOutputFile)[];
     /** Tool-specific settings */
     settings?: Record<string, unknown>;
+    /** Node role kind: input, process, output, gateway */
+    nodeKind?: 'input' | 'process' | 'output' | 'gateway';
+    /** Custom title or override label */
+    customTitle?: string;
+    /** Output file name or pattern for download nodes */
+    downloadFilename?: string;
     /** Conditional branching configuration (optional, for future use) */
     conditional?: {
         enabled: boolean;

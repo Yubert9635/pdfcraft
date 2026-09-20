@@ -36,6 +36,7 @@ import { useUndoRedo } from '@/hooks/useUndoRedo';
 
 import ToolNode from './ToolNode';
 import ConditionalNode from './ConditionalNode';
+import InputNode from './InputNode';
 import CustomEdge from './CustomEdge';
 import { ToolSidebar } from './ToolSidebar';
 import { WorkflowLibrary } from './WorkflowLibrary';
@@ -53,6 +54,7 @@ let globalDragData: ToolNodeData | null = null;
 const nodeTypes = {
     toolNode: ToolNode,
     conditionalNode: ConditionalNode,
+    inputNode: InputNode,
 };
 
 // Edge types for ReactFlow
@@ -108,6 +110,12 @@ function WorkflowEditorContent() {
     const [isRightSidebarCollapsed, setIsRightSidebarCollapsed] = useState(false);
     const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
 
+    // Automatically aggregate files uploaded in InputNode cards on canvas or globally
+    const effectiveInputFiles = useMemo(() => {
+        if (selectedFiles.length > 0) return selectedFiles;
+        return (nodes as WorkflowNode[]).flatMap((n) => n.data.inputFiles || []);
+    }, [selectedFiles, nodes]);
+
     // Track created Blob URLs for cleanup
     const createdBlobUrls = useRef<Set<string>>(new Set());
 
@@ -149,6 +157,15 @@ function WorkflowEditorContent() {
             cleanupBlobUrls();
         };
     }, [cleanupBlobUrls]);
+
+    // Listen for preview open events from canvas cards
+    useEffect(() => {
+        const handleOpenPreview = () => {
+            setIsPreviewVisible(true);
+        };
+        window.addEventListener('workflow:open-preview', handleOpenPreview);
+        return () => window.removeEventListener('workflow:open-preview', handleOpenPreview);
+    }, []);
 
     // Undo/Redo
     const { canUndo, canRedo, pushHistory, undo, redo, clearHistory } = useUndoRedo();
@@ -363,32 +380,49 @@ function WorkflowEditorContent() {
     const addToolNodeAtClientPosition = useCallback((nodeData: ToolNodeData, clientX: number, clientY: number) => {
         if (!reactFlowWrapper.current || !reactFlowInstance) return;
 
+        // Strict deduplication guard (e.g. dual triggers from pointerup + native onDrop)
+        const lastDrop = lastToolDropRef.current;
+        const now = Date.now();
+        if (
+            lastDrop &&
+            lastDrop.toolId === nodeData.toolId &&
+            now - lastDrop.time < 500 &&
+            Math.abs(lastDrop.clientX - clientX) < 80 &&
+            Math.abs(lastDrop.clientY - clientY) < 80
+        ) {
+            logger.log('[Workflow] Deduplicated double drop for tool:', nodeData.toolId);
+            return;
+        }
+
+        lastToolDropRef.current = {
+            toolId: nodeData.toolId,
+            clientX,
+            clientY,
+            time: now,
+        };
+
         const position = reactFlowInstance.screenToFlowPosition({
             x: clientX,
             y: clientY,
         });
 
         const isCondition = nodeData.toolId === 'condition-gateway';
+        const isInput = nodeData.toolId === 'pdf-input' || nodeData.toolId === 'image-input' || nodeData.toolId === 'file-input' || nodeData.category === 'input';
 
         const newNode: Node<ToolNodeData> = {
             id: getNodeId(),
-            type: isCondition ? 'conditionalNode' : 'toolNode',
+            type: isCondition ? 'conditionalNode' : isInput ? 'inputNode' : 'toolNode',
             position,
             data: { ...nodeData, settings: nodeData.settings || {} },
         };
 
         setNodes((nds) => nds.concat(newNode));
-        lastToolDropRef.current = {
-            toolId: nodeData.toolId,
-            clientX,
-            clientY,
-            time: Date.now(),
-        };
     }, [reactFlowInstance, setNodes]);
 
     const onDrop = useCallback(
         (event: React.DragEvent) => {
             event.preventDefault();
+            event.stopPropagation();
 
             if (!reactFlowWrapper.current || !reactFlowInstance) return;
 
@@ -553,14 +587,22 @@ function WorkflowEditorContent() {
                 throw new Error('No input nodes found in workflow. Cannot execute.');
             }
 
+            const hasLocalFiles = inputNodes.some(n => n.data.inputFiles && n.data.inputFiles.length > 0);
+            if (inputFiles.length === 0 && !hasLocalFiles) {
+                throw new Error('请先上传文件（可在顶部面板上传，或直接在输入节点卡片中上传）');
+            }
+
             logger.log(
-                `[Workflow] Starting execution with ${inputFiles.length} file(s) ` +
+                `[Workflow] Starting execution with ${inputFiles.length} file(s) (has local node files: ${hasLocalFiles}) ` +
                 `for ${inputNodes.length} input node(s): ${inputNodes.map(n => n.data.label).join(', ')}`
             );
 
             const inputFileAssignments = distributeFilesToInputNodes(inputFiles, inputNodes);
 
             setNodes((nds) => nds.map(node => {
+                if (node.data.inputFiles && node.data.inputFiles.length > 0) {
+                    return node;
+                }
                 const assigned = inputFileAssignments.get(node.id);
                 if (assigned !== undefined) {
                     return {
@@ -720,7 +762,9 @@ function WorkflowEditorContent() {
                             nodeInputFiles.length > 0
                                 ? nodeInputFiles
                                 : isInputNode
-                                  ? (inputFileAssignments.get(nodeId) || inputFiles)
+                                  ? (currentNode.data.inputFiles && currentNode.data.inputFiles.length > 0
+                                      ? currentNode.data.inputFiles
+                                      : (inputFileAssignments.get(nodeId) || inputFiles))
                                   : [];
 
                         // Execute the node
@@ -1050,6 +1094,7 @@ function WorkflowEditorContent() {
         setNodes(workflow.nodes);
         setEdges(workflow.edges as Edge[]);
         clearHistory();
+        setIsRightSidebarCollapsed(true);
     }, [setNodes, setEdges, clearHistory]);
 
     /**
@@ -1065,6 +1110,7 @@ function WorkflowEditorContent() {
         
         // Clear undo/redo history
         clearHistory();
+        setIsRightSidebarCollapsed(true);
         
         logger.log('[Workflow] Loaded from history:', record.workflowName || 'Unnamed');
     }, [clearHistory, clearWorkflowState, setNodes, setEdges]);
@@ -1076,6 +1122,7 @@ function WorkflowEditorContent() {
         setNodes(template.nodes);
         setEdges(template.edges as Edge[]);
         clearHistory();
+        setIsRightSidebarCollapsed(true);
     }, [setNodes, setEdges, clearHistory]);
 
     /**
@@ -1159,6 +1206,12 @@ function WorkflowEditorContent() {
                             onRetry={retryFromFailedNode}
                             onImport={handleImportWorkflow}
                             onFilesChange={setSelectedFiles}
+                            isPreviewVisible={isPreviewVisible}
+                            onTogglePreview={() => setIsPreviewVisible(prev => !prev)}
+                            isLeftSidebarCollapsed={isLeftSidebarCollapsed}
+                            isRightSidebarCollapsed={isRightSidebarCollapsed}
+                            onToggleLeftSidebar={() => setIsLeftSidebarCollapsed(!isLeftSidebarCollapsed)}
+                            onToggleRightSidebar={() => setIsRightSidebarCollapsed(!isRightSidebarCollapsed)}
                         />
                     </div>
                 </div>
@@ -1167,70 +1220,68 @@ function WorkflowEditorContent() {
                 <div 
                     className="flex-1 relative" 
                     ref={reactFlowWrapper}
-                    onDragOver={onDragOver}
-                    onDrop={onDrop}
                 >
-                    {/* Undo/Redo buttons */}
-                    <div className="absolute top-2 left-2 z-10 flex gap-1">
+                    {/* Undo/Redo Floating Island */}
+                    <div className="absolute top-3 left-3 z-10 flex items-center gap-1 p-1 rounded-lg bg-[hsl(var(--color-background)/0.9)] backdrop-blur-md border border-[hsl(var(--color-border))] shadow-md">
                         <button
                             onClick={handleUndo}
                             disabled={!canUndo}
                             className={`
-                                p-2 rounded-lg bg-[hsl(var(--color-background))] border border-[hsl(var(--color-border))] shadow-sm
+                                p-1.5 rounded-md transition-colors
                                 ${canUndo
-                                    ? 'hover:bg-[hsl(var(--color-muted))] cursor-pointer'
-                                    : 'opacity-50 cursor-not-allowed'
+                                    ? 'hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] cursor-pointer'
+                                    : 'opacity-35 text-[hsl(var(--color-muted-foreground))] cursor-not-allowed'
                                 }
                             `}
-                            title={`${tWorkflow('undo') || 'Undo'} (Ctrl+Z)`}
+                            title={`${tWorkflow('undo') || '撤销'} (Ctrl+Z)`}
                         >
-                            <Undo2 className="w-4 h-4 text-[hsl(var(--color-foreground))]" />
+                            <Undo2 className="w-4 h-4" />
                         </button>
                         <button
                             onClick={handleRedo}
                             disabled={!canRedo}
                             className={`
-                                p-2 rounded-lg bg-[hsl(var(--color-background))] border border-[hsl(var(--color-border))] shadow-sm
+                                p-1.5 rounded-md transition-colors
                                 ${canRedo
-                                    ? 'hover:bg-[hsl(var(--color-muted))] cursor-pointer'
-                                    : 'opacity-50 cursor-not-allowed'
+                                    ? 'hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] cursor-pointer'
+                                    : 'opacity-35 text-[hsl(var(--color-muted-foreground))] cursor-not-allowed'
                                 }
                             `}
-                            title={`${tWorkflow('redo') || 'Redo'} (Ctrl+Shift+Z)`}
+                            title={`${tWorkflow('redo') || '重做'} (Ctrl+Shift+Z)`}
                         >
-                            <Redo2 className="w-4 h-4 text-[hsl(var(--color-foreground))]" />
+                            <Redo2 className="w-4 h-4" />
                         </button>
 
-                        <div className="w-px h-8 bg-[hsl(var(--color-border))] mx-0.5" />
+                        <div className="w-px h-4 bg-[hsl(var(--color-border))] mx-0.5" />
 
                         <button
                             onClick={handleAutoLayout}
                             disabled={nodes.length === 0}
                             className={`
-                                p-2 rounded-lg bg-[hsl(var(--color-background))] border border-[hsl(var(--color-border))] shadow-sm
+                                p-1.5 rounded-md transition-colors
                                 ${nodes.length > 0
-                                    ? 'hover:bg-[hsl(var(--color-muted))] cursor-pointer'
-                                    : 'opacity-50 cursor-not-allowed'
+                                    ? 'hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] cursor-pointer'
+                                    : 'opacity-35 text-[hsl(var(--color-muted-foreground))] cursor-not-allowed'
                                 }
                             `}
-                            title={tWorkflow('autoLayout') || 'Auto Layout (整理布局)'}
+                            title={tWorkflow('autoLayout') || '自动整理布局 (Auto Layout)'}
                         >
-                            <LayoutGrid className="w-4 h-4 text-[hsl(var(--color-foreground))]" />
+                            <LayoutGrid className="w-4 h-4" />
                         </button>
 
                         <button
                             onClick={duplicateSelectedNode}
                             disabled={!selectedNode && !nodes.some(n => n.selected)}
                             className={`
-                                p-2 rounded-lg bg-[hsl(var(--color-background))] border border-[hsl(var(--color-border))] shadow-sm
+                                p-1.5 rounded-md transition-colors
                                 ${(selectedNode || nodes.some(n => n.selected))
-                                    ? 'hover:bg-[hsl(var(--color-muted))] cursor-pointer'
-                                    : 'opacity-50 cursor-not-allowed'
+                                    ? 'hover:bg-[hsl(var(--color-muted))] text-[hsl(var(--color-foreground))] cursor-pointer'
+                                    : 'opacity-35 text-[hsl(var(--color-muted-foreground))] cursor-not-allowed'
                                 }
                             `}
-                            title={`${tWorkflow('duplicateNode') || 'Duplicate Node (复制节点)'} (Ctrl+D)`}
+                            title={`${tWorkflow('duplicateNode') || '复制节点 (Duplicate)'} (Ctrl+D)`}
                         >
-                            <Copy className="w-4 h-4 text-[hsl(var(--color-foreground))]" />
+                            <Copy className="w-4 h-4" />
                         </button>
                     </div>
 
@@ -1252,12 +1303,14 @@ function WorkflowEditorContent() {
                         fitView
                         snapToGrid
                         snapGrid={[15, 15]}
+                        proOptions={{ hideAttribution: true }}
                     >
                         <Controls />
                         <MiniMap
                             nodeStrokeWidth={3}
                             zoomable
                             pannable
+                            className="!bg-[hsl(var(--color-background)/0.8)] !border-[hsl(var(--color-border))] !rounded-lg !shadow-md backdrop-blur-sm"
                         />
                         <Background variant={BackgroundVariant.Dots} gap={12} size={1} />
 
@@ -1313,7 +1366,7 @@ function WorkflowEditorContent() {
             <WorkflowPreview
                 nodes={nodes as WorkflowNode[]}
                 edges={edges as WorkflowEdge[]}
-                inputFiles={selectedFiles}
+                inputFiles={effectiveInputFiles}
                 isVisible={isPreviewVisible}
                 onToggle={() => setIsPreviewVisible(!isPreviewVisible)}
             />

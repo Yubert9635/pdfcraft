@@ -239,6 +239,9 @@ export function saveUpdateSettings(settings: UpdateSettings): void {
  * Checks whether it's time to run an automatic update check.
  */
 export function shouldCheckUpdate(): boolean {
+  if (process.env.NEXT_PUBLIC_DISABLE_UPDATE_CHECK === 'true') {
+    return false;
+  }
   const settings = getUpdateSettings();
   if (!settings.autoCheck) return false;
 
@@ -374,6 +377,15 @@ export async function checkUpdate(
 
   const currentVersion = DEFAULT_CURRENT_VERSION;
   const shouldBypassInterval = Boolean(options.force || options.isDesktop);
+
+  if (process.env.NEXT_PUBLIC_DISABLE_UPDATE_CHECK === 'true' && !options.force) {
+    return {
+      hasUpdate: false,
+      currentVersion,
+      latestVersion: currentVersion,
+      matchedAssets: { all: [] },
+    };
+  }
 
   if (!shouldBypassInterval && !shouldCheckUpdate()) {
     return {

@@ -255,16 +255,16 @@ export const UpdateModal: React.FC<UpdateModalProps> = ({
                   <span className="rounded-full bg-emerald-100 dark:bg-emerald-900/50 px-2.5 py-0.5 text-xs font-semibold text-emerald-700 dark:text-emerald-300">
                     {result.latestVersion}
                   </span>
+                  {result.release?.publishedAt && (
+                    <span className="text-[11px] text-[hsl(var(--color-muted-foreground))]">
+                      ({getMsg('released', 'Released')}:{' '}
+                      {new Date(result.release.publishedAt).toLocaleDateString()})
+                    </span>
+                  )}
                 </div>
                 <p className="text-xs text-[hsl(var(--color-muted-foreground))] mt-1">
                   {getMsg('currentVersion', 'Current')}:{' '}
                   <span className="font-mono">{result.currentVersion}</span>
-                  {result.release?.publishedAt && (
-                    <span className="ml-3">
-                      {getMsg('released', 'Released')}:{' '}
-                      {new Date(result.release.publishedAt).toLocaleDateString()}
-                    </span>
-                  )}
                 </p>
               </div>
             </div>

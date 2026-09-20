@@ -68,6 +68,7 @@ ehthumbs.db
 *.tmp
 *.temp
 .cache
+scratch/
 
 # Reference project (if not needed in repo)
 bentopdf-main
