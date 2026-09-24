@@ -13,6 +13,7 @@ import type {
 } from '@/types/pdf';
 import { PDFErrorCode } from '@/types/pdf';
 import { BasePDFProcessor } from '../processor';
+import { decodePdfFilename } from '../utils/filename-decoder';
 
 /**
  * Attachment info returned from the worker
@@ -323,12 +324,17 @@ export class ExtractAttachmentsPDFProcessor extends BasePDFProcessor {
       this.updateProgress(100, 'Complete!');
 
       // Return attachments as metadata (they'll be handled by the UI)
+      const decodedAttachments = (result.attachments || []).map((att) => ({
+        ...att,
+        name: decodePdfFilename(att.name),
+      }));
+
       return {
         success: true,
         result: undefined, // No single blob result
         metadata: {
-          attachments: result.attachments,
-          attachmentCount: result.attachments?.length || 0,
+          attachments: decodedAttachments,
+          attachmentCount: decodedAttachments.length,
         },
       };
 
@@ -424,7 +430,14 @@ export class EditAttachmentsPDFProcessor extends BasePDFProcessor {
   async getAttachments(file: File): Promise<{ success: boolean; attachments?: AttachmentInfo[]; error?: string }> {
     try {
       const buffer = await file.arrayBuffer();
-      return this.getAttachmentsWithWorker(buffer, file.name);
+      const res = await this.getAttachmentsWithWorker(buffer, file.name);
+      if (res.success && res.attachments) {
+        res.attachments = res.attachments.map((att) => ({
+          ...att,
+          name: decodePdfFilename(att.name),
+        }));
+      }
+      return res;
     } catch (error) {
       return {
         success: false,
