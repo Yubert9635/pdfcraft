@@ -1509,14 +1509,14 @@
       "hint": "更高的质量会产生更大的文件，转换时间更长。"
     },
     "mergePdf": {
-      "uploadLabel": "上传PDF文件",
-      "uploadDescription": "拖放PDF文件到此处，或点击浏览。可以添加多个文件。",
-      "filesTitle": "要合并的文件",
-      "reorderHint": "拖放以重新排序文件。文件将按显示顺序合并。",
+      "uploadLabel": "上传文件（PDF、图片、文档）",
+      "uploadDescription": "拖放 PDF、图片、Word、Excel、PPT 或文本文件到此处，或点击浏览。支持多种格式混选合并为一个 PDF。",
+      "filesTitle": "待合并文件",
+      "reorderHint": "拖放缩略图可调整先后顺序。所有文件将按列表顺序自动整合合并为一个 PDF。",
       "optionsTitle": "合并选项",
-      "preserveBookmarks": "保留书签（为每个文件创建书签）",
-      "mergeButton": "合并PDF",
-      "successMessage": "PDF合并成功！点击下载按钮保存文件。"
+      "preserveBookmarks": "保留书签（自动以原文件名生成目录书签）",
+      "mergeButton": "合并文件为 PDF",
+      "successMessage": "文件合并成功！点击下载按钮保存您的 PDF 文件。"
     },
     "gridCombine": {
       "uploadLabel": "上传PDF文件",
@@ -1920,7 +1920,7 @@
       "uploadDescription": "拖放PDF文件到此处进行签名。",
       "instructionsTitle": "如何签名",
       "instruction1": "点击工具栏中的签名工具（钢笔图标）",
-      "instruction2": "绘制、输入或上传您的签名",
+      "instruction2": "绘制、输入或上传您的签名，或扫描签名照片",
       "instruction3": "点击要放置签名的位置",
       "instruction4": "完成后点击下方的「保存签名PDF」",
       "flattenOption": "扁平化签名（推荐 - 使签名永久）",

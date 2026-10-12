@@ -1509,14 +1509,14 @@
       "hint": "Higher quality produces larger files and takes longer to convert."
     },
     "mergePdf": {
-      "uploadLabel": "Upload PDF Files",
-      "uploadDescription": "Drag and drop PDF files here, or click to browse. You can add multiple files.",
+      "uploadLabel": "Upload Files (PDF, Images, Documents)",
+      "uploadDescription": "Drag and drop PDF, image, Word, Excel, PowerPoint, or text files here, or click to browse. Multiple formats can be combined into a single PDF.",
       "filesTitle": "Files to Merge",
-      "reorderHint": "Drag and drop to reorder files. Files will be merged in the order shown.",
+      "reorderHint": "Drag and drop to reorder files. All files will be automatically combined in the order shown.",
       "optionsTitle": "Merge Options",
       "preserveBookmarks": "Preserve bookmarks (create bookmark for each file)",
-      "mergeButton": "Merge PDFs",
-      "successMessage": "PDFs merged successfully! Click the download button to save your file."
+      "mergeButton": "Merge Files to PDF",
+      "successMessage": "Files merged successfully! Click the download button to save your PDF."
     },
     "gridCombine": {
       "uploadLabel": "Upload PDF Files",
@@ -1928,7 +1928,7 @@
       "uploadDescription": "Drag and drop a PDF file to sign.",
       "instructionsTitle": "How to Sign",
       "instruction1": "Click the Signature tool (pen icon) in the toolbar",
-      "instruction2": "Draw, type, or upload your signature",
+      "instruction2": "Draw, type, or upload your signature, or scan a photo of it",
       "instruction3": "Click where you want to place the signature",
       "instruction4": "Click \"Save Signed PDF\" below when done",
       "flattenOption": "Flatten signature (recommended - makes signature permanent)",

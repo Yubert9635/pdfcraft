@@ -116,10 +116,17 @@ jobs:
             Download the appropriate file for your platform:
             - **Windows (Portable):** `PDFCraft-Windows-x64-Portable.zip` (No installation needed, isolated data)
             - **Windows (Installer):** `.msi` or `*-setup.exe`
-            - **macOS:** `.dmg`
+            - **macOS (Apple Silicon):** `.dmg` or `PDFCraft_macos_aarch64.app.zip`
             - **Linux:** `.AppImage` (Portable) or `.deb`
 
-            Install and run like any desktop application.
+            #### 🍎 macOS Users Note (Fixing *"PDFCraft.app is damaged and can't be opened"*)
+            Because the app is currently built with ad-hoc signing (without a paid Apple Developer ID notarization), macOS Gatekeeper quarantines files downloaded from browsers.
+            1. Open the `.dmg` and drag **PDFCraft.app** into your **Applications** folder (do **not** launch it directly from inside the mounted DMG window).
+            2. Open **Terminal** and run the following command to clear the quarantine flag:
+               ```bash
+               sudo xattr -rd com.apple.quarantine /Applications/PDFCraft.app
+               ```
+            3. Launch **PDFCraft** from Applications as normal.
 
             ---
             **Commit:** `${{ github.sha }}`

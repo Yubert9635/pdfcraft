@@ -3,6 +3,7 @@
  * 
  * Accurately decodes attachment filenames extracted from PDF documents.
  * Handles various PDF text encodings:
+ * - js_of_ocaml string objects ({ t: 0, c: "...", l: ... })
  * - UTF-8 byte sequences mapped to Latin-1/Windows-1252 (mojibake)
  * - UTF-16BE with BOM (0xFE 0xFF)
  * - UTF-16LE with BOM (0xFF 0xFE)
@@ -57,6 +58,29 @@ const PDF_DOC_ENCODING_MAP: Record<number, number> = {
 };
 
 /**
+ * Extracts a string representation from various input types, including
+ * raw primitive strings, js_of_ocaml internal string objects ({ t: 0, c: "...", l: ... }),
+ * or any object implementing toString().
+ */
+export function extractRawString(raw: unknown): string {
+  if (raw == null) return '';
+  if (typeof raw === 'string') return raw;
+  if (typeof raw === 'object') {
+    const ocamlObj = raw as { c?: unknown; toString?: () => string };
+    if (typeof ocamlObj.c === 'string') {
+      return ocamlObj.c;
+    }
+    if (typeof ocamlObj.toString === 'function') {
+      const str = ocamlObj.toString();
+      if (str && str !== '[object Object]') {
+        return str;
+      }
+    }
+  }
+  return String(raw);
+}
+
+/**
  * Clean filename by stripping control characters and path components
  */
 export function cleanFilename(name: string): string {
@@ -86,15 +110,16 @@ function decodePdfDocEncoding(bytes: Uint8Array): string {
 }
 
 /**
- * Decodes a raw PDF attachment filename string into a proper Unicode string.
+ * Decodes a raw PDF attachment filename (string or js_of_ocaml object) into a proper Unicode string.
  *
- * @param raw The raw filename string obtained from PDF parser/engine
+ * @param raw The raw filename string or object obtained from PDF parser/engine
  * @returns Clean, properly decoded Unicode filename string
  */
-export function decodePdfFilename(raw: string): string {
-  if (!raw || typeof raw !== 'string') return '';
+export function decodePdfFilename(raw: unknown): string {
+  if (raw == null) return '';
 
-  let str = raw.trim();
+  let str = extractRawString(raw).trim();
+  if (!str) return '';
 
   // 1. Unescape PDF octal string escapes if present (e.g. \347\250\213)
   if (/\\([0-7]{1,3})/.test(str)) {
@@ -161,26 +186,38 @@ export function decodePdfFilename(raw: string): string {
     const hasHighByte = bytes.some(b => b >= 128);
 
     if (hasHighByte) {
-      // Primary: Try UTF-8 (strict) - handles standard multi-byte UTF-8 mojibake
+      // Priority 1: Strict UTF-8 decoding
       try {
         const decoded = new TextDecoder('utf-8', { fatal: true }).decode(bytes);
         return cleanFilename(decoded);
       } catch {
-        // Not valid UTF-8
+        // Not valid strict UTF-8
       }
 
-      // Secondary: Try GB18030 / GBK (strict) - handles Chinese PDFs encoded in GBK
+      // Priority 2: Loose UTF-8 decoding (tolerates minor byte corruption or non-strict sequences)
+      try {
+        const looseDecoded = new TextDecoder('utf-8').decode(bytes);
+        const repCount = (looseDecoded.match(/\uFFFD/g) || []).length;
+        if (repCount <= 1 || repCount / looseDecoded.length <= 0.15) {
+          return cleanFilename(looseDecoded.replace(/\uFFFD/g, ''));
+        }
+      } catch {
+        // Fallback
+      }
+
+      // Priority 3: GB18030 / GBK fallback for localized Chinese PDFs
       try {
         const decoded = new TextDecoder('gb18030', { fatal: true }).decode(bytes);
         if (decoded && !decoded.includes('\uFFFD')) {
           return cleanFilename(decoded);
         }
       } catch {
-        // Not valid GBK
+        // Fallback
       }
 
-      // Tertiary: Fallback to PDFDocEncoding mapping
-      return cleanFilename(decodePdfDocEncoding(bytes));
+      // Priority 4: Safe fallback - avoid damaging Latin-1 / PDFDocEncoding conversion on multi-byte sequences!
+      // Return the cleaned original string rather than a destructive Mojibake mapping
+      return cleanFilename(str);
     }
   }
 

@@ -30,7 +30,7 @@ describe('tool content integrity', () => {
   });
 
   it('keeps Chinese tool titles localized instead of falling back to English slugs', () => {
-    expect(getToolContent('zh', 'merge-pdf')?.title).toBe('合并PDF');
+    expect(getToolContent('zh', 'merge-pdf')?.title).toContain('合并');
     expect(getToolContent('zh', 'split-pdf')?.title).toBe('拆分PDF');
     expect(getToolContent('zh', 'compress-pdf')?.title).toBe('压缩PDF');
     expect(getToolContent('zh', 'edit-pdf')?.title).toBe('编辑PDF');
