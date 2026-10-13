@@ -1,9 +1,16 @@
 #![cfg_attr(not(debug_assertions), windows_subsystem = "windows")]
 
-use serde::Deserialize;
+use serde::{Deserialize, Serialize};
 use std::env;
 use std::fs;
 use tauri_plugin_dialog::DialogExt;
+
+#[derive(Debug, Serialize, Deserialize, Clone)]
+pub struct SystemPrinter {
+    pub name: String,
+    pub is_default: bool,
+    pub port_name: Option<String>,
+}
 
 #[derive(Debug, Deserialize)]
 pub struct FileFilter {
@@ -115,6 +122,189 @@ fn open_url(url: String) -> Result<(), String> {
     }
 }
 
+#[tauri::command]
+fn get_system_printers() -> Result<Vec<SystemPrinter>, String> {
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+        let script = r#"
+            [Console]::OutputEncoding = [System.Text.Encoding]::UTF8;
+            $printers = Get-CimInstance Win32_Printer | Select-Object -Property Name, Default, PortName;
+            if ($printers) {
+                if ($printers -isnot [array]) {
+                    $printers = @($printers)
+                }
+                ConvertTo-Json -InputObject $printers -Compress
+            } else {
+                "[]"
+            }
+        "#;
+        let output = std::process::Command::new("powershell")
+            .args(["-NoProfile", "-NonInteractive", "-Command", script])
+            .creation_flags(CREATE_NO_WINDOW)
+            .output()
+            .map_err(|e| e.to_string())?;
+
+        if !output.status.success() {
+            let err_str = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Failed to query printers: {}", err_str));
+        }
+
+        let json_str = String::from_utf8_lossy(&output.stdout).trim().to_string();
+        if json_str.is_empty() || json_str == "null" {
+            return Ok(vec![]);
+        }
+
+        #[derive(Deserialize)]
+        struct RawPrinter {
+            #[serde(rename = "Name")]
+            name: Option<String>,
+            #[serde(rename = "Default")]
+            is_default: Option<bool>,
+            #[serde(rename = "PortName")]
+            port_name: Option<String>,
+        }
+
+        if let Ok(raw_list) = serde_json::from_str::<Vec<RawPrinter>>(&json_str) {
+            let printers = raw_list
+                .into_iter()
+                .filter_map(|p| {
+                    p.name.map(|name| SystemPrinter {
+                        name,
+                        is_default: p.is_default.unwrap_or(false),
+                        port_name: p.port_name,
+                    })
+                })
+                .collect();
+            return Ok(printers);
+        } else if let Ok(single) = serde_json::from_str::<RawPrinter>(&json_str) {
+            if let Some(name) = single.name {
+                return Ok(vec![SystemPrinter {
+                    name,
+                    is_default: single.is_default.unwrap_or(false),
+                    port_name: single.port_name,
+                }]);
+            }
+        }
+
+        Ok(vec![])
+    }
+
+    #[cfg(target_os = "macos")]
+    {
+        let output = std::process::Command::new("lpstat")
+            .args(["-p"])
+            .output()
+            .map_err(|e| e.to_string())?;
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let mut printers = Vec::new();
+        for line in stdout.lines() {
+            if let Some(rest) = line.strip_prefix("printer ") {
+                if let Some(name) = rest.split_whitespace().next() {
+                    printers.push(SystemPrinter {
+                        name: name.to_string(),
+                        is_default: false,
+                        port_name: None,
+                    });
+                }
+            }
+        }
+        Ok(printers)
+    }
+
+    #[cfg(target_os = "linux")]
+    {
+        let output = std::process::Command::new("lpstat")
+            .args(["-p"])
+            .output()
+            .map_err(|e| e.to_string())?;
+        let stdout = String::from_utf8_lossy(&output.stdout);
+        let mut printers = Vec::new();
+        for line in stdout.lines() {
+            if let Some(rest) = line.strip_prefix("printer ") {
+                if let Some(name) = rest.split_whitespace().next() {
+                    printers.push(SystemPrinter {
+                        name: name.to_string(),
+                        is_default: false,
+                        port_name: None,
+                    });
+                }
+            }
+        }
+        Ok(printers)
+    }
+
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        Ok(vec![])
+    }
+}
+
+#[tauri::command]
+fn print_pdf_file(data: Vec<u8>, printer_name: Option<String>) -> Result<(), String> {
+    let timestamp = std::time::SystemTime::now()
+        .duration_since(std::time::UNIX_EPOCH)
+        .map(|d| d.as_millis())
+        .unwrap_or(0);
+    let temp_file_path = env::temp_dir().join(format!("pdfcraft_print_{}.pdf", timestamp));
+    fs::write(&temp_file_path, &data).map_err(|e| e.to_string())?;
+
+    let file_path_str = temp_file_path.to_string_lossy().to_string();
+
+    #[cfg(target_os = "windows")]
+    {
+        use std::os::windows::process::CommandExt;
+        const CREATE_NO_WINDOW: u32 = 0x08000000;
+
+        let script = if let Some(printer) = printer_name {
+            format!(
+                "Start-Process -FilePath '{}' -Verb PrintTo -ArgumentList '\"{}\"'",
+                file_path_str.replace("'", "''"),
+                printer.replace("'", "''")
+            )
+        } else {
+            format!(
+                "Start-Process -FilePath '{}' -Verb Print",
+                file_path_str.replace("'", "''")
+            )
+        };
+
+        let output = std::process::Command::new("powershell")
+            .args(["-NoProfile", "-NonInteractive", "-Command", &script])
+            .creation_flags(CREATE_NO_WINDOW)
+            .output()
+            .map_err(|e| e.to_string())?;
+
+        if !output.status.success() {
+            let err_str = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Print execution failed: {}", err_str));
+        }
+
+        Ok(())
+    }
+
+    #[cfg(any(target_os = "macos", target_os = "linux"))]
+    {
+        let mut cmd = std::process::Command::new("lpr");
+        if let Some(printer) = printer_name {
+            cmd.arg("-P").arg(printer);
+        }
+        cmd.arg(&file_path_str);
+        let output = cmd.output().map_err(|e| e.to_string())?;
+        if !output.status.success() {
+            let err_str = String::from_utf8_lossy(&output.stderr);
+            return Err(format!("Print execution failed: {}", err_str));
+        }
+        Ok(())
+    }
+
+    #[cfg(not(any(target_os = "windows", target_os = "macos", target_os = "linux")))]
+    {
+        Err("Unsupported operating system for printing".to_string())
+    }
+}
+
 fn main() {
     #[cfg(target_os = "linux")]
     {
@@ -160,7 +350,9 @@ fn main() {
             read_file,
             write_file,
             get_temp_dir,
-            open_url
+            open_url,
+            get_system_printers,
+            print_pdf_file
         ])
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
