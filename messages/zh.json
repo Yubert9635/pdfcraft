@@ -1638,9 +1638,11 @@
       "uploadLabel": "上传PDF文件",
       "uploadDescription": "拖放PDF文件到此处，或点击浏览。",
       "selectTitle": "选择要提取的页面",
-      "selectHint": "点击页面选择，或在上方输入页码/范围。",
+      "selectHint": "点击页面选择，或在上方输入页码、范围、odd 或 even。",
       "pageRange": "页面范围",
-      "pageRangePlaceholder": "例如：1-5, 8, 10-12",
+      "pageRangePlaceholder": "例如：1-5, 8, 10-12, odd, even",
+      "selectOdd": "奇数页",
+      "selectEven": "偶数页",
       "extractButton": "提取页面",
       "successMessage": "页面提取成功！点击下载按钮保存文件。"
     },
@@ -2538,7 +2540,14 @@
       "bold": "加粗",
       "italic": "倾斜",
       "boldItalic": "加粗并倾斜",
-      "setToCurrentPage": "设为当前页"
+      "setToCurrentPage": "设为当前页",
+      "removeAll": "全部移除",
+      "removeAllConfirm": "要移除所有书签吗？保存后，导出的 PDF 将不包含书签。",
+      "removedAllHint": "已移除所有书签。保存即可下载不含书签的 PDF。",
+      "removeSelected": "移除所选（{count}）",
+      "removeSelectedConfirm": "要移除所选的 {count} 个书签吗？其子书签也会一并移除。",
+      "selectForRemoval": "选择“{title}”",
+      "selectHint": "勾选复选框可一次移除多个书签。按住 Shift 点击可选择一个范围。"
     },
     "pageNumbers": {
       "uploadLabel": "上传PDF文件",

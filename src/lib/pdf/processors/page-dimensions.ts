@@ -89,6 +89,7 @@ const STANDARD_SIZES: Record<string, { width: number; height: number }> = {
   'B4': { width: 709, height: 1001 },
   'B5': { width: 499, height: 709 },
   'Executive': { width: 522, height: 756 },
+  '#10 Envelope': { width: 297, height: 684 },
 };
 
 /**

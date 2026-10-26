@@ -22,6 +22,11 @@ import { loadPdfLib } from '../loader';
 export interface ExtractOptions {
   /** Pages to extract (1-based page numbers) */
   pages: number[];
+  /**
+   * Selection text such as "1-5, 8" or "odd".
+   * Parsed after the PDF page count is known, so parity keywords cover the whole file.
+   */
+  pageSelection?: string;
 }
 
 /**
@@ -61,8 +66,10 @@ export class ExtractPagesPDFProcessor extends BasePDFProcessor {
       );
     }
 
+    const pageSelection = extractOptions.pageSelection?.trim() ?? '';
+
     // Validate pages are provided
-    if (!extractOptions.pages || extractOptions.pages.length === 0) {
+    if ((!extractOptions.pages || extractOptions.pages.length === 0) && pageSelection.length === 0) {
       return this.createErrorOutput(
         PDFErrorCode.INVALID_OPTIONS,
         'At least one page is required for extraction.',
@@ -107,8 +114,20 @@ export class ExtractPagesPDFProcessor extends BasePDFProcessor {
       const totalPages = sourcePdf.getPageCount();
       this.updateProgress(20, `Source PDF has ${totalPages} pages.`);
 
+      const selectedPages = pageSelection.length > 0
+        ? parsePageSelection(pageSelection, totalPages)
+        : extractOptions.pages;
+
+      if (selectedPages.length === 0) {
+        return this.createErrorOutput(
+          PDFErrorCode.INVALID_PAGE_RANGE,
+          'No pages matched the selection.',
+          `The PDF has ${totalPages} pages.`
+        );
+      }
+
       // Validate pages
-      const validationError = validatePages(extractOptions.pages, totalPages);
+      const validationError = validatePages(selectedPages, totalPages);
       if (validationError) {
         return this.createErrorOutput(
           PDFErrorCode.INVALID_PAGE_RANGE,
@@ -118,7 +137,7 @@ export class ExtractPagesPDFProcessor extends BasePDFProcessor {
       }
 
       // Remove duplicates and sort
-      const uniquePages = [...new Set(extractOptions.pages)].sort((a, b) => a - b);
+      const uniquePages = [...new Set(selectedPages)].sort((a, b) => a - b);
 
       if (this.checkCancelled()) {
         return this.createErrorOutput(
@@ -267,14 +286,28 @@ function generateExtractedFilename(originalName: string, pages: number[]): strin
 }
 
 /**
- * Parse page selection string into array of page numbers
- * Supports formats like: "1,3,5", "1-5", "1-3,5,7-10"
+ * Parse page selection string into array of page numbers.
+ * Supports formats like: "1,3,5", "1-5", "1-3,5,7-10", "odd", "even".
+ * "odd" and "even" are whole tokens and can be combined with other pages.
  */
 export function parsePageSelection(selectionString: string, totalPages: number): number[] {
   const pages: number[] = [];
   const parts = selectionString.split(',').map(s => s.trim()).filter(s => s.length > 0);
 
+  const pushParity = (parity: 'odd' | 'even') => {
+    const start = parity === 'odd' ? 1 : 2;
+    for (let i = start; i <= totalPages; i += 2) {
+      pages.push(i);
+    }
+  };
+
   for (const part of parts) {
+    const keyword = part.toLowerCase();
+    if (keyword === 'odd' || keyword === 'even') {
+      pushParity(keyword);
+      continue;
+    }
+
     if (part.includes('-')) {
       const [startStr, endStr] = part.split('-').map(s => s.trim());
       const start = parseInt(startStr, 10);

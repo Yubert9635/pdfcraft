@@ -1940,6 +1940,7 @@ const getToolSettingsConfig = (): Record<string, ToolSettingsConfig> => ({
                     { value: 'LEGAL', labelKey: 'Legal' },
                     { value: 'A3', labelKey: 'A3' },
                     { value: 'A5', labelKey: 'A5' },
+                    { value: 'ENVELOPE-10', labelKey: '#10 Envelope' },
                 ],
             },
         ],

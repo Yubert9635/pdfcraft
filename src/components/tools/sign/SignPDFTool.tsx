@@ -10,6 +10,7 @@ import { saveBlobFile } from '@/lib/tauri-bridge';
 import { SignatureExtractorModal } from './SignatureExtractorModal';
 import { SignatureLibraryModal } from './SignatureLibraryModal';
 import { getSavedSignatures, saveSignature, dataUrlToBlob } from '@/lib/pdf/signature-storage';
+import { loadSignatureImageFile } from '@/lib/pdf/signature-image';
 
 export interface SignPDFToolProps {
   className?: string;
@@ -84,38 +85,40 @@ export function SignPDFTool({ className = '' }: SignPDFToolProps) {
   const fileRef = useRef<File | null>(null);
   const imageInputRef = useRef<HTMLInputElement | null>(null);
 
-  const handleQuickImageUpload = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleQuickImageUpload = useCallback(async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const img = new Image();
-      img.onload = async () => {
-        const name = file.name.replace(/\.[^/.]+$/, '');
-        const saved = saveSignature({
-          name: name || '签名图片',
-          dataUrl,
-          width: img.width || 300,
-          height: img.height || 150,
-          sourceDoc: '本地图片导入',
-        });
-        setSavedSignatureCount(getSavedSignatures().length);
+    let loaded;
+    try {
+      // Rasterizes SVG/WebP to PNG so the PDF.js signature editor can embed it.
+      loaded = await loadSignatureImageFile(file);
+    } catch (err) {
+      console.error('Failed to load signature image:', err);
+      setToastMessage(`无法读取图片“${file.name}”，请使用 PNG、JPEG、WebP 或 SVG 文件。`);
+      setTimeout(() => setToastMessage(null), 6000);
+      return;
+    }
 
-        if (iframeRef.current?.contentWindow && (iframeRef.current.contentWindow as any).pdfcraftImportSignature) {
-          const blob = dataUrlToBlob(dataUrl);
-          await (iframeRef.current.contentWindow as any).pdfcraftImportSignature(blob, saved.name);
-          setToastMessage(`签名“${saved.name}”已成功导入并在当前文档激活！可在页面点击放置并拖动边角自由缩放。`);
-        } else {
-          setToastMessage(`签名“${saved.name}”已存入签名库！打开 PDF 后即可随时选用盖章。`);
-        }
-        setTimeout(() => setToastMessage(null), 6000);
-      };
-      img.src = dataUrl;
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+    const name = file.name.replace(/\.[^/.]+$/, '');
+    const saved = saveSignature({
+      name: name || '签名图片',
+      dataUrl: loaded.dataUrl,
+      width: loaded.width || 300,
+      height: loaded.height || 150,
+      sourceDoc: '本地图片导入',
+    });
+    setSavedSignatureCount(getSavedSignatures().length);
+
+    if (iframeRef.current?.contentWindow && (iframeRef.current.contentWindow as any).pdfcraftImportSignature) {
+      const blob = dataUrlToBlob(loaded.dataUrl);
+      await (iframeRef.current.contentWindow as any).pdfcraftImportSignature(blob, saved.name);
+      setToastMessage(`签名“${saved.name}”已成功导入并在当前文档激活！可在页面点击放置并拖动边角自由缩放。`);
+    } else {
+      setToastMessage(`签名“${saved.name}”已存入签名库！打开 PDF 后即可随时选用盖章。`);
+    }
+    setTimeout(() => setToastMessage(null), 6000);
   }, []);
 
   /**

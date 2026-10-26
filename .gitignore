@@ -86,3 +86,7 @@ public/libreoffice-wasm/soffice.data.bin
 src-tauri/target/
 
 yarn.lock
+
+# AI / Agents & Knowledge graph
+.agents/
+graphify-out/

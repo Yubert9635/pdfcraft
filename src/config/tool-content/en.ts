@@ -1905,27 +1905,28 @@ export const toolContentEn: Record<string, ToolContent> = {
 
   'edit-metadata': {
     title: 'Edit Metadata',
-    metaDescription: 'Edit PDF document properties. Change title, author, subject, and keywords.',
-    keywords: ['edit pdf metadata', 'change pdf properties', 'pdf author', 'document info'],
+    metaDescription: 'Edit PDF document properties. Change title, author, subject, keywords, creation date, and modification date.',
+    keywords: ['edit pdf metadata', 'change pdf properties', 'pdf author', 'document info', 'pdf creation date', 'pdf modification date'],
     description: `
-      <p>Edit Metadata allows you to modify document properties in your PDF files. Change the title, author, subject, keywords, and other metadata fields.</p>
-      <p>Perfect for correcting document information, adding proper attribution, or preparing files for distribution.</p>
+      <p>Edit Metadata allows you to modify document properties in your PDF files. Change the title, author, subject, keywords, creator, producer, and document dates.</p>
+      <p>You can set custom creation and modification dates, perfect for correcting document information, adding proper attribution, or preparing files for distribution.</p>
       <p>All editing happens in your browser, ensuring your documents remain private.</p>
     `,
     howToUse: [
       { step: 1, title: 'Upload Your PDF', description: 'Drag and drop your PDF file or click to select.' },
-      { step: 2, title: 'Edit Properties', description: 'Modify title, author, subject, keywords, and other fields.' },
-      { step: 3, title: 'Save and Download', description: 'Click Save to apply changes and download.' },
+      { step: 2, title: 'Edit Properties & Dates', description: 'Modify title, author, subject, keywords, creation date, modification date, and other fields.' },
+      { step: 3, title: 'Save and Download', description: 'Click Save to apply changes and download the updated PDF.' },
     ],
     useCases: [
       { title: 'Add Attribution', description: 'Set proper author and creator information.', icon: 'user' },
       { title: 'SEO Optimization', description: 'Add keywords and descriptions for searchability.', icon: 'search' },
+      { title: 'Correct Document Dates', description: 'Fix creation or modification dates for accurate records.', icon: 'calendar' },
       { title: 'Document Preparation', description: 'Prepare documents with proper metadata before sharing.', icon: 'file-check' },
     ],
     faq: [
-      { question: 'What fields can I edit?', answer: 'Title, author, subject, keywords, creator, and producer fields.' },
-      { question: 'Can I clear all metadata?', answer: 'Use Remove Metadata tool to strip all document properties.' },
-      { question: 'Are dates editable?', answer: 'Creation and modification dates are updated automatically.' },
+      { question: 'What fields can I edit?', answer: 'Title, author, subject, keywords, creator, producer, creation date, and modification date.' },
+      { question: 'Can I clear all metadata?', answer: 'Use the Remove Metadata tool to strip all document properties.' },
+      { question: 'Are dates editable?', answer: 'Yes! You can set custom creation and modification dates using the date picker fields. If you leave the modification date empty, it will be auto-updated to the current time when you save.' },
     ],
   },
 

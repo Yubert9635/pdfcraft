@@ -26,6 +26,7 @@ export const PAGE_SIZES = {
   'legal': { width: 612, height: 1008, label: 'Legal (8.5 × 14 in)' },
   'tabloid': { width: 792, height: 1224, label: 'Tabloid (11 × 17 in)' },
   'executive': { width: 522, height: 756, label: 'Executive (7.25 × 10.5 in)' },
+  'envelope-10': { width: 297, height: 684, label: '#10 Envelope (4.125 × 9.5 in)' },
   'custom': { width: 0, height: 0, label: 'Custom' },
 } as const;
 

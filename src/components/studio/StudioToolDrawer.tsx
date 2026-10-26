@@ -337,7 +337,7 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
   const [posterizePageSize, setPosterizePageSize] = useState<'A4' | 'Letter'>('A4');
 
   // 16. Fix Page Size / Page Dimensions (Full options: Preset + Scale Mode + Orientation)
-  const [pageSizePreset, setPageSizePreset] = useState<'a4' | 'letter' | 'a3' | 'a5'>('a4');
+  const [pageSizePreset, setPageSizePreset] = useState<'a4' | 'letter' | 'a3' | 'a5' | 'envelope-10'>('a4');
   const [pageSizeScaleMode, setPageSizeScaleMode] = useState<'fit' | 'fill' | 'stretch'>('fit');
   const [pageSizeOrientation, setPageSizeOrientation] = useState<'auto' | 'portrait' | 'landscape'>('auto');
 
@@ -495,8 +495,16 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
         break;
       }
       case 'extract-pages': {
-        const pages = parsePageNumbers(extractPagesInput);
-        options = { pages: pages.length > 0 ? pages : [1] };
+        const usesParity = extractPagesInput.split(',').some((part) => {
+          const token = part.trim().toLowerCase();
+          return token === 'odd' || token === 'even';
+        });
+        if (usesParity) {
+          options = { pageSelection: extractPagesInput, pages: [] };
+        } else {
+          const pages = parsePageNumbers(extractPagesInput);
+          options = { pages: pages.length > 0 ? pages : [1] };
+        }
         break;
       }
       case 'add-blank-page':
@@ -1279,8 +1287,8 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
                 {[
                   { label: isZh ? '前 3 页' : '1-3', val: '1-3' },
                   { label: isZh ? '仅第 1 页' : 'Page 1', val: '1' },
-                  { label: isZh ? '奇数页' : 'Odd', val: '1, 3, 5, 7, 9' },
-                  { label: isZh ? '偶数页' : 'Even', val: '2, 4, 6, 8, 10' },
+                  { label: isZh ? '奇数页' : 'Odd', val: 'odd' },
+                  { label: isZh ? '偶数页' : 'Even', val: 'even' },
                 ].map((item) => (
                   <button
                     key={item.label}
@@ -1788,6 +1796,7 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
                     { key: 'letter', label: 'Letter (8.5×11in)' },
                     { key: 'a3', label: 'A3 (297×420mm)' },
                     { key: 'a5', label: 'A5 (148×210mm)' },
+                    { key: 'envelope-10', label: '#10 Envelope (4.125×9.5in)' },
                   ].map((p) => (
                     <button
                       key={p.key}
@@ -1825,6 +1834,31 @@ export const StudioToolDrawer: React.FC<StudioToolDrawerProps> = ({
                       }`}
                     >
                       {m.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+              <div>
+                <label className="text-xs font-semibold text-[hsl(var(--color-foreground))] block mb-1">
+                  {isZh ? '页面方向' : 'Page Orientation'}
+                </label>
+                <div className="grid grid-cols-3 gap-1.5">
+                  {[
+                    { key: 'auto', label: isZh ? '自动' : 'Auto' },
+                    { key: 'portrait', label: isZh ? '纵向' : 'Portrait' },
+                    { key: 'landscape', label: isZh ? '横向' : 'Landscape' },
+                  ].map((o) => (
+                    <button
+                      key={o.key}
+                      type="button"
+                      onClick={() => setPageSizeOrientation(o.key as any)}
+                      className={`py-1.5 text-xs rounded-lg border font-medium text-center transition-all ${
+                        pageSizeOrientation === o.key
+                          ? 'border-[hsl(var(--color-primary))] bg-[hsl(var(--color-primary)/0.1)] text-[hsl(var(--color-primary))] font-bold'
+                          : 'border-[hsl(var(--color-border))] text-[hsl(var(--color-muted-foreground))] hover:bg-[hsl(var(--color-muted))]'
+                      }`}
+                    >
+                      {o.label}
                     </button>
                   ))}
                 </div>

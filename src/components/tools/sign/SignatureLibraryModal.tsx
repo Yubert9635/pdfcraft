@@ -10,6 +10,7 @@ import {
   PDFCraftSignature,
   dataUrlToBlob,
 } from '@/lib/pdf/signature-storage';
+import { loadSignatureImageFile } from '@/lib/pdf/signature-image';
 import { saveBlobFile } from '@/lib/tauri-bridge';
 
 export interface SignatureLibraryModalProps {
@@ -33,36 +34,36 @@ export function SignatureLibraryModal({
     setSignatures(getSavedSignatures());
   };
 
-  const handleImageFileSelected = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleImageFileSelected = async (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
+    e.target.value = '';
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const dataUrl = reader.result as string;
-      const img = new Image();
-      img.onload = async () => {
-        const name = file.name.replace(/\.[^/.]+$/, '');
-        const saved = saveSignature({
-          name: name || '签名图片',
-          dataUrl,
-          width: img.width || 300,
-          height: img.height || 150,
-          sourceDoc: '本地图片导入',
-        });
-        loadList();
+    let loaded;
+    try {
+      // Rasterizes SVG/WebP to PNG so the PDF.js signature editor can embed it.
+      loaded = await loadSignatureImageFile(file);
+    } catch (err) {
+      console.error('Failed to load signature image:', err);
+      return;
+    }
 
-        // If viewer is ready, immediately apply to document
-        if (viewerWindow && (viewerWindow as any).pdfcraftImportSignature) {
-          const blob = dataUrlToBlob(dataUrl);
-          await (viewerWindow as any).pdfcraftImportSignature(blob, saved.name);
-          onClose();
-        }
-      };
-      img.src = dataUrl;
-    };
-    reader.readAsDataURL(file);
-    e.target.value = '';
+    const name = file.name.replace(/\.[^/.]+$/, '');
+    const saved = saveSignature({
+      name: name || '签名图片',
+      dataUrl: loaded.dataUrl,
+      width: loaded.width || 300,
+      height: loaded.height || 150,
+      sourceDoc: '本地图片导入',
+    });
+    loadList();
+
+    // If viewer is ready, immediately apply to document
+    if (viewerWindow && (viewerWindow as any).pdfcraftImportSignature) {
+      const blob = dataUrlToBlob(loaded.dataUrl);
+      await (viewerWindow as any).pdfcraftImportSignature(blob, saved.name);
+      onClose();
+    }
   };
 
   useEffect(() => {

@@ -245,7 +245,7 @@ export function FixPageSizeTool({ className = '' }: FixPageSizeToolProps) {
                       disabled:opacity-50 disabled:cursor-not-allowed
                     `}
                   >
-                    {preset === 'custom' ? (tTools('fixPageSize.custom') || 'Custom') : preset.toUpperCase()}
+                    {preset === 'custom' ? (tTools('fixPageSize.custom') || 'Custom') : preset === 'envelope-10' ? '#10 Envelope' : preset.toUpperCase()}
                   </button>
                 ))}
               </div>
