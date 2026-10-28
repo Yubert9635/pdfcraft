@@ -133,7 +133,7 @@ export class PageLabelsProcessor extends BasePDFProcessor {
               dictProperties['S'] = pdfLib.PDFName.of(currentRule.style);
             }
             if (currentRule.prefix) {
-              dictProperties['P'] = pdfLib.PDFString.of(currentRule.prefix);
+              dictProperties['P'] = pdfLib.PDFHexString.fromText(currentRule.prefix);
             }
             if (finalStartVal !== 1) {
               dictProperties['St'] = pdfLib.PDFNumber.of(finalStartVal);

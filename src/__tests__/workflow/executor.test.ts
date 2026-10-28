@@ -207,6 +207,23 @@ describe('Workflow Executor', () => {
             expect(result.filename).toBe('custom_report.pdf');
         });
 
+        it('preserves literal dollar signs and token-like text in download filenames', async () => {
+            const file = await createRealPDFFile('budget_$&_{date}.pdf');
+            const node: WorkflowNode = {
+                id: 'literal-name', type: 'toolNode', position: { x: 0, y: 0 },
+                data: {
+                    toolId: 'download-pdf', label: 'Download PDF', icon: 'file-down',
+                    category: 'output', acceptedFormats: ['application/pdf'],
+                    outputFormat: 'application/pdf', status: 'idle', progress: 0,
+                    settings: { filename: '{filename}_processed.{ext}' },
+                },
+            };
+            const result = await executeNode(node, [file]);
+            expect(result.success).toBe(true);
+            expect(result.filename).toBe('budget_$&_{date}_processed.pdf');
+            expect(result.result).toBeInstanceOf(Blob);
+        });
+
         it('handles download-zip by bundling multiple files', async () => {
             const { executeNode } = await import('@/lib/workflow/executor');
             const file1 = new File(['file 1 content'], 'page1.pdf', { type: 'application/pdf' });

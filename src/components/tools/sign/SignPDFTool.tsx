@@ -11,6 +11,7 @@ import { SignatureExtractorModal } from './SignatureExtractorModal';
 import { SignatureLibraryModal } from './SignatureLibraryModal';
 import { getSavedSignatures, saveSignature, dataUrlToBlob } from '@/lib/pdf/signature-storage';
 import { loadSignatureImageFile } from '@/lib/pdf/signature-image';
+import { protectSignatureAnnotations } from '@/lib/pdf/signature-protection';
 
 export interface SignPDFToolProps {
   className?: string;
@@ -278,7 +279,11 @@ export function SignPDFTool({ className = '' }: SignPDFToolProps) {
           ? rawPdfBytes
           : new Uint8Array(rawPdfBytes);
 
-      const blob = new Blob([pdfBytes as unknown as BlobPart], { type: 'application/pdf' });
+      // Lock signature annotations according to ISO 32000-2 Table 167 (Print, ReadOnly, Locked, LockedContents)
+      // so signatures cannot be moved, resized, or copied in external viewers (fixes Issue #244)
+      const protectedPdfBytes = await protectSignatureAnnotations(pdfBytes);
+
+      const blob = new Blob([protectedPdfBytes as unknown as BlobPart], { type: 'application/pdf' });
       const downloadName = `signed_${signState.file?.name || 'document.pdf'}`;
       await saveBlobFile(blob, downloadName);
 

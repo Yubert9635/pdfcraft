@@ -182,16 +182,23 @@ export function interpolateTokens(
     const total = context.total ?? 1;
     const tool = context.toolId ? context.toolId.replace(/-(pdf|to-pdf|from-pdf)$/, '') : '';
 
-    return template
-        .replace(/\{filename\}/gi, basename)
-        .replace(/\{basename\}/gi, basename)
-        .replace(/\{date\}/gi, dateStr)
-        .replace(/\{time\}/gi, timeStr)
-        .replace(/\{timestamp\}/gi, timestampStr)
-        .replace(/\{index\}/gi, String(index))
-        .replace(/\{total\}/gi, String(total))
-        .replace(/\{tool\}/gi, tool)
-        .replace(/\{ext\}/gi, context.outputExt || originalExt);
+    const values: Record<string, string> = {
+        filename: basename,
+        basename,
+        date: dateStr,
+        time: timeStr,
+        timestamp: timestampStr,
+        index: String(index),
+        total: String(total),
+        tool,
+        ext: context.outputExt || originalExt,
+    };
+
+    // A single pass keeps context values literal, including $& and {date} in filenames.
+    return template.replace(
+        /\{(filename|basename|date|time|timestamp|index|total|tool|ext)\}/gi,
+        (_match, token: string) => values[token.toLowerCase()]
+    );
 }
 
 /**

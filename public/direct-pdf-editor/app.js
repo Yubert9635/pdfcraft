@@ -9913,7 +9913,10 @@ function wireUI() {
 
   $('find').addEventListener('click', () => {
     $('findbar').hidden = !$('findbar').hidden;
-    if (!$('findbar').hidden) $('findText').focus();
+    if (!$('findbar').hidden) {
+      $('findText').focus();
+      $('findText').select();
+    }
   });
   $('findDone').addEventListener('click', () => ($('findbar').hidden = true));
   const findReport = (r) => {
@@ -9974,6 +9977,7 @@ function wireUI() {
       e.preventDefault();
       $('findbar').hidden = false;
       $('findText').focus();
+      $('findText').select();
     } else if (
       (e.key === 'Backspace' || e.key === 'Delete') &&
       !typing &&

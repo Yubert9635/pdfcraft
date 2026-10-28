@@ -514,7 +514,11 @@ export function BookmarkTool({ className = '' }: BookmarkToolProps) {
 
       // Create a deep copy to avoid mutations
       const nodesWithoutSource = removeNode(JSON.parse(JSON.stringify(prev)));
-      if (!sourceNode) return prev;
+      // A descendant target disappears with the source subtree. Do not commit
+      // the removal unless the target still exists (also covers stale targets).
+      const hasTarget = (nodes: BookmarkNode[]): boolean =>
+        nodes.some(node => node.id === targetId || hasTarget(node.children));
+      if (!sourceNode || !hasTarget(nodesWithoutSource)) return prev;
 
       // 2. Recursive insertion at target
       const insertNode = (nodes: BookmarkNode[]): BookmarkNode[] => {
