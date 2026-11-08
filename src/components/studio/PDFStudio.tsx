@@ -146,9 +146,11 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
 
   const fileInputRef = useRef<HTMLInputElement>(null);
   const multiFileInputRef = useRef<HTMLInputElement>(null);
+  const tabStripRef = useRef<HTMLDivElement>(null);
   const iframeRef = useRef<HTMLIFrameElement>(null);
   const iframeCleanupRef = useRef<(() => void) | null>(null);
   const handleKeyDownRef = useRef<((e: KeyboardEvent) => void) | null>(null);
+  const handleAddFilesRef = useRef<((files: FileList | File[]) => void) | null>(null);
 
   // Synchronized state refs for stable event listeners
   const documentsRef = useRef(documents);
@@ -182,6 +184,44 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       return next;
     });
   }, []);
+
+  // Let a vertical mouse wheel scroll the horizontal tab strip (trackpads already scroll it sideways)
+  const hasDocuments = documents.length > 0;
+  useEffect(() => {
+    const strip = tabStripRef.current;
+    if (!strip) return;
+
+    const handleWheel = (e: WheelEvent) => {
+      if (e.ctrlKey || Math.abs(e.deltaY) <= Math.abs(e.deltaX)) return;
+      if (strip.scrollWidth <= strip.clientWidth) return;
+      // deltaMode 1 = lines (Firefox mouse wheels), 2 = pages
+      const unit = e.deltaMode === 1 ? 16 : e.deltaMode === 2 ? strip.clientWidth : 1;
+      e.preventDefault();
+      strip.scrollLeft += e.deltaY * unit;
+    };
+
+    strip.addEventListener('wheel', handleWheel, { passive: false });
+    return () => strip.removeEventListener('wheel', handleWheel);
+  }, [hasDocuments]);
+
+  // Keep the active tab visible when it changes (keyboard cycling, opening or closing documents)
+  const activeDocIdForStrip = activeDoc?.id;
+  useEffect(() => {
+    const strip = tabStripRef.current;
+    if (!strip || !activeDocIdForStrip) return;
+    const tab = Array.from(strip.children).find(
+      (el) => (el as HTMLElement).dataset.docId === activeDocIdForStrip
+    );
+    if (!tab) return;
+
+    const stripRect = strip.getBoundingClientRect();
+    const tabRect = tab.getBoundingClientRect();
+    if (tabRect.left < stripRect.left) {
+      strip.scrollLeft -= stripRect.left - tabRect.left;
+    } else if (tabRect.right > stripRect.right) {
+      strip.scrollLeft += tabRect.right - stripRect.right;
+    }
+  }, [activeDocIdForStrip]);
 
   // Update object URL when currentBlob changes
   useEffect(() => {
@@ -325,7 +365,17 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
     handleCloseDocumentRef.current = handleCloseDocument;
   }, [handleCloseDocument]);
 
-  // Handle Drag & Drop on Empty State and View Area
+  useLayoutEffect(() => {
+    handleAddFilesRef.current = handleAddFiles;
+  }, [handleAddFiles]);
+
+  // Handle Drag & Drop anywhere in the Studio window
+  const handleDragOver = useCallback((e: React.DragEvent) => {
+    if (e.dataTransfer.types.includes('Files')) {
+      e.preventDefault();
+    }
+  }, []);
+
   const handleDrop = useCallback(
     (e: React.DragEvent) => {
       e.preventDefault();
@@ -699,11 +749,38 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       handleKeyDownRef.current?.(e);
     };
 
+    // Route PDF drops on the viewer to Studio so they open as a new tab instead of
+    // replacing the viewer's document behind Studio's back. Non-PDF drops (e.g. images
+    // for the viewer's signature dialog) are left to the viewer.
+    const hasPdfItem = (dt: DataTransfer | null) =>
+      !!dt && Array.from(dt.items || []).some((item) => item.kind === 'file' && item.type === 'application/pdf');
+
+    const handleIframeDragOver = (e: DragEvent) => {
+      if (!hasPdfItem(e.dataTransfer)) return;
+      e.preventDefault();
+      e.stopPropagation();
+    };
+
+    const handleIframeDrop = (e: DragEvent) => {
+      const files = Array.from(e.dataTransfer?.files || []);
+      const hasPdf = files.some(
+        (f) => f.type === 'application/pdf' || f.name.toLowerCase().endsWith('.pdf')
+      );
+      if (!hasPdf) return;
+      e.preventDefault();
+      e.stopPropagation();
+      handleAddFilesRef.current?.(files);
+    };
+
     try {
       iframeWin.addEventListener('keydown', handleIframeKeyDown);
+      iframeWin.addEventListener('dragover', handleIframeDragOver, true);
+      iframeWin.addEventListener('drop', handleIframeDrop, true);
       iframeCleanupRef.current = () => {
         try {
           iframeWin.removeEventListener('keydown', handleIframeKeyDown);
+          iframeWin.removeEventListener('dragover', handleIframeDragOver, true);
+          iframeWin.removeEventListener('drop', handleIframeDrop, true);
         } catch {}
       };
     } catch {}
@@ -721,7 +798,11 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
   }, [activeDocId, pdfUrl, attachIframeListener]);
 
   return (
-    <div className={`h-screen flex flex-col bg-[hsl(var(--color-background))] select-none ${className}`.trim()}>
+    <div
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+      className={`h-screen flex flex-col bg-[hsl(var(--color-background))] select-none ${className}`.trim()}
+    >
       {/* Studio Header (Compact Toolbar - 52px) */}
       <header className="h-[52px] flex-shrink-0 border-b border-[hsl(var(--color-border))] bg-[hsl(var(--color-card)/0.9)] backdrop-blur-md px-4 flex items-center justify-between z-30 relative">
         {/* Left: Brand & File Info */}
@@ -979,13 +1060,17 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
       {documents.length > 0 && (
         <div className="h-10 flex-shrink-0 border-b border-[hsl(var(--color-border)/0.8)] bg-[hsl(var(--color-muted)/0.35)] px-3 flex items-center justify-between z-20">
           {/* Scrollable Document Tabs */}
-          <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1 flex-1 min-w-0 mr-2">
+          <div
+            ref={tabStripRef}
+            className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1 flex-1 min-w-0 mr-2"
+          >
             {documents.map((doc) => {
               const isActive = doc.id === activeDoc?.id;
               const isModified = doc.historyStack.length > 0;
               return (
                 <div
                   key={doc.id}
+                  data-doc-id={doc.id}
                   onClick={() => handleSelectDocument(doc.id)}
                   className={`group flex items-center gap-2 px-3 py-1.5 rounded-lg text-xs font-medium cursor-pointer transition-all border shrink-0 max-w-[220px] select-none ${
                     isActive
@@ -1105,11 +1190,7 @@ export const PDFStudio: React.FC<PDFStudioProps> = ({
           </>
         ) : (
           /* Empty Workspace Welcome & Import Screen */
-          <div
-            onDragOver={(e) => e.preventDefault()}
-            onDrop={handleDrop}
-            className="flex-1 flex flex-col items-center justify-center p-6 text-center"
-          >
+          <div className="flex-1 flex flex-col items-center justify-center p-6 text-center">
             <input
               ref={fileInputRef}
               type="file"
